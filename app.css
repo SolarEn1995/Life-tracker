@@ -1156,3 +1156,41 @@ html[data-theme="dark"] #home > .free-card::before{
   #home > .home-stat-card,
   #home > .home-section-title{transform:none !important;}
 }
+
+
+/* ========== 🐱 P4b 互動貓 SVG ========== */
+.cmc-emoji{
+  /* 取消原本 emoji 的 font-size，改由 SVG 決定 */
+  font-size:0;line-height:0;
+  width:72px;height:72px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+  user-select:none;
+  transition:transform 0.18s cubic-bezier(.4,1.5,.6,1);
+}
+.cmc-emoji svg.meow-cat{display:block;}
+.cmc-emoji.meow-pop{animation:catPop 0.45s cubic-bezier(.4,1.6,.6,1);}
+@keyframes catPop{
+  0%{transform:scale(1) rotate(0);}
+  30%{transform:scale(1.18) rotate(-8deg);}
+  60%{transform:scale(0.94) rotate(6deg);}
+  100%{transform:scale(1) rotate(0);}
+}
+/* 鬍鬚抖動（hover/破產時） */
+.cat-mood-card.tier-broke .meow-whiskers,
+.cmc-emoji:hover .meow-whiskers{
+  animation:whiskerWiggle 0.6s ease-in-out infinite;transform-origin:50% 66%;
+}
+@keyframes whiskerWiggle{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-1px);}
+}
+.cmc-quote{transition:opacity 0.15s;}
+
+/* 防偷窺鈕 SVG */
+.privacy-toggle{padding:0 !important;display:flex !important;align-items:center;justify-content:center;}
+.privacy-toggle svg.meow-cat{
+  display:block;width:24px;height:24px;
+}
+/* OFF 狀態（看得見）SVG 顏色按鈕風 */
+.privacy-toggle:hover svg.meow-cat{transform:scale(1.08);transition:transform 0.18s;}

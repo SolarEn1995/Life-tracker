@@ -510,6 +510,74 @@ function renderStats(now){
 }
 
 // ── 🐱 CAT MOOD CARD ──
+// 喵咪 SVG 生成器（多表情：rich/mid/low/broke/peek/look）
+function meowCatSvg(mood='mid',size=72){
+  const FACE='#FFB874', STRIPE='#E08A3C', EAR='#F8A48C', LINE='#2A2520', WHISK='#5C544A';
+  const parts={
+    rich:{ // 皇室喵：閉眼大笑 + 吐舌 + 皇冠
+      eyes:`<path d="M36 50 Q42 44 48 50" stroke="${LINE}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M58 50 Q64 44 70 50" stroke="${LINE}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+      mouth:`<path d="M50 64 Q53 70 50 76 Q47 80 50 84" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M58 64 Q55 70 58 76 Q61 80 58 84" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="54" cy="78" rx="4.5" ry="3.5" fill="#FF7A8A"/>`,
+      extra:`<g transform="translate(0,-2)"><path d="M36 22 L42 12 L48 20 L54 10 L60 20 L66 12 L72 22 Z" fill="#FFD54F" stroke="#C8961D" stroke-width="1.2" stroke-linejoin="round"/><circle cx="42" cy="14" r="1.6" fill="#FF6B6B"/><circle cx="54" cy="12" r="1.6" fill="#FF6B6B"/><circle cx="66" cy="14" r="1.6" fill="#FF6B6B"/></g>`
+    },
+    mid:{ // 小資喵：圓眼小微笑
+      eyes:`<circle cx="40" cy="52" r="4" fill="${LINE}"/><circle cx="66" cy="52" r="4" fill="${LINE}"/><circle cx="42" cy="50" r="1.4" fill="#fff"/><circle cx="68" cy="50" r="1.4" fill="#fff"/>`,
+      mouth:`<path d="M48 66 Q54 70 60 66" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+      extra:''
+    },
+    low:{ // 貧民喵：瞇眼斜嘴
+      eyes:`<path d="M34 54 L48 50" stroke="${LINE}" stroke-width="3" stroke-linecap="round"/><path d="M60 50 L72 54" stroke="${LINE}" stroke-width="3" stroke-linecap="round"/>`,
+      mouth:`<path d="M48 68 Q52 64 58 70" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+      extra:''
+    },
+    broke:{ // 破產喵：驚恐圓眼 + 張嘴 + 淚滴
+      eyes:`<circle cx="40" cy="52" r="6" fill="#fff" stroke="${LINE}" stroke-width="1.5"/><circle cx="66" cy="52" r="6" fill="#fff" stroke="${LINE}" stroke-width="1.5"/><circle cx="40" cy="53" r="2.2" fill="${LINE}"/><circle cx="66" cy="53" r="2.2" fill="${LINE}"/>`,
+      mouth:`<ellipse cx="53" cy="70" rx="4.5" ry="6" fill="${LINE}"/><ellipse cx="53" cy="72" rx="2.8" ry="3.5" fill="#FF7A8A"/>`,
+      extra:`<path d="M30 60 Q26 68 30 74 Q34 68 30 60 Z" fill="#5BC2DC" stroke="#3DA0BC" stroke-width="0.8"/>`
+    },
+    peek:{ // 防偷窺：肉球遮眼
+      eyes:`<path d="M34 52 Q42 50 50 52" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M58 52 Q66 50 74 52" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>`,
+      mouth:`<path d="M48 68 Q54 71 60 68" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+      extra:`<ellipse cx="36" cy="50" rx="11" ry="9" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.4"/><circle cx="32" cy="50" r="2" fill="${STRIPE}"/><circle cx="36" cy="46" r="2" fill="${STRIPE}"/><circle cx="40" cy="50" r="2" fill="${STRIPE}"/><circle cx="36" cy="54" r="2.3" fill="${STRIPE}"/><ellipse cx="72" cy="50" rx="11" ry="9" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.4"/><circle cx="68" cy="50" r="2" fill="${STRIPE}"/><circle cx="72" cy="46" r="2" fill="${STRIPE}"/><circle cx="76" cy="50" r="2" fill="${STRIPE}"/><circle cx="72" cy="54" r="2.3" fill="${STRIPE}"/>`
+    },
+    look:{ // 顯示模式：睜眼喵
+      eyes:`<circle cx="40" cy="52" r="4" fill="${LINE}"/><circle cx="66" cy="52" r="4" fill="${LINE}"/><circle cx="42" cy="50" r="1.4" fill="#fff"/><circle cx="68" cy="50" r="1.4" fill="#fff"/>`,
+      mouth:`<path d="M48 66 Q54 70 60 66" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+      extra:''
+    }
+  };
+  const p=parts[mood]||parts.mid;
+  return `<svg class="meow-cat mood-${mood}" viewBox="0 0 100 100" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- 耳朵 -->
+    <path d="M22 38 L30 18 L42 36 Z" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M30 32 L33 24 L37 32 Z" fill="${EAR}"/>
+    <path d="M78 38 L70 18 L58 36 Z" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M70 32 L67 24 L63 32 Z" fill="${EAR}"/>
+    <!-- 臉 -->
+    <ellipse cx="50" cy="58" rx="32" ry="30" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.5"/>
+    <!-- 條紋 -->
+    <path d="M50 30 Q52 34 50 38" stroke="${STRIPE}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M28 44 Q32 46 36 44" stroke="${STRIPE}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M64 44 Q68 46 72 44" stroke="${STRIPE}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <!-- 鬍鬚 -->
+    <g class="meow-whiskers" stroke="${WHISK}" stroke-width="0.8" stroke-linecap="round" opacity="0.55" fill="none">
+      <path d="M22 64 L36 62"/><path d="M22 70 L36 68"/>
+      <path d="M64 62 L78 64"/><path d="M64 68 L78 70"/>
+    </g>
+    <!-- 鼻 -->
+    <path d="M50 58 L47 62 L53 62 Z" fill="${STRIPE}"/>
+    ${p.eyes}
+    ${p.mouth}
+    ${p.extra}
+  </svg>`;
+}
+
+const CAT_QUOTES={
+  rich:['優秀！這個月本喵賞你一條小魚乾 🐟','繼續省下去本喵考慮升你為鏟屎官總管 ✨','本喵很滿意 (｡•́‿•̀｡)','財務優等生～本喵驕傲','再多省一點本喵就賞你 SSR 罐罐'],
+  mid:['還行啦，繼續努力本喵就考慮誇你 ✨','勉強及格 ٩(˃̶͈̀௰˂̶͈́)و','本喵看你還有救','記得多存一點啊鏟屎官','差一步就晉級了喵～'],
+  low:['勉強及格，下個月再不努力本喵要罷工 💢','你這樣本喵的罐罐要打折了喔','可以再省一點啦～','再亂花本喵真的會生氣','你的零用錢被本喵沒收了'],
+  broke:['鏟屎官你完蛋了，本喵的罐罐錢都被你花光啦！','救命喔！本喵要餓死了！','錢呢？(´;ω;`)','本喵宣布罷工 (╯°□°）╯','你給本喵省一點啦！']
+};
+
 function renderCatMood(ctx){
   const card=document.getElementById('catMoodCard');
   if(!card) return;
@@ -518,17 +586,40 @@ function renderCatMood(ctx){
   if(income<=0){ card.style.display='none'; return; }
   card.style.display='block';
   const balance=income-spend;
-  const rate=balance/income; // 可能負值
-  let tier;
-  if(rate>=0.5)      tier={emoji:'😸',name:'皇室喵',lv:99,quote:'優秀！這個月本喵賞你一條小魚乾 🐟',cls:'tier-rich'};
-  else if(rate>=0.2) tier={emoji:'😺',name:'小資喵',lv:50,quote:'還行啦，繼續努力本喵就考慮誇你 ✨',cls:'tier-mid'};
-  else if(rate>0)    tier={emoji:'😼',name:'貧民喵',lv:10,quote:'勉強及格，下個月再不努力本喵要罷工 💢',cls:'tier-low'};
-  else               tier={emoji:'🙀',name:'破產喵',lv:1, quote:'鏟屎官你完蛋了，本喵的罐罐錢都被你花光啦！',cls:'tier-broke'};
+  const rate=balance/income;
+  let key;
+  if(rate>=0.5) key='rich';
+  else if(rate>=0.2) key='mid';
+  else if(rate>0) key='low';
+  else key='broke';
+  const tierMap={
+    rich:{name:'皇室喵',lv:99,cls:'tier-rich'},
+    mid:{name:'小資喵',lv:50,cls:'tier-mid'},
+    low:{name:'貧民喵',lv:10,cls:'tier-low'},
+    broke:{name:'破產喵',lv:1,cls:'tier-broke'}
+  };
+  const tier=tierMap[key];
   card.className='cat-mood-card '+tier.cls;
-  document.getElementById('cmcEmoji').textContent=tier.emoji;
+  card.dataset.mood=key;
+  const emojiEl=document.getElementById('cmcEmoji');
+  emojiEl.innerHTML=meowCatSvg(key,72);
+  emojiEl.style.cursor='pointer';
+  emojiEl.title='點本喵看心情碎碎念';
+  if(!emojiEl._meowBound){
+    emojiEl.addEventListener('click',()=>{
+      const k=card.dataset.mood||'mid';
+      const arr=CAT_QUOTES[k]||CAT_QUOTES.mid;
+      const q=arr[Math.floor(Math.random()*arr.length)];
+      const qEl=document.getElementById('cmcQuote');
+      qEl.style.opacity='0';
+      setTimeout(()=>{qEl.textContent=q;qEl.style.opacity='1';},150);
+      emojiEl.classList.remove('meow-pop');void emojiEl.offsetWidth;emojiEl.classList.add('meow-pop');
+    });
+    emojiEl._meowBound=true;
+  }
   document.getElementById('cmcName').textContent=tier.name;
   document.getElementById('cmcLevel').textContent='Lv·'+tier.lv;
-  document.getElementById('cmcQuote').textContent=tier.quote;
+  document.getElementById('cmcQuote').textContent=CAT_QUOTES[key][0];
   const pct=Math.max(0,Math.min(100,rate*100));
   document.getElementById('cmcBarFill').style.width=pct+'%';
   const rateEl=document.getElementById('cmcRate');
@@ -4192,7 +4283,7 @@ function applyPrivacyMode(){
   const btn=document.getElementById('privacyToggle');
   if(btn){
     btn.classList.toggle('on',privacyMode);
-    btn.textContent=privacyMode?'🙈':'👁';
+    btn.innerHTML=meowCatSvg(privacyMode?'peek':'look',24);
     btn.title=privacyMode?'已開啟防偷窺，點擊顯示金額':'防偷窺：模糊金額';
   }
 }
