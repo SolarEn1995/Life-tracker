@@ -672,7 +672,10 @@
       <button class="btn-sm" id="salaryShiftBtn" onclick="toggleSalaryShift()" style="padding:6px 10px;font-size:11px;flex-shrink:0">切換</button>
     </div>
 
-    <div class="page-section-title">💵 薪資記錄</div>
+    <div class="section-head">
+      <div class="page-section-title">💵 薪資記錄</div>
+      <button class="pill-add green" onclick="openManualSalaryModal()">✏️ ＋ 輸入薪資</button>
+    </div>
     <div id="salaryList"></div>
   </div>
 
@@ -699,7 +702,10 @@
     <div class="info-banner warn">
       💡 副業/投資不穩定，<strong>不會</strong>納入採購／生活預算的計算基準。每月預算仍以主業薪資為依據。
     </div>
-    <div class="page-section-title">📋 收入記錄</div>
+    <div class="section-head">
+      <div class="page-section-title">📋 收入記錄</div>
+      <button class="pill-add pink" onclick="openExtraIncomeModal()">📈 ＋ 新增副業收入</button>
+    </div>
     <div id="extraIncomeList"></div>
   </div>
 
@@ -712,7 +718,10 @@
       </div>
       <div id="bonusTimeline"></div>
     </div>
-    <div class="page-section-title" style="margin-bottom:8px">📅 獎金清單</div>
+    <div class="section-head" style="margin-bottom:8px">
+      <div class="page-section-title" style="margin-bottom:0">📅 獎金清單</div>
+      <button class="pill-add orange" onclick="openBonusModal()">🎁 ＋ 新增獎金</button>
+    </div>
     <div id="bonusCalendar"></div>
   </div>
 
@@ -812,7 +821,10 @@
     <div class="info-banner">
       💡 即享券錢包：記錄面額，每次使用時填寫購買了什麼，系統幫你追蹤剩餘金額
     </div>
-    <div class="page-section-title">🎫 我的即享券</div>
+    <div class="section-head">
+      <div class="page-section-title">🎫 我的即享券</div>
+      <button class="pill-add" onclick="openVoucherModal()">🎟️ ＋ 新增即享券</button>
+    </div>
     <div id="voucherList"></div>
   </div>
 
