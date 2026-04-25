@@ -1224,7 +1224,7 @@ function onInvoiceQRDecoded(raw){
   // 填結果
   const body=document.getElementById('invoiceResultBody');
   body.innerHTML=`
-    <div style="background:linear-gradient(135deg,rgba(0,188,212,0.12),rgba(244,114,182,0.08));border:1.5px solid rgba(0,188,212,0.3);border-radius:var(--r-sm);padding:14px;margin-bottom:12px">
+    <div style="background:linear-gradient(135deg,rgba(0,188,212,0.12),rgba(240,138,107,0.08));border:1.5px solid rgba(0,188,212,0.3);border-radius:var(--r-sm);padding:14px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
         <div style="font-size:11px;color:var(--text2)">💰 金額</div>
         <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:800;color:var(--accent)">$${parsed.total.toLocaleString()}</div>
@@ -3136,7 +3136,7 @@ function renderYearSummary(){
 
   el.innerHTML=`
     <!-- 年度總覽 -->
-    <div style="background:${totalSurplus>=0?'linear-gradient(135deg,rgba(24,184,124,0.1),rgba(244,114,182,0.07))':'linear-gradient(135deg,rgba(232,48,48,0.08),rgba(232,124,32,0.06))'};border:2px solid ${totalSurplus>=0?'rgba(24,184,124,0.3)':'rgba(232,48,48,0.3)'};border-radius:var(--r);padding:16px;margin-bottom:10px;text-align:center">
+    <div style="background:${totalSurplus>=0?'linear-gradient(135deg,rgba(24,184,124,0.1),rgba(240,138,107,0.07))':'linear-gradient(135deg,rgba(232,48,48,0.08),rgba(232,124,32,0.06))'};border:2px solid ${totalSurplus>=0?'rgba(24,184,124,0.3)':'rgba(232,48,48,0.3)'};border-radius:var(--r);padding:16px;margin-bottom:10px;text-align:center">
       <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${totalSurplus>=0?`💰 ${y}年結餘`:`⚠️ ${y}年超支`}</div>
       <div style="font-family:'DM Mono',monospace;font-size:30px;font-weight:700;color:${totalSurplus>=0?'var(--accent3)':'var(--danger)'}">
         ${totalSurplus>=0?'':'-'}$${Math.abs(totalSurplus).toLocaleString()}
@@ -3232,7 +3232,7 @@ function renderSankeyCard(year, totalIncome, topCats, totalCashSp, totalSurplus)
   const leftH=H-30, leftY=15;
 
   // 多色色盤（避免全部一色）
-  const palette=['#e8488a','#f472b6','#18b87c','#e87c20','#3b82f6','#a855f7','#14b8a6'];
+  const palette=['#e8488a','#F08A6B','#18b87c','#e87c20','#3b82f6','#a855f7','#14b8a6'];
 
   // 取 top 4 類別 + 其他歸併
   const sortedCats=[...topCats].sort((a,b)=>b.total-a.total);
@@ -3277,7 +3277,7 @@ function renderSankeyCard(year, totalIncome, topCats, totalCashSp, totalSurplus)
     return o;
   });
 
-  const incomeColor='#f472b6';
+  const incomeColor='#F08A6B';
   const flowsSvg=flows.map(f=>{
     const sx=leftX+10, sy=leftY+leftH/2;
     const ex=rightX, ey=f.y+f.h/2;
@@ -3425,9 +3425,9 @@ function renderNetWorthTimelineCard(){
     <div class="chart-card" style="margin-top:12px">
       <div class="chart-title">📈 近 12 月淨值變化</div>
       <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
-        <path d="${area}" fill="rgba(244,114,182,0.12)"/>
-        <path d="${path}" fill="none" stroke="#f472b6" stroke-width="2"/>
-        ${points.map((p,i)=>`<circle cx="${xs(i)}" cy="${ys(p.val)}" r="2.5" fill="#f472b6"/>`).join('')}
+        <path d="${area}" fill="rgba(240,138,107,0.12)"/>
+        <path d="${path}" fill="none" stroke="#F08A6B" stroke-width="2"/>
+        ${points.map((p,i)=>`<circle cx="${xs(i)}" cy="${ys(p.val)}" r="2.5" fill="#F08A6B"/>`).join('')}
         ${xlabels}
       </svg>
       <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
@@ -3447,7 +3447,7 @@ function exportYearReviewCard(year){
     const c=cv.getContext('2d');
     // 漸層背景
     const g=c.createLinearGradient(0,0,720,1280);
-    g.addColorStop(0,'#f472b6'); g.addColorStop(1,'#e8488a');
+    g.addColorStop(0,'#F08A6B'); g.addColorStop(1,'#e8488a');
     c.fillStyle=g; c.fillRect(0,0,720,1280);
     // 計算
     let totalIncome=0,totalSp=0;
@@ -3559,7 +3559,7 @@ function renderSummary(){
     </div>
 
     <!-- surplus block -->
-    <div style="background:${surplus>=0?'linear-gradient(135deg,rgba(24,184,124,0.1),rgba(244,114,182,0.07))':'linear-gradient(135deg,rgba(232,48,48,0.08),rgba(232,124,32,0.06))'};border:2px solid ${surplus>=0?'rgba(24,184,124,0.3)':'rgba(232,48,48,0.3)'};border-radius:var(--r);padding:16px;margin-bottom:14px;text-align:center">
+    <div style="background:${surplus>=0?'linear-gradient(135deg,rgba(24,184,124,0.1),rgba(240,138,107,0.07))':'linear-gradient(135deg,rgba(232,48,48,0.08),rgba(232,124,32,0.06))'};border:2px solid ${surplus>=0?'rgba(24,184,124,0.3)':'rgba(232,48,48,0.3)'};border-radius:var(--r);padding:16px;margin-bottom:14px;text-align:center">
       <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${surplus>=0?'💰 本月結餘':'⚠️ 本月超支'}</div>
       <div style="font-family:'DM Mono',monospace;font-size:32px;font-weight:700;color:${surplus>=0?'var(--accent3)':'var(--danger)'}">
         ${surplus>=0?'':'-'}$${Math.abs(surplus).toLocaleString()}
@@ -3689,7 +3689,7 @@ function renderVouchers(){
   const heroEl=document.getElementById('voucherHero');
   if(heroEl){
     heroEl.innerHTML=`
-    <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--r);padding:14px 16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(244,114,182,0.25)">
+    <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--r);padding:14px 16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(240,138,107,0.25)">
       <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:4px">即享券總餘額</div>
       <div style="font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:white">$${totalRem.toLocaleString()}</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:4px">共 ${active.length} 張可用 · 已用 ${used.length} 張</div>
@@ -4439,7 +4439,7 @@ function renderYearlySavings(){
   const avgMonthly=recorded.length?Math.round(totalSaved/recorded.length):0;
 
   el.innerHTML=`
-    <div style="background:linear-gradient(135deg,rgba(24,184,124,0.1),rgba(244,114,182,0.07));border:1.5px solid rgba(24,184,124,0.25);border-radius:var(--r);padding:14px;margin-bottom:12px;text-align:center">
+    <div style="background:linear-gradient(135deg,rgba(24,184,124,0.1),rgba(240,138,107,0.07));border:1.5px solid rgba(24,184,124,0.25);border-radius:var(--r);padding:14px;margin-bottom:12px;text-align:center">
       <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${yr}年 累計結餘</div>
       <div style="font-family:'DM Mono',monospace;font-size:30px;font-weight:700;color:${totalSaved>=0?'var(--accent3)':'var(--danger)'}">
         ${totalSaved>=0?'+':''}$${totalSaved.toLocaleString()}
@@ -6184,7 +6184,7 @@ function renderBonusTab(){
       const isCur=diff===0; const isPast=diff<0;
       const label=isCur?'🎉 本月':(isPast?`${Math.abs(diff)}月前`:`${diff}月後`);
       const mode=b.mode||(b.includeInBudget===false?'savings':'budget');
-      const modeBadge={budget:'<span class="record-tag" style="background:#ddd6fe;color:#f472b6">📊 當月可用</span>',travel:'<span class="record-tag" style="background:#dbeafe;color:#2563eb">✈️ 旅遊額度</span>',savings:'<span class="record-tag" style="background:#fde9f2;color:#e8488a">🐷 存款</span>'}[mode]||'';
+      const modeBadge={budget:'<span class="record-tag" style="background:#ddd6fe;color:#F08A6B">📊 當月可用</span>',travel:'<span class="record-tag" style="background:#dbeafe;color:#2563eb">✈️ 旅遊額度</span>',savings:'<span class="record-tag" style="background:#fde9f2;color:#e8488a">🐷 存款</span>'}[mode]||'';
       return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:${isCur?'var(--accent3-light)':'var(--surface)'};border:1.5px solid ${isCur?'rgba(24,184,124,0.3)':'var(--border)'};border-radius:var(--r-sm);margin-bottom:7px;box-shadow:var(--shadow)">
         <div style="font-size:18px;flex-shrink:0">${b.emoji}</div>
         <div style="flex:1;min-width:0">
@@ -6237,7 +6237,7 @@ function renderInvModal(pid){
   const recent=finishedUnits.slice(-3);
   const avgDays=recent.length?Math.round(recent.reduce((s,u)=>s+u.actualDays,0)/recent.length):0;
   const calibrateBanner=(avgDays>0&&Math.abs(avgDays-p.totalDays)/p.totalDays>=0.25)?`
-    <div style="background:linear-gradient(135deg,rgba(244,114,182,0.08),rgba(244,114,182,0.02));border:1px solid rgba(244,114,182,0.25);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:center">
+    <div style="background:linear-gradient(135deg,rgba(240,138,107,0.08),rgba(240,138,107,0.02));border:1px solid rgba(240,138,107,0.25);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:center">
       <div style="font-size:18px">📊</div>
       <div style="flex:1;font-size:11px;line-height:1.5">
         <div style="color:var(--accent);font-weight:600;margin-bottom:2px">建議校正使用週期</div>
@@ -6384,7 +6384,7 @@ function openCompareModal(pid){
   ];
   const linkClass={'shopee':'shopee-l','momo':'momo-l','pchome':'pchome-l','yahoo':'shopee-l','books':'pchome-l'};
   document.getElementById('cmpContent').innerHTML=`
-    <div style="background:var(--accent-light);border:1px solid rgba(244,114,182,0.2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--accent);font-weight:500;line-height:1.5">
+    <div style="background:var(--accent-light);border:1px solid rgba(240,138,107,0.2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--accent);font-weight:500;line-height:1.5">
       💡 上次購買價格：<strong style="font-family:'DM Mono',monospace">$${lastPrice.toLocaleString()}</strong><br>
       點擊各平台按鈕搜尋，實際價格以各平台為準
     </div>
@@ -7310,7 +7310,7 @@ function renderOnboardStep(){
     </div>`;
   }
   if(step.key==='ai'){
-    html+=`<div style="background:linear-gradient(135deg,#f472b6,#fbbf24);color:#fff;border-radius:12px;padding:12px 14px;font-size:11px;line-height:1.7;margin-bottom:10px">
+    html+=`<div style="background:linear-gradient(135deg,#F08A6B,#E5A234);color:#fff;border-radius:12px;padding:12px 14px;font-size:11px;line-height:1.7;margin-bottom:10px">
       <div style="font-weight:700;margin-bottom:4px">📌 申請步驟（約 1 分鐘）</div>
       <div>1. 點下方藍色連結 → 用 Google 帳號登入</div>
       <div>2. 點「Create API Key」→ 選擇任一專案</div>
@@ -7498,7 +7498,7 @@ window.openExportCenter=openExportCenter;
 function _todayStr(){ const d=getNow(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
 
 function _buildXlsHtml(sheetName, headers, rows){
-  const headHtml=headers.map(h=>`<th style="background:#f472b6;color:#fff;padding:6px 10px;text-align:left">${escapeHTML(h)}</th>`).join('');
+  const headHtml=headers.map(h=>`<th style="background:#F08A6B;color:#fff;padding:6px 10px;text-align:left">${escapeHTML(h)}</th>`).join('');
   const bodyHtml=rows.map(r=>'<tr>'+r.map(c=>`<td style="padding:4px 10px;border:1px solid #ccc">${c==null?'':c}</td>`).join('')+'</tr>').join('');
   return `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>${sheetName}</x:Name></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:12px"><thead><tr>${headHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></body></html>`;
 }
@@ -7547,22 +7547,22 @@ function _printHtml(title, bodyHtml){
     <style>
       @page{margin:18mm}
       body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;color:#222;margin:0;padding:24px;}
-      h1{font-size:22px;margin:0 0 4px;color:#f472b6}
-      h2{font-size:14px;margin:18px 0 8px;border-left:4px solid #f472b6;padding-left:8px}
+      h1{font-size:22px;margin:0 0 4px;color:#F08A6B}
+      h2{font-size:14px;margin:18px 0 8px;border-left:4px solid #F08A6B;padding-left:8px}
       .sub{font-size:11px;color:#666;margin-bottom:18px}
       table{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:14px}
-      th{background:#f0eef9;color:#f472b6;text-align:left;padding:6px 8px;border:1px solid #ddd;font-weight:700}
+      th{background:#f0eef9;color:#F08A6B;text-align:left;padding:6px 8px;border:1px solid #ddd;font-weight:700}
       td{padding:5px 8px;border:1px solid #eee}
       tr:nth-child(even) td{background:#fafafa}
       .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
       .kpi .c{border:1px solid #ddd;border-radius:6px;padding:10px;text-align:center}
       .kpi .l{font-size:10px;color:#666}
-      .kpi .v{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#f472b6;margin-top:3px}
+      .kpi .v{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#F08A6B;margin-top:3px}
       .pos{color:#16a974} .neg{color:#e83030}
       .footer{margin-top:24px;font-size:10px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}
       @media print { .no-print{display:none} }
     </style></head><body>
-    <button class="no-print" onclick="window.print()" style="position:fixed;top:10px;right:10px;padding:8px 14px;background:#f472b6;color:#fff;border:0;border-radius:6px;cursor:pointer">🖨️ 列印 / 存為 PDF</button>
+    <button class="no-print" onclick="window.print()" style="position:fixed;top:10px;right:10px;padding:8px 14px;background:#F08A6B;color:#fff;border:0;border-radius:6px;cursor:pointer">🖨️ 列印 / 存為 PDF</button>
     ${bodyHtml}
     <div class="footer">📱 TheTrack · 產生於 ${new Date().toLocaleString('zh-TW')}</div>
     </body></html>`);
