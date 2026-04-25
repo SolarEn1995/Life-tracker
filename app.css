@@ -1042,3 +1042,117 @@ html[data-theme="dark"] .cmc-bar{background:rgba(255,255,255,0.08);}
     box-shadow:0 6px 22px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,238,210,0.06);
   }
 }
+
+
+/* ========== 🎨 P4a 俏皮排版 — 紙膠帶/不規則邊框/小爪印裝飾 ========== */
+
+/* (B) 章節標題：貼紙感 + 旋轉 -2° + 底線塗鴉 */
+#home > .home-section-title{
+  display:inline-block;
+  position:relative;
+  padding:6px 14px 6px 12px;
+  margin-left:4px;
+  background:rgba(255,255,255,0.55);
+  border:1.5px solid rgba(240,138,107,0.35);
+  border-radius:14px 18px 12px 16px;
+  transform:rotate(-1.6deg);
+  box-shadow:0 2px 6px rgba(178,138,98,0.10);
+  letter-spacing:-0.2px;
+}
+#home > .home-section-title::after{
+  content:'';position:absolute;left:14px;right:14px;bottom:-3px;height:3px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 4' preserveAspectRatio='none'><path d='M0 2 Q 5 0 10 2 T 20 2 T 30 2 T 40 2 T 50 2 T 60 2' stroke='%23F08A6B' stroke-width='1.4' fill='none' stroke-linecap='round'/></svg>") repeat-x;
+  background-size:60px 4px;
+}
+html[data-theme="dark"] #home > .home-section-title{
+  background:rgba(43,36,29,0.60);
+  border-color:rgba(245,160,133,0.35);
+}
+
+/* (A) 卡片微旋轉 — 製造手貼感（手機看才感覺得到，桌機放大會明顯） */
+#home > .free-card{transform:rotate(0.4deg);}
+#home > .cat-mood-card{transform:rotate(-0.5deg);}
+#home > .quick-stats{transform:rotate(0.3deg);}
+#home > .home-stat-card{transform:rotate(-0.3deg);}
+
+/* (C) 不規則邊框 — 捏黏土感 */
+#home > .free-card{
+  border-radius:24px 28px 22px 26px;
+  border:1.5px solid rgba(240,138,107,0.20);
+}
+.cat-mood-card{
+  border-radius:22px 28px 24px 30px;
+}
+.home-stat-card{
+  border-radius:26px 22px 28px 24px;
+}
+.quick-stats .qs-cell{
+  border-radius:16px 20px 14px 18px;
+}
+.home-stat-card .hsc-cell{
+  border-radius:14px 18px 12px 16px;
+}
+
+/* (A2) 紙膠帶裝飾 — 可用餘額卡頂部 */
+#home > .free-card::before{
+  content:'';position:absolute;
+  top:-8px;left:50%;
+  width:64px;height:18px;
+  transform:translateX(-50%) rotate(-2.5deg);
+  background:linear-gradient(90deg,rgba(245,185,125,0.55),rgba(240,138,107,0.55));
+  border-left:2px dashed rgba(255,255,255,0.6);
+  border-right:2px dashed rgba(255,255,255,0.6);
+  box-shadow:0 1px 3px rgba(178,138,98,0.18);
+  z-index:2;pointer-events:none;
+}
+html[data-theme="dark"] #home > .free-card::before{
+  background:linear-gradient(90deg,rgba(245,185,125,0.30),rgba(240,138,107,0.30));
+}
+
+/* (E) 小爪印浮在心情卡右上角 */
+.cat-mood-card{position:relative;}
+.cat-mood-card::after{
+  content:'🐾';
+  position:absolute;top:8px;right:14px;
+  font-size:18px;opacity:0.32;
+  transform:rotate(18deg);
+  z-index:2;pointer-events:none;
+}
+
+/* (E2) Quick Stats 區塊上方加虛線連接（從心情卡延伸） */
+#home > .quick-stats{position:relative;}
+#home > .quick-stats::before{
+  content:'';position:absolute;
+  top:-12px;left:50%;width:2px;height:10px;
+  border-left:2px dashed rgba(240,138,107,0.40);
+  transform:translateX(-50%);
+}
+
+/* hero free-card 數字加一點塗鴉底色 */
+#home > .free-card .fc-value{
+  position:relative;
+  display:inline-block;
+}
+
+/* 卡片之間多一點呼吸 */
+#home > .free-card{margin-top:8px;}
+#home > .cat-mood-card{margin-top:18px;}
+#home > .quick-stats{margin-top:22px;}
+#home > .home-stat-card{margin-top:18px !important;}
+
+/* hover 時卡片回正 — 互動回饋 */
+#home > .free-card:hover,
+#home > .cat-mood-card:hover,
+#home > .home-stat-card:hover{
+  transform:rotate(0deg) scale(1.005);
+  transition:transform 0.25s cubic-bezier(.4,1.4,.6,1);
+}
+
+/* prefers-reduced-motion 友善 */
+@media (prefers-reduced-motion: reduce){
+  #home > .free-card,
+  #home > .cat-mood-card,
+  #home > .quick-stats,
+  #home > .home-stat-card,
+  #home > .home-section-title{transform:none !important;}
+}
