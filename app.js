@@ -6931,28 +6931,9 @@ renderRecords=function(){
 const _origChangeRecordMonth=changeRecordMonth;
 changeRecordMonth=function(d){ recordsVisible=RECORDS_PAGE_SIZE; recordsCatFilter=null; _origChangeRecordMonth(d); };
 
-// ── 🔔 PWA: 註冊 Service Worker（HTTPS/localhost 才會成功，file:// 會靜默失敗） ──
+// ── 🔔 PWA: Service Worker 已改由 index.html 註冊外部 sw.js（HTTPS GitHub Pages 有 manifest.json + sw.js + icons）；保留此處為 no-op 避免 blob: SW 註冊失敗噴錯 ──
 (function registerSW(){
-  if(!('serviceWorker' in navigator)) return;
-  if(location.protocol==='file:') return; // file:// 不支援
-  const swCode=`
-    const CACHE='life-tracker-v2';
-    self.addEventListener('install',e=>{self.skipWaiting();});
-    self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});
-    self.addEventListener('fetch',e=>{
-      if(e.request.method!=='GET') return;
-      e.respondWith(
-        caches.open(CACHE).then(c=>c.match(e.request).then(hit=>{
-          const net=fetch(e.request).then(r=>{ if(r.ok) c.put(e.request,r.clone()); return r; }).catch(()=>hit);
-          return hit||net;
-        }))
-      );
-    });
-  `;
-  try{
-    const url=URL.createObjectURL(new Blob([swCode],{type:'application/javascript'}));
-    navigator.serviceWorker.register(url).catch(err=>console.debug('SW skipped:',err.message));
-  }catch(e){ /* ignore */ }
+  // intentionally empty — see <script> in index.html for `navigator.serviceWorker.register('sw.js')`
 })();
 
 // 👋 ONBOARDING（首次使用引導）
