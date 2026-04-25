@@ -4608,28 +4608,115 @@ function handlePayslipFile(e){
   reader.readAsDataURL(file);
 }
 async function analyzePayslip(b64url){
-  const base64=b64url.split(',')[1];
-  const mediaType=b64url.split(';')[0].split(':')[1];
   const prompt=`你是薪資單辨識 AI。分析這張薪資單，提取所有金額項目。
 以 JSON 格式回傳：{"fields":[{"label":"底薪","amount":40000,"type":"income"},{"label":"健保費","amount":800,"type":"deduction"}]}
 type 只能是 "income"（收入/加項）或 "deduction"（扣項）。只回傳 JSON，不加說明。看不清楚回傳 {"fields":[]}.`;
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:claudeHeaders(),
-    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,
-      messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
-        {type:'text',text:prompt}
-      ]}]})
-  });
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`API錯誤 ${res.status}`);}
-  const data=await res.json();
-  const text=data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
+  const text=await aiAnalyzeImage(b64url,prompt,1000);
   const clean=text.replace(/```json|```/g,'').trim();
   let parsed;
-  try{parsed=JSON.parse(clean);}catch{throw new Error('AI回傳格式錯誤，請重試');}
+  try{parsed=JSON.parse(clean.match(/\{[\s\S]*\}/)?.[0]||clean);}catch{throw new Error('AI回傳格式錯誤，請重試');}
   if(!parsed.fields?.length) throw new Error('未辨識到薪資項目，請確認截圖清晰');
   return parsed;
 }
+
+// ── 🧾 收據辨識記帳 ──
+let rcItems=[];
+function openReceiptScanModal(){
+  if(!getActiveAiProvider()){
+    showToast('請先到「⚙️ → 🤖 AI」設定 Claude 或 Gemini 金鑰','error');
+    return;
+  }
+  resetReceiptScan();
+  document.getElementById('receiptScanOverlay').classList.add('open');
+}
+function resetReceiptScan(){
+  ['rcStep1','rcStep2','rcStep3'].forEach((id,i)=>
+    document.getElementById(id).style.display=i===0?'block':'none');
+  document.getElementById('rcFileInput').value='';
+}
+function handleReceiptFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  document.getElementById('rcFileInput').value='';
+  document.getElementById('rcStep1').style.display='none';
+  document.getElementById('rcStep2').style.display='block';
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    try{
+      const result=await analyzeReceiptImage(ev.target.result);
+      rcItems=result.items.map((it,i)=>({...it,_id:i,_checked:true}));
+      document.getElementById('rcStep2').style.display='none';
+      document.getElementById('rcStep3').style.display='block';
+      const total=result.total||rcItems.reduce((s,it)=>s+it.amount,0);
+      document.getElementById('rcShopInfo').innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:14px;font-weight:700">${result.shop||'收據'}</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">${result.date||todayStr()}</div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--accent2)">
+            NT$${total.toLocaleString()}
+          </div>
+        </div>`;
+      renderRcItems();
+    }catch(err){
+      document.getElementById('rcStep2').style.display='none';
+      document.getElementById('rcStep1').style.display='block';
+      showToast('辨識失敗：'+err.message,'error');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+function renderRcItems(){
+  document.getElementById('rcItemList').innerHTML=rcItems.map((it,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" ${it._checked?'checked':''} onchange="rcItems[${i}]._checked=this.checked"
+        style="width:16px;height:16px;accent-color:var(--accent);flex-shrink:0"/>
+      <input style="flex:1;padding:7px 9px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:13px;color:var(--text);outline:none;font-family:inherit"
+        value="${it.name}" oninput="rcItems[${i}].name=this.value"/>
+      <input type="number" style="width:80px;padding:7px 8px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'DM Mono',monospace;color:var(--accent2);outline:none;text-align:right"
+        value="${it.amount}" oninput="rcItems[${i}].amount=parseInt(this.value)||0"/>
+    </div>`).join('');
+}
+async function analyzeReceiptImage(b64url){
+  const today=todayStr();
+  const prompt=`你是收據辨識 AI。分析這張收據/發票照片（超商、餐廳、手寫收據均可）。
+以 JSON 格式回傳（只回 JSON，不加說明）：
+{"shop":"全家便利商店","date":"${today}","total":120,"items":[{"name":"御飯糰鮭魚","amount":35,"cat":"food"},{"name":"礦泉水","amount":20,"cat":"food"}]}
+欄位說明：
+- shop: 商店/餐廳名稱（找不到填空字串）
+- date: 交易日期 YYYY-MM-DD（找不到用 ${today}）
+- total: 總金額（找不到填0）
+- items: 明細，每項 name（品項）、amount（金額數字）、cat（分類）
+- cat 只能是: "food"/"transport"/"shopping"/"health"/"entertainment"/"other"
+- 看不清楚或非收據回：{"shop":"","date":"${today}","total":0,"items":[]}`;
+  const text=await aiAnalyzeImage(b64url,prompt,1000);
+  const clean=text.replace(/```json|```/g,'').trim();
+  let parsed;
+  try{parsed=JSON.parse(clean.match(/\{[\s\S]*\}/)?.[0]||clean);}catch{throw new Error('AI回傳格式錯誤，請重試');}
+  if(!parsed.items?.length) throw new Error('未辨識到明細，請確認圖片清晰或嘗試手動輸入');
+  return parsed;
+}
+function confirmReceiptItems(){
+  const checked=rcItems.filter(it=>it._checked&&it.name&&it.amount>0);
+  if(!checked.length){showToast('請至少勾選一筆明細','error');return;}
+  const shopEl=document.querySelector('#rcShopInfo [style*="font-size:14px"]');
+  const dateEl=document.querySelector('#rcShopInfo [style*="color:var(--text2)"]');
+  const shopName=shopEl?.textContent||'收據';
+  const dateStr=dateEl?.textContent||todayStr();
+  checked.forEach(it=>{
+    records.push({
+      id:Date.now()+Math.floor(Math.random()*1000),
+      name:it.name, emoji:catEmoji(it.cat)||'🧾',
+      brand:shopName, price:it.amount,
+      cat:it.cat||'other', date:dateStr,
+      type:'life', pay:'cash'
+    });
+  });
+  save(); renderAll();
+  closeModal('receiptScanOverlay');
+  showToast(`✓ 已加入 ${checked.length} 筆記帳`,'ok');
+}
+
 function renderPsFields(){
   const inc=psFields.filter(f=>f.type==='income');
   const ded=psFields.filter(f=>f.type==='deduction');
