@@ -2366,16 +2366,27 @@ async function aiAnalyzeImage(b64url, prompt, maxTokens=800){
     return data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
   } else {
     const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+    // gemini-2.5-flash 預設啟用 thinking 會吃掉大量 tokens，必須關掉並提高 maxOutputTokens
     const res=await fetch(url,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[
         {inline_data:{mime_type:mediaType,data:base64}},
         {text:prompt}
-      ]}],generationConfig:{maxOutputTokens:maxTokens,temperature:0.1}})
+      ]}],generationConfig:{
+        maxOutputTokens:Math.max(maxTokens*4,4000),
+        temperature:0.1,
+        thinkingConfig:{thinkingBudget:0}
+      }})
     });
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Gemini ${res.status}`);}
     const data=await res.json();
-    return (data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+    const cand=data.candidates?.[0];
+    const text=(cand?.content?.parts||[]).map(p=>p.text||'').join('');
+    if(!text){
+      const reason=cand?.finishReason||'未知';
+      throw new Error(`Gemini 未回傳內容 (finishReason=${reason})，請重試或換較清晰的圖片`);
+    }
+    return text;
   }
 }
 
@@ -2556,7 +2567,10 @@ async function analyzeOrderScreenshot(base64Url){
   const text=await aiAnalyzeImage(base64Url,prompt,1500);
   const clean=text.replace(/```json|```/g,'').trim();
   let items;
-  try{items=JSON.parse(clean.match(/\[[\s\S]*\]/)?.[0]||clean);}catch{throw new Error('AI回傳格式錯誤，請重試');}
+  try{items=JSON.parse(clean.match(/\[[\s\S]*\]/)?.[0]||clean);}catch{
+    console.warn('AI 原始回傳:', text);
+    throw new Error(`AI回傳格式錯誤：${text.slice(0,80)}…`);
+  }
   if(!Array.isArray(items)) throw new Error('AI回傳格式錯誤，請重試');
   return items;
 }
