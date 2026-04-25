@@ -243,8 +243,11 @@
       </div>
     </div>
     <div id="fixedCalendar"></div>
+    <div class="section-head">
+      <div class="page-section-title">📋 訂閱清單</div>
+      <button class="pill-add" onclick="openFixedModal()">📺 ＋ 新增訂閱／固定</button>
+    </div>
     <div id="fixedList"></div>
-    <button class="btn-submit" style="margin-top:12px" onclick="openFixedModal()">📺 ＋ 新增訂閱／固定支出</button>
   </div>
 
   <!-- 負債分期 -->
@@ -257,9 +260,12 @@
         <div class="ph-sub" id="debtPageCount">共 0 筆 · 每月還款 $0</div>
       </div>
     </div>
-    <div class="info-banner">💡 房貸 / 車貸 / 分期付款 / 學貸。每月付款會自動加入「訂閱／固定」分頁並從可用餘額扣除。<br><span style="color:var(--text3)">＋ 新增分期請點下方按鈕，或右下方「＋」按鈕 → 手動新增 → 分期還款</span></div>
+    <div class="info-banner">💡 房貸 / 車貸 / 分期付款 / 學貸。每月付款會自動加入「訂閱／固定」分頁並從可用餘額扣除。</div>
+    <div class="section-head">
+      <div class="page-section-title">💳 負債清單</div>
+      <button class="pill-add" onclick="openDebtModal()">🏦 ＋ 新增負債分期</button>
+    </div>
     <div id="debtList"></div>
-    <button class="btn-submit" style="margin-top:12px" onclick="openDebtModal()">🏦 ＋ 新增負債分期</button>
   </div>
 
   <div style="height:14px"></div>
@@ -818,6 +824,8 @@
 
   <!-- VOUCHER SUB-PAGE -->
   <div id="incSub-voucher" style="display:none">
+    <!-- 即享券總餘額大卡 (上方) -->
+    <div id="voucherHero"></div>
     <div class="info-banner">
       💡 即享券錢包：記錄面額，每次使用時填寫購買了什麼，系統幫你追蹤剩餘金額
     </div>

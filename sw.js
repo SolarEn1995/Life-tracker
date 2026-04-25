@@ -1,5 +1,5 @@
 // service worker — minimal: 提供 fetch handler 讓 Chrome 認定為 PWA，可離線快取核心資源
-const CACHE='life-tracker-v8';
+const CACHE='life-tracker-v9';
 const ASSETS=['./','./index.html','./app.css','./app.js','./manifest.json','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',e=>{

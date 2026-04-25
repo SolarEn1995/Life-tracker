@@ -642,7 +642,7 @@ function renderFixed(){
 
   const list=document.getElementById('fixedList');
   if(!fixedExpenses.length){
-    list.innerHTML=`<div style="text-align:center;padding:32px;color:var(--text3)">還沒有固定支出<br>點 + 新增</div>`;
+    list.innerHTML=`<div style="text-align:center;padding:32px;color:var(--text3)">還沒有固定支出<br>點上方「📺 ＋ 新增訂閱／固定」開始記錄</div>`;
     return;
   }
   const cycleLabel={monthly:'每月',yearly:'每年',weekly:'每週'};
@@ -2274,7 +2274,7 @@ function renderDebts(){
   if(dpt) dpt.textContent=`$${tot.toLocaleString()}`;
   if(dpc) dpc.textContent=`共 ${debts.filter(d=>d.status!=='paid').length} 筆 · 每月還款 $${monthly.toLocaleString()}`;
   if(!debts.length){
-    list.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;background:var(--surface);border-radius:12px">尚無負債紀錄<br>有房貸 / 車貸 / 分期可點下方「🏦 ＋ 新增負債分期」</div>`;
+    list.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;background:var(--surface);border-radius:12px">尚無負債紀錄<br>點上方「🏦 ＋ 新增負債分期」開始記錄</div>`;
     return;
   }
   // 按未還清優先 + 剩餘金額大的優先
@@ -3618,12 +3618,17 @@ function renderVouchers(){
   const used=vouchers.filter(v=>(v.faceValue-(v.usedAmt||0))<=0);
 
   const voucherListEl=document.getElementById('voucherList'); if(!voucherListEl) return;
-  voucherListEl.innerHTML=`
+  // 把總餘額卡片渲染到上方獨立容器
+  const heroEl=document.getElementById('voucherHero');
+  if(heroEl){
+    heroEl.innerHTML=`
     <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--r);padding:14px 16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(91,72,232,0.25)">
       <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:4px">即享券總餘額</div>
       <div style="font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:white">$${totalRem.toLocaleString()}</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:4px">共 ${active.length} 張可用 · 已用 ${used.length} 張</div>
-    </div>
+    </div>`;
+  }
+  voucherListEl.innerHTML=`
     ${!vouchers.length?emptyState({emoji:'🎫',title:'還沒有即享券',sub:'記錄紙本或數位券面額，每次使用自動鬆餘額',ctaLabel:'＋ 新增即享券',ctaOnClick:'openVoucherModal()'}):''}
     ${active.length?`<div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.8px;margin-bottom:8px">可用</div>`:''}
     ${active.map(v=>{
