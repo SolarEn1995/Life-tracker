@@ -756,3 +756,11 @@ html[data-theme="dark"] .fc-compare.down{background:rgba(24,184,124,0.18);}
 
 @keyframes slideUp{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* === \u624b\u6a5f\u5b57\u9ad4\u4fdd\u8b77\uff1a\u8986\u84cb HTML/JS \u88e1\u7684 inline font-size === */
+[style*="font-size:9px"]{font-size:12px !important;}
+[style*="font-size: 9px"]{font-size:12px !important;}
+[style*="font-size:10px"]{font-size:12px !important;}
+[style*="font-size: 10px"]{font-size:12px !important;}
+[style*="font-size:11px"]{font-size:13px !important;}
+[style*="font-size: 11px"]{font-size:13px !important;}
