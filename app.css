@@ -119,10 +119,29 @@ body{
   background-attachment:fixed;
   color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden;
   transition:color 0.2s;
+  position:relative;
+}
+/* 🌈 P2 玻璃感色塊光暈 — 固定在 viewport，卡片模糊背景時透出色彩 */
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(520px 420px at 12% 8%,  rgba(240,138,107,0.42), transparent 60%),
+    radial-gradient(480px 400px at 92% 22%, rgba(229,162,52,0.32),  transparent 62%),
+    radial-gradient(560px 460px at 6% 72%,  rgba(63,169,133,0.28),  transparent 65%),
+    radial-gradient(620px 500px at 95% 92%, rgba(245,185,125,0.34), transparent 60%);
+  filter:blur(8px);
 }
 html[data-theme="dark"] body{
   background:linear-gradient(160deg, #1F1A15 0%, #241E18 55%, #1A1F1B 100%);
   background-attachment:fixed;
+}
+html[data-theme="dark"] body::before{
+  background:
+    radial-gradient(520px 420px at 12% 8%,  rgba(245,160,133,0.22), transparent 62%),
+    radial-gradient(480px 400px at 92% 22%, rgba(232,181,102,0.18), transparent 65%),
+    radial-gradient(560px 460px at 6% 72%,  rgba(91,194,152,0.16),  transparent 65%),
+    radial-gradient(620px 500px at 95% 92%, rgba(245,160,133,0.20), transparent 62%);
+  filter:blur(10px);
 }
 
 .header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(16px);padding:14px 18px 10px;border-bottom:1px solid var(--border);}
@@ -864,11 +883,11 @@ html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(240,138,107,0
   .kpi-mini,
   .modal,
   .fixed-row{
-    background:rgba(255,255,255,0.62);
-    backdrop-filter:blur(14px) saturate(140%);
-    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    background:rgba(255,255,255,0.42);
+    backdrop-filter:blur(20px) saturate(170%);
+    -webkit-backdrop-filter:blur(20px) saturate(170%);
     border-color:rgba(255,255,255,0.55);
-    box-shadow:0 4px 18px rgba(178,138,98,0.08), inset 0 1px 0 rgba(255,255,255,0.55);
+    box-shadow:0 6px 22px rgba(178,138,98,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
   }
   .summary-card:active,.split-card:active,.product-card:active{
     background:rgba(255,255,255,0.78);
@@ -907,9 +926,11 @@ html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(240,138,107,0
   html[data-theme="dark"] .kpi-mini,
   html[data-theme="dark"] .modal,
   html[data-theme="dark"] .fixed-row{
-    background:rgba(43,36,29,0.62);
-    border-color:rgba(255,238,210,0.08);
-    box-shadow:0 4px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,238,210,0.05);
+    background:rgba(43,36,29,0.48);
+    backdrop-filter:blur(22px) saturate(160%);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    border-color:rgba(255,238,210,0.10);
+    box-shadow:0 6px 22px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,238,210,0.06);
   }
   html[data-theme="dark"] .summary-card:active,
   html[data-theme="dark"] .split-card:active,
