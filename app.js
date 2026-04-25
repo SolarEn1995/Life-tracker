@@ -510,61 +510,97 @@ function renderStats(now){
 }
 
 // ── 🐱 CAT MOOD CARD ──
-// 喵咪 SVG 生成器（多表情：rich/mid/low/broke/peek/look）
+// 喵咪 SVG 生成器 v2 — Q 版超萌（大頭、星星眼、白口吻、腮紅、清楚鬍鬚）
 function meowCatSvg(mood='mid',size=72){
-  const FACE='#FFB874', STRIPE='#E08A3C', EAR='#F8A48C', LINE='#2A2520', WHISK='#5C544A';
+  const FACE='#FFB874', STRIPE='#D27A3C', EAR_IN='#FFC9D6', SNOUT='#FFF5E8',
+        LINE='#3A2A1F', WHISK='#5C544A', BLUSH='#FF9F8A', NOSE='#E55A4D';
+  // 共用：白口吻（嘴部三角白塊）+ 腮紅 — 讓「貓味」立刻出來
+  const snout=`<ellipse cx="50" cy="68" rx="20" ry="13" fill="${SNOUT}"/>`;
+  const blush=`<ellipse cx="26" cy="64" rx="6" ry="3.5" fill="${BLUSH}" opacity="0.55"/><ellipse cx="74" cy="64" rx="6" ry="3.5" fill="${BLUSH}" opacity="0.55"/>`;
+  const nose =`<path d="M46 60 Q50 64 54 60 Q52 65 50 65 Q48 65 46 60 Z" fill="${NOSE}"/>`;
+  const lips =`<path d="M50 65 L50 68" stroke="${LINE}" stroke-width="1.2" stroke-linecap="round"/>`;
+
   const parts={
     rich:{ // 皇室喵：閉眼大笑 + 吐舌 + 皇冠
-      eyes:`<path d="M36 50 Q42 44 48 50" stroke="${LINE}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M58 50 Q64 44 70 50" stroke="${LINE}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-      mouth:`<path d="M50 64 Q53 70 50 76 Q47 80 50 84" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M58 64 Q55 70 58 76 Q61 80 58 84" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="54" cy="78" rx="4.5" ry="3.5" fill="#FF7A8A"/>`,
-      extra:`<g transform="translate(0,-2)"><path d="M36 22 L42 12 L48 20 L54 10 L60 20 L66 12 L72 22 Z" fill="#FFD54F" stroke="#C8961D" stroke-width="1.2" stroke-linejoin="round"/><circle cx="42" cy="14" r="1.6" fill="#FF6B6B"/><circle cx="54" cy="12" r="1.6" fill="#FF6B6B"/><circle cx="66" cy="14" r="1.6" fill="#FF6B6B"/></g>`
+      eyes:`<path d="M28 50 Q35 42 42 50" stroke="${LINE}" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M58 50 Q65 42 72 50" stroke="${LINE}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+            <circle cx="80" cy="34" r="3" fill="#FFD54F" stroke="#C8961D" stroke-width="0.8"/>
+            <text x="78" y="37" font-size="4" fill="#C8961D">★</text>`,
+      mouth:`<path d="M50 70 Q47 76 50 80 Q53 84 50 86" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>
+             <ellipse cx="50" cy="80" rx="5" ry="4" fill="#FF7A8A"/>
+             <path d="M50 78 L50 84" stroke="#D14E60" stroke-width="0.8"/>`,
+      extra:`<g><path d="M30 24 L36 12 L44 22 L50 8 L56 22 L64 12 L70 24 Z" fill="#FFD54F" stroke="#C8961D" stroke-width="1.4" stroke-linejoin="round"/>
+             <circle cx="36" cy="14" r="1.8" fill="#FF6B6B"/>
+             <circle cx="50" cy="10" r="2" fill="#5BC2DC"/>
+             <circle cx="64" cy="14" r="1.8" fill="#FF6B6B"/></g>`
     },
-    mid:{ // 小資喵：圓眼小微笑
-      eyes:`<circle cx="40" cy="52" r="4" fill="${LINE}"/><circle cx="66" cy="52" r="4" fill="${LINE}"/><circle cx="42" cy="50" r="1.4" fill="#fff"/><circle cx="68" cy="50" r="1.4" fill="#fff"/>`,
-      mouth:`<path d="M48 66 Q54 70 60 66" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    mid:{ // 小資喵：圓亮眼 + 微笑（最 Q 版，大眼睛）
+      eyes:`<circle cx="36" cy="52" r="7" fill="${LINE}"/><circle cx="64" cy="52" r="7" fill="${LINE}"/>
+            <circle cx="38" cy="49" r="2.6" fill="#fff"/><circle cx="66" cy="49" r="2.6" fill="#fff"/>
+            <circle cx="34" cy="55" r="1.2" fill="#fff" opacity="0.7"/><circle cx="62" cy="55" r="1.2" fill="#fff" opacity="0.7"/>`,
+      mouth:`<path d="M44 70 Q50 76 56 70" stroke="${LINE}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
       extra:''
     },
-    low:{ // 貧民喵：瞇眼斜嘴
-      eyes:`<path d="M34 54 L48 50" stroke="${LINE}" stroke-width="3" stroke-linecap="round"/><path d="M60 50 L72 54" stroke="${LINE}" stroke-width="3" stroke-linecap="round"/>`,
-      mouth:`<path d="M48 68 Q52 64 58 70" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    low:{ // 貧民喵：瞇眼 + 歪嘴
+      eyes:`<path d="M30 54 L42 50" stroke="${LINE}" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M58 50 L70 54" stroke="${LINE}" stroke-width="3.2" stroke-linecap="round"/>
+            <text x="74" y="44" font-size="6">💢</text>`,
+      mouth:`<path d="M44 72 Q48 68 52 73 Q56 78 60 72" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
       extra:''
     },
-    broke:{ // 破產喵：驚恐圓眼 + 張嘴 + 淚滴
-      eyes:`<circle cx="40" cy="52" r="6" fill="#fff" stroke="${LINE}" stroke-width="1.5"/><circle cx="66" cy="52" r="6" fill="#fff" stroke="${LINE}" stroke-width="1.5"/><circle cx="40" cy="53" r="2.2" fill="${LINE}"/><circle cx="66" cy="53" r="2.2" fill="${LINE}"/>`,
-      mouth:`<ellipse cx="53" cy="70" rx="4.5" ry="6" fill="${LINE}"/><ellipse cx="53" cy="72" rx="2.8" ry="3.5" fill="#FF7A8A"/>`,
-      extra:`<path d="M30 60 Q26 68 30 74 Q34 68 30 60 Z" fill="#5BC2DC" stroke="#3DA0BC" stroke-width="0.8"/>`
+    broke:{ // 破產喵：超驚恐圓眼 + 大張嘴 + 淚水
+      eyes:`<circle cx="36" cy="52" r="9" fill="#fff" stroke="${LINE}" stroke-width="1.8"/>
+            <circle cx="64" cy="52" r="9" fill="#fff" stroke="${LINE}" stroke-width="1.8"/>
+            <circle cx="36" cy="54" r="3.2" fill="${LINE}"/>
+            <circle cx="64" cy="54" r="3.2" fill="${LINE}"/>
+            <circle cx="34" cy="51" r="1.4" fill="#fff"/><circle cx="62" cy="51" r="1.4" fill="#fff"/>`,
+      mouth:`<ellipse cx="50" cy="76" rx="6.5" ry="8" fill="${LINE}"/>
+             <ellipse cx="50" cy="78" rx="4" ry="4.5" fill="#FF7A8A"/>`,
+      extra:`<g><path d="M22 58 Q18 70 22 80 Q26 70 22 58 Z" fill="#5BC2DC" stroke="#3DA0BC" stroke-width="0.8"/>
+             <path d="M78 58 Q82 70 78 80 Q74 70 78 58 Z" fill="#5BC2DC" stroke="#3DA0BC" stroke-width="0.8"/></g>`
     },
-    peek:{ // 防偷窺：肉球遮眼
-      eyes:`<path d="M34 52 Q42 50 50 52" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M58 52 Q66 50 74 52" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>`,
-      mouth:`<path d="M48 68 Q54 71 60 68" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
-      extra:`<ellipse cx="36" cy="50" rx="11" ry="9" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.4"/><circle cx="32" cy="50" r="2" fill="${STRIPE}"/><circle cx="36" cy="46" r="2" fill="${STRIPE}"/><circle cx="40" cy="50" r="2" fill="${STRIPE}"/><circle cx="36" cy="54" r="2.3" fill="${STRIPE}"/><ellipse cx="72" cy="50" rx="11" ry="9" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.4"/><circle cx="68" cy="50" r="2" fill="${STRIPE}"/><circle cx="72" cy="46" r="2" fill="${STRIPE}"/><circle cx="76" cy="50" r="2" fill="${STRIPE}"/><circle cx="72" cy="54" r="2.3" fill="${STRIPE}"/>`
+    peek:{ // 防偷窺：兩肉球遮眼
+      eyes:`<path d="M30 53 Q38 51 46 53" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M54 53 Q62 51 70 53" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>`,
+      mouth:`<path d="M44 70 Q50 75 56 70" stroke="${LINE}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
+      extra:`<g>
+        <ellipse cx="36" cy="52" rx="13" ry="11" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.6"/>
+        <circle cx="30" cy="50" r="2.4" fill="${STRIPE}"/><circle cx="36" cy="46" r="2.4" fill="${STRIPE}"/><circle cx="42" cy="50" r="2.4" fill="${STRIPE}"/>
+        <ellipse cx="36" cy="56" rx="3.2" ry="2.6" fill="${STRIPE}"/>
+        <ellipse cx="64" cy="52" rx="13" ry="11" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.6"/>
+        <circle cx="58" cy="50" r="2.4" fill="${STRIPE}"/><circle cx="64" cy="46" r="2.4" fill="${STRIPE}"/><circle cx="70" cy="50" r="2.4" fill="${STRIPE}"/>
+        <ellipse cx="64" cy="56" rx="3.2" ry="2.6" fill="${STRIPE}"/>
+      </g>`
     },
-    look:{ // 顯示模式：睜眼喵
-      eyes:`<circle cx="40" cy="52" r="4" fill="${LINE}"/><circle cx="66" cy="52" r="4" fill="${LINE}"/><circle cx="42" cy="50" r="1.4" fill="#fff"/><circle cx="68" cy="50" r="1.4" fill="#fff"/>`,
-      mouth:`<path d="M48 66 Q54 70 60 66" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    look:{ // 顯示模式：睜眼喵（同 mid 但小一號 — 用於 toggle）
+      eyes:`<circle cx="36" cy="52" r="6" fill="${LINE}"/><circle cx="64" cy="52" r="6" fill="${LINE}"/>
+            <circle cx="38" cy="50" r="2.2" fill="#fff"/><circle cx="66" cy="50" r="2.2" fill="#fff"/>`,
+      mouth:`<path d="M44 70 Q50 75 56 70" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
       extra:''
     }
   };
   const p=parts[mood]||parts.mid;
+  const showFaceFx=mood!=='peek'; // peek 模式肉球蓋住，不畫鼻/嘴吻
   return `<svg class="meow-cat mood-${mood}" viewBox="0 0 100 100" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <!-- 耳朵 -->
-    <path d="M22 38 L30 18 L42 36 Z" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M30 32 L33 24 L37 32 Z" fill="${EAR}"/>
-    <path d="M78 38 L70 18 L58 36 Z" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M70 32 L67 24 L63 32 Z" fill="${EAR}"/>
-    <!-- 臉 -->
-    <ellipse cx="50" cy="58" rx="32" ry="30" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.5"/>
-    <!-- 條紋 -->
-    <path d="M50 30 Q52 34 50 38" stroke="${STRIPE}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <path d="M28 44 Q32 46 36 44" stroke="${STRIPE}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <path d="M64 44 Q68 46 72 44" stroke="${STRIPE}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <!-- 鬍鬚 -->
-    <g class="meow-whiskers" stroke="${WHISK}" stroke-width="0.8" stroke-linecap="round" opacity="0.55" fill="none">
-      <path d="M22 64 L36 62"/><path d="M22 70 L36 68"/>
-      <path d="M64 62 L78 64"/><path d="M64 68 L78 70"/>
+    <!-- 耳朵（更大更尖、內側粉色） -->
+    <path d="M14 42 L26 14 L42 38 Z" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M22 36 L27 22 L33 36 Z" fill="${EAR_IN}"/>
+    <path d="M86 42 L74 14 L58 38 Z" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M78 36 L73 22 L67 36 Z" fill="${EAR_IN}"/>
+    <!-- 大圓臉（Q 版重點：頭大臉圓） -->
+    <ellipse cx="50" cy="60" rx="36" ry="33" fill="${FACE}" stroke="${STRIPE}" stroke-width="1.8"/>
+    <!-- 額頭 M 字斑（橘貓特徵） -->
+    <path d="M44 32 Q48 38 50 34 Q52 38 56 32" stroke="${STRIPE}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M28 44 Q34 46 38 44" stroke="${STRIPE}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M62 44 Q66 46 72 44" stroke="${STRIPE}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    ${showFaceFx?blush:''}
+    ${showFaceFx?snout:''}
+    <!-- 鬍鬚（更明顯） -->
+    <g class="meow-whiskers" stroke="${WHISK}" stroke-width="1" stroke-linecap="round" opacity="0.7" fill="none">
+      <path d="M14 64 L34 62"/><path d="M14 70 L34 68"/>
+      <path d="M66 62 L86 64"/><path d="M66 68 L86 70"/>
     </g>
-    <!-- 鼻 -->
-    <path d="M50 58 L47 62 L53 62 Z" fill="${STRIPE}"/>
+    ${showFaceFx?nose:''}
+    ${showFaceFx?lips:''}
     ${p.eyes}
     ${p.mouth}
     ${p.extra}
