@@ -1846,10 +1846,10 @@
     <!-- Step 1: upload -->
     <div id="importStep1">
       <label class="import-drop-zone" for="importFileInput" style="display:block;cursor:pointer">
-        <input type="file" accept="image/*" id="importFileInput" onchange="handleImportFile(event)" style="position:absolute;opacity:0;width:0;height:0"/>
+        <input type="file" accept="image/*" multiple id="importFileInput" onchange="handleImportFile(event)" style="position:absolute;opacity:0;width:0;height:0"/>
         <div class="import-drop-icon">🖼️</div>
         <div class="import-drop-text">點擊上傳訂單截圖</div>
-        <div class="import-drop-hint">支援蝦皮、momo 等訂單頁面截圖</div>
+        <div class="import-drop-hint">支援蝦皮、momo 等訂單頁面截圖，可一次選多張</div>
       </label>
       <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">圖片僅用於 AI 辨識，不會上傳至任何伺服器</div>
     </div>

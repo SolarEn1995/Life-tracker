@@ -2492,33 +2492,46 @@ function resetImport(){
   document.getElementById('importFileInput').value='';
 }
 function handleImportFile(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=async(ev)=>{
-    const base64Url=ev.target.result;
-    document.getElementById('importStep1').style.display='none';
-    document.getElementById('importStep2').style.display='block';
-    document.getElementById('importPreviewImg').src=base64Url;
+  const files=Array.from(e.target.files||[]);if(!files.length)return;
+  document.getElementById('importFileInput').value='';
+  document.getElementById('importStep1').style.display='none';
+  document.getElementById('importStep2').style.display='block';
+  const loadingText=document.querySelector('#importStep2 div[style*="font-size:13px"]');
+  if(loadingText&&files.length>1) loadingText.textContent=`AI 正在辨識 ${files.length} 張截圖…`;
+  const readFile=f=>new Promise(res=>{
+    const r=new FileReader();
+    r.onload=ev=>res(ev.target.result);
+    r.readAsDataURL(f);
+  });
+  (async()=>{
     try{
-      const items=await analyzeOrderScreenshot(base64Url);
-      importResults=items.map((it,i)=>({...it,_id:i,_days:30}));
+      let allItems=[];
+      for(let i=0;i<files.length;i++){
+        if(loadingText&&files.length>1) loadingText.textContent=`AI 辨識第 ${i+1}/${files.length} 張…`;
+        const b64url=await readFile(files[i]);
+        const items=await analyzeOrderScreenshot(b64url);
+        allItems=allItems.concat(items);
+      }
+      if(!allItems.length) throw new Error('未辨識到商品，請確認截圖是訂單頁面');
+      // 重新編號 _id
+      importResults=allItems.map((it,i)=>({...it,_id:i,_days:30}));
       importSelectedIds=new Set(importResults.map(it=>it._id));
       document.getElementById('importStep2').style.display='none';
       document.getElementById('importStep3').style.display='block';
-      document.getElementById('importPreviewImg2').src=base64Url;
-      document.getElementById('importResultTitle').textContent=`辨識到 ${importResults.length} 件商品，請確認`;
+      document.getElementById('importPreviewImg2').src=await readFile(files[0]);
+      document.getElementById('importResultTitle').textContent=
+        files.length>1
+          ? `辨識到 ${importResults.length} 件商品（${files.length} 張截圖），請確認`
+          : `辨識到 ${importResults.length} 件商品，請確認`;
       renderImportResults();
     }catch(err){
       document.getElementById('importStep2').style.display='none';
       document.getElementById('importStep1').style.display='block';
       showToast('辨識失敗：'+err.message,'error');
     }
-  };
-  reader.readAsDataURL(file);
+  })();
 }
 async function analyzeOrderScreenshot(base64Url){
-  const base64=base64Url.split(',')[1];
-  const mediaType=base64Url.split(';')[0].split(':')[1];
   const prompt=`你是訂單辨識 AI。分析這張電商訂單截圖（蝦皮/momo/PChome/Yahoo/東森等），提取所有商品。
 
 回傳 JSON 陣列，每個物件欄位：
@@ -2540,24 +2553,11 @@ async function analyzeOrderScreenshot(base64Url){
 3. 看不清楚或不是訂單截圖則回傳 []
 4. 同品項多數量請合併成一筆並正確填 qty，不要拆成多筆
 5. volume/unit 用於與既有品項做容量比例換算，請盡量從商品名抽取（如「保濕乳液 200ml」→ volume:200, unit:"ml"）`;
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:claudeHeaders(),
-    body:JSON.stringify({
-      model:'claude-sonnet-4-5',max_tokens:1500,
-      messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
-        {type:'text',text:prompt}
-      ]}]
-    })
-  });
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`API錯誤 ${res.status}`);}
-  const data=await res.json();
-  const text=data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
+  const text=await aiAnalyzeImage(base64Url,prompt,1500);
   const clean=text.replace(/```json|```/g,'').trim();
   let items;
-  try{items=JSON.parse(clean);}catch{throw new Error('AI回傳格式錯誤，請重試');}
-  if(!Array.isArray(items)||!items.length) throw new Error('未辨識到商品，請確認截圖是訂單頁面');
+  try{items=JSON.parse(clean.match(/\[[\s\S]*\]/)?.[0]||clean);}catch{throw new Error('AI回傳格式錯誤，請重試');}
+  if(!Array.isArray(items)) throw new Error('AI回傳格式錯誤，請重試');
   return items;
 }
 
