@@ -2365,7 +2365,7 @@ async function aiAnalyzeImage(b64url, prompt, maxTokens=800){
     const data=await res.json();
     return data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
   } else {
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
     const res=await fetch(url,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[
@@ -2466,7 +2466,7 @@ async function testGeminiKey(){
   if(!geminiApiKey){showToast('請先儲存金鑰','error');return;}
   showToast('測試 Gemini 連線中…','ok');
   try{
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
     const res=await fetch(url,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[{text:'Say OK'}]}],generationConfig:{maxOutputTokens:10}})
