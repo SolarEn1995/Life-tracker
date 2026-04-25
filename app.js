@@ -945,6 +945,10 @@ function clearData(type){
         if(k && k.startsWith('bt')) keys.push(k);
       }
       keys.forEach(k=>localStorage.removeItem(k));
+      // 明確存空陣列，防止 JS 裡的硬寫預設品項重新載入
+      localStorage.setItem('btProducts','[]');
+      localStorage.setItem('btRecords','[]');
+      localStorage.setItem('btFixed','[]');
       // 也清掉 service worker 快取，確保下次載入是乾淨的
       if('caches' in window){
         caches.keys().then(ks=>ks.forEach(k=>caches.delete(k))).finally(()=>location.reload());
