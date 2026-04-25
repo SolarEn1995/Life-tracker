@@ -852,3 +852,92 @@ html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(240,138,107,0
   color:var(--accent);
   background:var(--accent-light);
 }
+
+
+/* ========== P2: Glassmorphism 琉璃擬態 ========== */
+@supports ((backdrop-filter:blur(8px)) or (-webkit-backdrop-filter:blur(8px))){
+  /* Light mode 半透明白底 + 模糊 */
+  .summary-card,
+  .split-card,
+  .fixed-card,
+  .product-card,
+  .kpi-mini,
+  .modal,
+  .fixed-row{
+    background:rgba(255,255,255,0.62);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    border-color:rgba(255,255,255,0.55);
+    box-shadow:0 4px 18px rgba(178,138,98,0.08), inset 0 1px 0 rgba(255,255,255,0.55);
+  }
+  .summary-card:active,.split-card:active,.product-card:active{
+    background:rgba(255,255,255,0.78);
+  }
+  .fixed-card.confirmed{
+    background:linear-gradient(135deg,rgba(63,169,133,0.12),rgba(255,255,255,0.62));
+  }
+  .product-card.urgent{
+    background:linear-gradient(135deg,rgba(232,124,32,0.10),rgba(255,255,255,0.62));
+  }
+  /* Header 玻璃 */
+  .top-bar,header{
+    background:rgba(250,246,240,0.55);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+  }
+  /* FAB 浮層 */
+  .fab-card,.cat-menu,.card-menu{
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(16px) saturate(150%);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);
+    border:1px solid rgba(255,255,255,0.6);
+  }
+  /* Modal overlay 改為深色玻璃 */
+  .modal-overlay,.cat-menu-overlay,.card-menu-overlay{
+    background:rgba(40,30,22,0.32);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+
+  /* Dark mode 暖咖啡半透明 */
+  html[data-theme="dark"] .summary-card,
+  html[data-theme="dark"] .split-card,
+  html[data-theme="dark"] .fixed-card,
+  html[data-theme="dark"] .product-card,
+  html[data-theme="dark"] .kpi-mini,
+  html[data-theme="dark"] .modal,
+  html[data-theme="dark"] .fixed-row{
+    background:rgba(43,36,29,0.62);
+    border-color:rgba(255,238,210,0.08);
+    box-shadow:0 4px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,238,210,0.05);
+  }
+  html[data-theme="dark"] .summary-card:active,
+  html[data-theme="dark"] .split-card:active,
+  html[data-theme="dark"] .product-card:active{
+    background:rgba(43,36,29,0.82);
+  }
+  html[data-theme="dark"] .top-bar,
+  html[data-theme="dark"] header{
+    background:rgba(31,26,21,0.6);
+  }
+  html[data-theme="dark"] .fab-card,
+  html[data-theme="dark"] .cat-menu,
+  html[data-theme="dark"] .card-menu{
+    background:rgba(43,36,29,0.78);
+    border:1px solid rgba(255,238,210,0.08);
+  }
+  html[data-theme="dark"] .modal-overlay,
+  html[data-theme="dark"] .cat-menu-overlay,
+  html[data-theme="dark"] .card-menu-overlay{
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  html[data-theme="dark"] .fixed-card.confirmed{
+    background:linear-gradient(135deg,rgba(91,194,152,0.16),rgba(43,36,29,0.62));
+  }
+  html[data-theme="dark"] .product-card.urgent{
+    background:linear-gradient(135deg,rgba(232,124,32,0.18),rgba(43,36,29,0.62));
+  }
+}
+/* 不支援 backdrop-filter 的瀏覽器自動 fallback 到原本實心 surface */
