@@ -244,6 +244,7 @@
     </div>
     <div id="fixedCalendar"></div>
     <div id="fixedList"></div>
+    <button class="btn-submit" style="margin-top:12px" onclick="openFixedModal()">＋ 新增訂閱／固定支出</button>
   </div>
 
   <!-- 負債分期 -->
@@ -256,8 +257,9 @@
         <div class="ph-sub" id="debtPageCount">共 0 筆 · 每月還款 $0</div>
       </div>
     </div>
-    <div class="info-banner">💡 房貸 / 車貸 / 分期付款 / 學貸。每月付款會自動加入「訂閱／固定」分頁並從可用餘額扣除。<br><span style="color:var(--text3)">＋ 新增分期請點右下方「＋」按鈕 → 手動新增 → 分期還款</span></div>
+    <div class="info-banner">💡 房貸 / 車貸 / 分期付款 / 學貸。每月付款會自動加入「訂閱／固定」分頁並從可用餘額扣除。<br><span style="color:var(--text3)">＋ 新增分期請點下方按鈕或右下方「＋」按鈕 → 手動新增 → 分期還款</span></div>
     <div id="debtList"></div>
+    <button class="btn-submit" style="margin-top:12px" onclick="openDebtModal()">＋ 新增負債分期</button>
   </div>
 
   <div style="height:14px"></div>
@@ -1906,7 +1908,8 @@
 
     <!-- Step 3: review results -->
     <div id="importStep3" style="display:none">
-      <img id="importPreviewImg2" class="import-preview-img" src="" alt="預覽"/>
+      <img id="importPreviewImg2" class="import-preview-img" src="" alt="預覽" onclick="openImageZoom(this.src)" style="cursor:zoom-in"/>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin:-6px 0 8px">🔍 點圖可放大檢視</div>
       <div style="font-size:13px;font-weight:600;margin-bottom:4px" id="importResultTitle">辨識到 0 件商品</div>
       <div style="font-size:11px;color:var(--text2);margin-bottom:10px">請確認 AI 分類結果，可編輯、取消勾選或切換「更新/新增」模式</div>
       <div id="importSummaryCard" style="display:none;background:linear-gradient(135deg,rgba(91,72,232,0.08),rgba(24,184,124,0.06));border:1.5px solid rgba(91,72,232,0.25);border-radius:var(--r);padding:12px 14px;margin-bottom:12px">
@@ -2055,7 +2058,33 @@
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW register failed:',err));
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      // 主動檢查更新
+      reg.update().catch(()=>{});
+      // 每次回到頁面也檢查（PWA 場景）
+      document.addEventListener('visibilitychange',()=>{
+        if(document.visibilityState==='visible') reg.update().catch(()=>{});
+      });
+      // 偵測新版啟用後自動 reload
+      if(reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); }
+      reg.addEventListener('updatefound',()=>{
+        const nw=reg.installing;
+        if(nw) nw.addEventListener('statechange',()=>{
+          if(nw.state==='installed' && navigator.serviceWorker.controller){
+            // 有新版本可用
+            console.log('[SW] new version installed, reloading…');
+            setTimeout(()=>location.reload(),200);
+          }
+        });
+      });
+    }).catch(err=>console.warn('SW register failed:',err));
+    // controllerchange = SW 換代了，refresh 取得新資源
+    let _swRefreshed=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(_swRefreshed) return;
+      _swRefreshed=true;
+      location.reload();
+    });
   });
 }
 </script>

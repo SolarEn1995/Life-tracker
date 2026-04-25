@@ -569,8 +569,8 @@ html[data-theme="dark"] .fc-compare.down{background:rgba(24,184,124,0.18);}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;}
 .bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;}
 .bar{width:100%;border-radius:5px 5px 0 0;min-height:4px;}
-.bar-label{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
-.bar-val{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;}
+.bar-label{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;white-space:nowrap;min-width:0;width:100%;letter-spacing:-0.5px;}
+.bar-val{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;text-align:center;white-space:nowrap;}
 .cat-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
 .cat-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 12px;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow);cursor:pointer;transition:transform 0.12s,border-color 0.15s;}
 .cat-item:active{transform:scale(0.97);}
@@ -758,9 +758,29 @@ html[data-theme="dark"] .fc-compare.down{background:rgba(24,184,124,0.18);}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
 /* === \u624b\u6a5f\u5b57\u9ad4\u4fdd\u8b77\uff1a\u8986\u84cb HTML/JS \u88e1\u7684 inline font-size === */
-[style*="font-size:9px"]{font-size:12px !important;}
-[style*="font-size: 9px"]{font-size:12px !important;}
-[style*="font-size:10px"]{font-size:12px !important;}
-[style*="font-size: 10px"]{font-size:12px !important;}
-[style*="font-size:11px"]{font-size:13px !important;}
-[style*="font-size: 11px"]{font-size:13px !important;}
+[style*="font-size:9px"]{font-size:13px !important;}
+[style*="font-size: 9px"]{font-size:13px !important;}
+[style*="font-size:10px"]{font-size:13px !important;}
+[style*="font-size: 10px"]{font-size:13px !important;}
+[style*="font-size:11px"]{font-size:14px !important;}
+[style*="font-size: 11px"]{font-size:14px !important;}
+[style*="font-size:12px"]{font-size:14px !important;}
+[style*="font-size: 12px"]{font-size:14px !important;}
+
+/* === 全域常用元素加大（手機可讀性） === */
+@media (max-width: 600px){
+  body{font-size:15px;}
+  .form-label{font-size:13px !important;}
+  .form-input{font-size:14px !important;}
+  .cat-opt{font-size:13px !important;}
+  .bar-label{font-size:13px !important;}
+  .bar-val{font-size:13px !important;}
+  .ph-sub{font-size:13px !important;}
+  .ph-label{font-size:13px !important;}
+  .info-banner{font-size:13px !important;line-height:1.6 !important;}
+  .fab-card-sub{font-size:12px !important;}
+  .fab-card-title{font-size:14px !important;}
+  .modal-title{font-size:18px !important;}
+  .ir-meta{font-size:13px !important;}
+  .ir-name{font-size:14px !important;}
+}

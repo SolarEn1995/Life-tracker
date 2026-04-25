@@ -1240,12 +1240,12 @@ function onInvoiceQRDecoded(raw){
       <input class="form-input" id="ir-name" value="${parsed.items[0]||'發票'+parsed.invoice.slice(-4)}"/>
     </div>
   `;
-  // 分類下拉
+  // 分類下拉（使用生活花費類別 expCats，而非補貨品項類別）
   const catSel=document.getElementById('ir-cat');
-  catSel.innerHTML=categories.map(c=>`<option value="${c.id}">${c.emoji} ${c.label||c.name||c.id}</option>`).join('');
+  catSel.innerHTML=expCats.map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
   // 簡單分類猜測
   const guess=guessInvoiceCategory(parsed);
-  if(guess) catSel.value=guess;
+  if(guess && expCats.some(c=>c.id===guess)) catSel.value=guess;
   document.getElementById('ir-pay').value='card';
   document.getElementById('invoiceResultOverlay').classList.add('open');
 }
@@ -1274,11 +1274,12 @@ function confirmInvoiceRecord(){
   const p=_invPending;
   const rec={
     id:Date.now(),
-    name, emoji:'🧾',
+    name, emoji:catEmoji(cat)||'🧾',
+    brand:'掃描發票',
     price:p.total,
     cat,
     date:p.date,
-    type:'var',
+    type:'life',
     pay,
     invoice:p.invoice,
     note:`發票 ${p.invoice}${p.sellerId?' · '+p.sellerId:''}`
@@ -2641,12 +2642,20 @@ function renderImportResults(){
       </div>`;
     })():'';
 
-    return `<div class="import-result-item ${sel?'selected':''}" id="ir-${it._id}" onclick="toggleImportItem(${it._id})">
-      <div class="ir-name">${it.emoji||'📦'} ${it.name}${it.qty>1?` ×${it.qty}`:''}</div>
-      <div class="ir-meta">
+    return `<div class="import-result-item ${sel?'selected':''}" id="ir-${it._id}">
+      <div class="ir-name">
+        <span style="cursor:pointer;user-select:none" onclick="toggleImportItem(${it._id})">
+          ${sel?'✅':'⬜'} ${it.emoji||'📦'} ${it.name}${it.qty>1?` ×${it.qty}`:''}
+        </span>
+      </div>
+      <div class="ir-meta" onclick="event.stopPropagation()">
         <span>🏷 ${it.brand||'未知'}</span>
         <span>💰 $${(it.price||0).toLocaleString()}</span>
-        <span>📂 ${catName}</span>
+        <select onchange="updateImportCat(${it._id},this.value)" style="font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:inherit">
+          <option value="health" ${it.cat==='health'?'selected':''}>💊 保健品</option>
+          <option value="skin" ${it.cat==='skin'?'selected':''}>🧴 保養品</option>
+          <option value="daily" ${it.cat==='daily'?'selected':''}>🧻 日用品</option>
+        </select>
         ${dup?'':'<span style="background:var(--accent3-light);color:var(--accent3);font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px">✨ 新品項</span>'}
       </div>
       <div class="import-edit-row" onclick="event.stopPropagation()">
@@ -2696,6 +2705,25 @@ function toggleImportItem(id){
 }
 function updateImportDays(id,val){const it=importResults.find(x=>x._id===id);if(it)it._days=parseInt(val)||30;}
 function updateImportPrice(id,val){const it=importResults.find(x=>x._id===id);if(it)it.price=parseInt(val)||it.price;}
+function updateImportCat(id,val){const it=importResults.find(x=>x._id===id);if(it){it.cat=val; renderImportResults();}}
+// 🔍 點圖放大檢視（訂單截圖、收據等）
+function openImageZoom(src){
+  if(!src) return;
+  let ov=document.getElementById('imgZoomOverlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='imgZoomOverlay';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px;cursor:zoom-out';
+    ov.onclick=()=>ov.remove();
+    ov.innerHTML=`<img id="imgZoomImg" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5)"/>
+      <div style="position:absolute;top:14px;right:14px;color:#fff;font-size:24px;background:rgba(0,0,0,0.5);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center">✕</div>
+      <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#fff;font-size:12px;background:rgba(0,0,0,0.5);padding:6px 14px;border-radius:14px">點任一處關閉</div>`;
+    document.body.appendChild(ov);
+  }
+  document.getElementById('imgZoomImg').src=src;
+  ov.style.display='flex';
+}
+window.openImageZoom=openImageZoom;
 
 function confirmImport(){
   const toAdd=importResults.filter(it=>importSelectedIds.has(it._id));
@@ -3706,6 +3734,29 @@ function openVoucherUseFromRecord(){
 // ── QUICK EXPENSE ──
 let qeCat='food', qePay='cash', qeCur='TWD';
 let lifeBudget=parseInt(localStorage.getItem('btLifeBudget')||'0');
+
+// 💱 外幣匯率與 metadata（避免未定義錯誤導致 modal 無法開啟）
+let fxRates=JSON.parse(localStorage.getItem('btFxRates')||'{}');
+const FX_META={
+  TWD:{symbol:'NT$',name:'新台幣'},
+  USD:{symbol:'$',name:'美元'},
+  JPY:{symbol:'¥',name:'日圓'},
+  EUR:{symbol:'€',name:'歐元'},
+  KRW:{symbol:'₩',name:'韓元'},
+  CNY:{symbol:'¥',name:'人民幣'},
+  HKD:{symbol:'HK$',name:'港幣'},
+  GBP:{symbol:'£',name:'英鎊'},
+  SGD:{symbol:'S$',name:'新幣'},
+  THB:{symbol:'฿',name:'泰銖'}
+};
+function renderQeCurrencyChips(){
+  const wrap=document.getElementById('qeCurrencySelect'); if(!wrap) return;
+  const list=['TWD',...Object.keys(fxRates||{}).filter(c=>c!=='TWD')];
+  wrap.innerHTML=list.map(c=>{
+    const sym=(FX_META[c]&&FX_META[c].symbol)||c;
+    return `<div class="cat-opt${c===qeCur?' selected':''}" data-val="${c}" onclick="selectQeCur(this)">${sym} ${c}</div>`;
+  }).join('');
+}
 
 // 🏷 記帳類別（可自訂）
 const DEFAULT_EXP_CATS=[
