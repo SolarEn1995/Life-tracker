@@ -938,9 +938,19 @@ function clearData(type){
     });
   } else if(type==='all'){
     showConfirm('確定重置全部資料？<br><span style="font-size:11px;color:var(--danger)">所有品項、記錄、設定將全部清除，無法復原</span>',()=>{
-      ['btProducts','btRecords','btCats','btFixed','btIncome','btBudget',
-       'btPriceHistory','btConfirmed','btInventory','btStock','btSalary','btBonus','btVouchers'].forEach(k=>localStorage.removeItem(k));
-      location.reload();
+      // 掃描所有 bt 開頭的 LS key 一次清光，避免漏掉新功能加的 key
+      const keys=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k && k.startsWith('bt')) keys.push(k);
+      }
+      keys.forEach(k=>localStorage.removeItem(k));
+      // 也清掉 service worker 快取，確保下次載入是乾淨的
+      if('caches' in window){
+        caches.keys().then(ks=>ks.forEach(k=>caches.delete(k))).finally(()=>location.reload());
+      } else {
+        location.reload();
+      }
     });
   }
 }
