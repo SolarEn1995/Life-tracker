@@ -513,7 +513,8 @@ function renderCatTabs(){
   const el=document.getElementById('homeCatTabs'); if(!el) return;
   el.innerHTML=
     `<button class="cat-tab ${currentCat==='all'?'active':''}" onclick="filterCat('all',this)">全部</button>`
-    +categories.map(c=>`<button class="cat-tab ${currentCat===c.id?'active':''}" onclick="filterCat('${c.id}',this)">${c.emoji} ${c.label}</button>`).join('');
+    +categories.map(c=>`<button class="cat-tab ${currentCat===c.id?'active':''}" onclick="filterCat('${c.id}',this)">${c.emoji} ${c.label}</button>`).join('')
+    +`<button class="cat-tab cat-tab-manage" onclick="openCatManagerModal()" title="管理類別">⚙️ 管理</button>`;
 }
 function filterCat(cat,el){
   currentCat=cat;
@@ -589,7 +590,7 @@ function renderHomeRestockSummary(){
   const el=document.getElementById('homeRestockSummary'); if(!el) return;
   // 含 5–10 天比價建議：擴大到 ≤14 天，按 d 升冪取前 5
   const list=products.map(p=>({p,d:getDaysLeft(p)})).filter(x=>x.d<=14).sort((a,b)=>a.d-b.d).slice(0,5);
-  if(!list.length){ el.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;text-align:center;color:var(--text3);box-shadow:var(--shadow)">🎉<br><br>目前沒有需補貨的商品</div>`; return; }
+  if(!list.length){ el.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;color:var(--text3);box-shadow:var(--shadow);font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:18px">🎉</span><span>目前沒有需補貨的商品</span></div>`; return; }
   const rows=list.map(({p,d})=>{
     const color=d<=3?'var(--danger)':(d<=7?'var(--warn)':'var(--accent3)');
     const msg=d<=0?'已用完！':`(剩 ${d} 天)`;
@@ -1247,8 +1248,40 @@ function onInvoiceQRDecoded(raw){
   const guess=guessInvoiceCategory(parsed);
   if(guess && expCats.some(c=>c.id===guess)) catSel.value=guess;
   document.getElementById('ir-pay').value='card';
+  // 重置 type 選擇 → 預設生活花費
+  _invType='life';
+  document.querySelectorAll('#invoiceTypeSelect .cat-opt').forEach(o=>o.classList.remove('selected'));
+  const lifeOpt=document.querySelector('#invoiceTypeSelect [data-val="life"]');
+  if(lifeOpt) lifeOpt.classList.add('selected');
+  applyInvoiceTypeUI();
   document.getElementById('invoiceResultOverlay').classList.add('open');
 }
+
+// 切換發票記到「生活花費」或「補貨採購」
+let _invType='life';
+function selectInvoiceType(el, mode){
+  document.querySelectorAll('#invoiceTypeSelect .cat-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  _invType=mode;
+  applyInvoiceTypeUI();
+}
+function applyInvoiceTypeUI(){
+  const catSel=document.getElementById('ir-cat');
+  const hint=document.getElementById('invoiceTypeHint');
+  if(!catSel) return;
+  if(_invType==='restock'){
+    // 切到補貨採購 → 用補貨類別 (categories: 保健品/保養品/日用品)
+    catSel.innerHTML=categories.map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+    if(hint) hint.textContent='將計入「本月採購」（保健品/保養品/日用品），不會新增到商品清單';
+  } else {
+    catSel.innerHTML=expCats.map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+    const guess=_invPending?guessInvoiceCategory(_invPending):null;
+    if(guess && expCats.some(c=>c.id===guess)) catSel.value=guess;
+    if(hint) hint.textContent='將以「分類」記入生活花費（餐飲/交通/醫藥保健…）';
+  }
+}
+window.selectInvoiceType=selectInvoiceType;
+window._setInvCatList=applyInvoiceTypeUI; // legacy
 
 function guessInvoiceCategory(parsed){
   const text=(parsed.items.join(' ')||'').toLowerCase();
@@ -1272,14 +1305,16 @@ function confirmInvoiceRecord(){
   const cat=document.getElementById('ir-cat').value;
   const pay=document.getElementById('ir-pay').value;
   const p=_invPending;
+  const isRestock=_invType==='restock';
   const rec={
     id:Date.now(),
-    name, emoji:catEmoji(cat)||'🧾',
+    name,
+    emoji:isRestock?(catById(cat)?.emoji||'📦'):(catEmoji(cat)||'🧾'),
     brand:'掃描發票',
     price:p.total,
     cat,
     date:p.date,
-    type:'life',
+    type:isRestock?'var':'life',
     pay,
     invoice:p.invoice,
     note:`發票 ${p.invoice}${p.sellerId?' · '+p.sellerId:''}`
@@ -2496,6 +2531,16 @@ function openImportModal(){
   resetImport();
   document.getElementById('importModalOverlay').classList.add('open');
 }
+function switchImportPreview(i){
+  const urls=window._importPreviewUrls||[];
+  if(!urls[i]) return;
+  document.getElementById('importPreviewImg2').src=urls[i];
+  document.querySelectorAll('#importThumbStrip img').forEach(img=>{
+    const idx=parseInt(img.dataset.i);
+    img.style.borderColor=idx===i?'var(--accent)':'var(--border)';
+  });
+}
+window.switchImportPreview=switchImportPreview;
 function resetImport(){
   importResults=[];importSelectedIds=new Set();
   ['importStep1','importStep2','importStep3','importStep4'].forEach((id,i)=>
@@ -2528,9 +2573,31 @@ function handleImportFile(e){
       // 重新編號 _id
       importResults=allItems.map((it,i)=>({...it,_id:i,_days:30}));
       importSelectedIds=new Set(importResults.map(it=>it._id));
+      // 預先讀取所有截圖 dataURL，供縮圖切換
+      const allUrls=[];
+      for(const f of files){ allUrls.push(await readFile(f)); }
+      window._importPreviewUrls=allUrls;
       document.getElementById('importStep2').style.display='none';
       document.getElementById('importStep3').style.display='block';
-      document.getElementById('importPreviewImg2').src=await readFile(files[0]);
+      const mainImg=document.getElementById('importPreviewImg2');
+      mainImg.src=allUrls[0];
+      // 縮圖列
+      const strip=document.getElementById('importThumbStrip');
+      const multiHint=document.getElementById('importMultiHint');
+      if(strip){
+        if(allUrls.length>1){
+          strip.style.display='flex';
+          if(multiHint) multiHint.style.display='inline';
+          strip.innerHTML=allUrls.map((u,i)=>
+            `<img src="${u}" data-i="${i}" onclick="switchImportPreview(${i})" alt="截圖${i+1}" `+
+            `style="flex:0 0 auto;width:62px;height:62px;object-fit:cover;border-radius:8px;cursor:pointer;`+
+            `border:2px solid ${i===0?'var(--accent)':'var(--border)'};box-shadow:var(--shadow-sm)"/>`).join('');
+        } else {
+          strip.style.display='none';
+          if(multiHint) multiHint.style.display='none';
+          strip.innerHTML='';
+        }
+      }
       document.getElementById('importResultTitle').textContent=
         files.length>1
           ? `辨識到 ${importResults.length} 件商品（${files.length} 張截圖），請確認`
@@ -3898,6 +3965,18 @@ function selectQePay(el, mode){
   } else {
     vp.style.display='none'; cp.style.display='none';
   }
+  // 悠遊卡餘額提示
+  const ecHint=document.getElementById('qeEasyCardHint');
+  if(ecHint){
+    if(mode==='easycard'){
+      const bal=(easyCard&&easyCard.balance)||0;
+      ecHint.style.display='block';
+      ecHint.textContent=`🚇 目前悠遊卡餘額 $${bal.toLocaleString()}`;
+      ecHint.style.color=bal<=100?'var(--danger)':'var(--accent)';
+    } else {
+      ecHint.style.display='none';
+    }
+  }
 }
 function updateCardBillingHint(){
   const sel=document.getElementById('qeCardSel');
@@ -3953,6 +4032,14 @@ function saveQuickExpense(){
     if(!v.history) v.history=[];
     v.history.push({date:dateVal,item:name,amount,cat:qeCat});
     records.push({id:Date.now(),name,emoji:'🎫',brand:`${v.name}折抵`,price:amount,cat:qeCat,date:dateVal,type:'voucher',pay:'voucher',...extras});
+  } else if(qePay==='easycard'){
+    const bal=(easyCard&&easyCard.balance)||0;
+    if(bal<amount){showToast(`🚇 悠遊卡餘額不足（剩 $${bal.toLocaleString()}），請先儲值`,'error');return;}
+    easyCard.balance=bal-amount;
+    if(!easyCard.history) easyCard.history=[];
+    const recId=Date.now();
+    easyCard.history.push({date:dateVal,delta:-amount,balance:easyCard.balance,note:name,type:'spend',recId});
+    records.push({id:recId,name,emoji:catEmoji(qeCat),brand:'🚇 悠遊卡',price:amount,cat:qeCat,date:dateVal,type:'easycard',pay:'easycard',...extras});
   } else if(qePay==='card'){
     const cid=parseInt(document.getElementById('qeCardSel').value);
     const card=creditCards.find(x=>x.id===cid);

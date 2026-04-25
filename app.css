@@ -811,3 +811,17 @@ html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(91,72,232,0.5
 
 /* === ep-btn 加大 tap target，且確保不超出容器 === */
 .ep-btn{min-width:38px;min-height:38px;}
+
+
+/* === \u88dc\u8ca8\u9801 \u985e\u5225\u7ba1\u7406\u81a0\u56ca === */
+.cat-tab.cat-tab-manage{
+  background:transparent;
+  border:1.5px dashed var(--border);
+  color:var(--text2);
+  font-weight:600;
+}
+.cat-tab.cat-tab-manage:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:var(--accent-light);
+}

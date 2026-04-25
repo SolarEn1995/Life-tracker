@@ -1045,6 +1045,7 @@
       <div style="display:flex;gap:7px;flex-wrap:wrap" id="qePaySelect">
         <div class="cat-opt selected" data-val="cash" onclick="selectQePay(this,'cash')">💵 現金/金融卡</div>
         <div class="cat-opt" data-val="card" onclick="selectQePay(this,'card')">💳 信用卡</div>
+        <div class="cat-opt" data-val="easycard" onclick="selectQePay(this,'easycard')">🚇 悠遊卡</div>
         <div class="cat-opt" data-val="voucher" onclick="selectQePay(this,'voucher')">🎫 即享券</div>
       </div>
       <div id="qeCardPicker" style="display:none;margin-top:8px">
@@ -1054,6 +1055,7 @@
       <div id="qeVoucherPicker" style="display:none;margin-top:8px">
         <select class="form-input" id="qeVoucherSel"></select>
       </div>
+      <div id="qeEasyCardHint" style="display:none;margin-top:8px;padding:9px 12px;background:var(--accent-light);border-radius:var(--r-sm);font-size:11px;color:var(--accent);font-weight:600"></div>
     </div>
     <!-- 💱 外幣 -->
     <div class="form-group">
@@ -1217,6 +1219,14 @@
     <div class="modal-handle"></div>
     <div class="modal-title">✅ 辨識成功</div>
     <div id="invoiceResultBody" style="margin-bottom:12px"></div>
+    <div class="form-group">
+      <label class="form-label">記到哪裡</label>
+      <div style="display:flex;gap:7px;flex-wrap:wrap" id="invoiceTypeSelect">
+        <div class="cat-opt selected" data-val="life" onclick="selectInvoiceType(this,'life')">🧾 生活花費</div>
+        <div class="cat-opt" data-val="restock" onclick="selectInvoiceType(this,'restock')">📦 補貨採購</div>
+      </div>
+      <div id="invoiceTypeHint" style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">將以「分類」記入生活花費（餐飲/交通/醫藥保健…）</div>
+    </div>
     <div class="form-group"><label class="form-label">分類</label>
       <select class="form-input" id="ir-cat"></select>
     </div>
@@ -1929,7 +1939,8 @@
     <!-- Step 3: review results -->
     <div id="importStep3" style="display:none">
       <img id="importPreviewImg2" class="import-preview-img" src="" alt="預覽" onclick="openImageZoom(this.src)" style="cursor:zoom-in"/>
-      <div style="font-size:11px;color:var(--text3);text-align:center;margin:-6px 0 8px">🔍 點圖可放大檢視</div>
+      <div id="importThumbStrip" style="display:none;gap:6px;overflow-x:auto;padding:6px 2px 8px;margin:-4px 0 0;-webkit-overflow-scrolling:touch"></div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin:-2px 0 8px">🔍 點圖可放大檢視<span id="importMultiHint" style="display:none">　•　點下方縮圖切換截圖</span></div>
       <div style="font-size:13px;font-weight:600;margin-bottom:4px" id="importResultTitle">辨識到 0 件商品</div>
       <div style="font-size:11px;color:var(--text2);margin-bottom:10px">請確認 AI 分類結果，可編輯、取消勾選或切換「更新/新增」模式</div>
       <div id="importSummaryCard" style="display:none;background:linear-gradient(135deg,rgba(91,72,232,0.08),rgba(24,184,124,0.06));border:1.5px solid rgba(91,72,232,0.25);border-radius:var(--r);padding:12px 14px;margin-bottom:12px">
