@@ -4086,6 +4086,34 @@ function togglePrivacy(){
   applyPrivacyMode();
 }
 // 💱 FX 匯率管理
+let fxRatesUpdatedAt=parseInt(localStorage.getItem('btFxRatesUpdatedAt')||'0')||0;
+function fxSymbol(c){ return (FX_META[c]&&FX_META[c].symbol)||c; }
+async function fetchFxRates(){
+  const codes=Object.keys(fxRates||{});
+  if(!codes.length){ showToast('尚無已加入的幣別','error'); return; }
+  showToast('🔄 正在從網路抓取匯率…','ok');
+  try{
+    // ECB 開源端點（無需金鑰）
+    const res=await fetch('https://open.er-api.com/v6/latest/TWD');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const j=await res.json();
+    if(j.result!=='success'||!j.rates) throw new Error('API 格式異常');
+    let updated=0;
+    codes.forEach(c=>{
+      // open.er-api 回傳「1 TWD = X 該幣」 → 我們要「1 該幣 = ? TWD」
+      const r=j.rates[c];
+      if(r && r>0){ fxRates[c]=Math.round((1/r)*10000)/10000; updated++; }
+    });
+    fxRatesUpdatedAt=Date.now();
+    localStorage.setItem('btFxRates',JSON.stringify(fxRates));
+    localStorage.setItem('btFxRatesUpdatedAt',String(fxRatesUpdatedAt));
+    showToast(`✓ 已更新 ${updated} 個幣別匯率`,'ok');
+    openFxRatesModal();
+    if(typeof renderQeCurrencyChips==='function') renderQeCurrencyChips();
+  }catch(err){
+    showToast('❌ 自動更新失敗：'+err.message,'error');
+  }
+}
 function openFxRatesModal(){
   const list=document.getElementById('fxRatesList');
   const curs=Object.keys(fxRates||{});

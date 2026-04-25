@@ -794,3 +794,20 @@ html[data-theme="dark"] .fc-compare.down{background:rgba(24,184,124,0.18);}
 .pill-add.green{background:linear-gradient(135deg,#18b87c,#4dd9a0);box-shadow:0 2px 6px rgba(24,184,124,0.25);}
 .pill-add.orange{background:linear-gradient(135deg,#f59e0b,#fb923c);box-shadow:0 2px 6px rgba(245,158,11,0.25);}
 .pill-add.pink{background:linear-gradient(135deg,#e8488a,#f472b6);box-shadow:0 2px 6px rgba(232,72,138,0.25);}
+
+
+/* === Dark mode polish for new pill / section-head === */
+html[data-theme="dark"] .pill-add{box-shadow:0 2px 8px rgba(0,0,0,0.5);}
+html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(91,72,232,0.5);}
+
+/* === Section-head responsive: 在窄螢幕分行避免擠壓 === */
+@media (max-width: 380px){
+  .section-head{flex-wrap:wrap;}
+  .pill-add{padding:7px 12px;font-size:12px;}
+}
+
+/* === Tap target minima (a11y) === */
+.fab-card, .pill-add, .btn-sm, .btn-mini{min-height:38px;}
+
+/* === ep-btn 加大 tap target，且確保不超出容器 === */
+.ep-btn{min-width:38px;min-height:38px;}
