@@ -233,7 +233,10 @@
   <div class="page-section-title">⭐ 補貨重點與比價</div>
   <div id="homeRestockSummary" style="margin-bottom:14px"></div>
 
-  <div class="page-section-title">📋 所有商品</div>
+  <div class="page-section-title section-with-action">
+    <span>📋 所有商品</span>
+    <button class="pill-add-btn" onclick="openProductModal()">➕ 新增商品</button>
+  </div>
   <div class="search-pill">
     <span class="sp-icon">🔍</span>
     <input id="productSearchInput" type="search" placeholder="搜尋商品名稱 / 品牌" oninput="renderProducts()"/>
@@ -561,7 +564,10 @@
   </div>
   <div class="cat-breakdown" id="catBreakdown"></div>
 
-  <div class="page-section-title">📋 消費明細</div>
+  <div class="page-section-title section-with-action">
+    <span>📋 消費明細</span>
+    <button class="pill-add-btn" onclick="openQuickExpense()">➕ 新增記錄</button>
+  </div>
   <!-- 篩選列：chip + 選取按鈕 -->
   <input type="hidden" id="recordFilterCat" value="all"/>
   <div class="filter-toolbar">
@@ -1460,7 +1466,7 @@
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">🏷 管理記帳類別</div>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6">
+    <div class="cat-mgr-desc" style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6">
       新增、編輯或刪除記帳類別。已使用過的類別無法刪除。
     </div>
     <div id="catManagerList"></div>

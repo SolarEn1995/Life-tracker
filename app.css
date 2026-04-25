@@ -1219,3 +1219,78 @@ html[data-theme="dark"] #home > .free-card::before{
     background:linear-gradient(135deg,rgba(232,124,32,0.20),rgba(43,36,29,0.92)) !important;
   }
 }
+
+
+/* ========== 📋 章節標題 + 膠囊新增鈕 ========== */
+.page-section-title.section-with-action{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.pill-add-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:6px 14px;border-radius:999px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-size:12px;font-weight:700;letter-spacing:0.3px;
+  border:none;cursor:pointer;
+  box-shadow:0 2px 8px rgba(240,138,107,0.30);
+  transition:transform 0.15s, box-shadow 0.2s;
+}
+.pill-add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(240,138,107,0.42);}
+.pill-add-btn:active{transform:translateY(0) scale(0.96);}
+
+/* ========== 🐱 P5 喵特效：尾巴 / 達標愛心 / 對話泡泡 ========== */
+
+/* (1) 搖尾巴 — 心情卡右下角浮一條尾巴 */
+.cat-mood-card .cmc-tail{
+  position:absolute;right:-8px;bottom:-6px;width:60px;height:60px;
+  pointer-events:none;z-index:0;
+  transform-origin:14px 50px;
+  animation:tailSwing 2.4s ease-in-out infinite;
+}
+.cat-mood-card.tier-broke .cmc-tail{animation:tailSwing 0.8s ease-in-out infinite;}
+@keyframes tailSwing{
+  0%,100%{transform:rotate(-12deg);}
+  50%{transform:rotate(18deg);}
+}
+
+/* (2) 對話泡泡 */
+.meow-bubble{
+  position:absolute;
+  top:-10px;left:90px;
+  max-width:200px;
+  padding:8px 12px;
+  background:#fff;
+  border:1.5px solid var(--accent);
+  border-radius:14px 14px 14px 4px;
+  font-size:12px;line-height:1.4;color:var(--text);
+  box-shadow:0 4px 14px rgba(178,138,98,0.18);
+  opacity:0;transform:translateY(8px) scale(0.92);
+  transition:opacity 0.22s, transform 0.22s cubic-bezier(.4,1.6,.6,1);
+  pointer-events:none;z-index:5;
+}
+.meow-bubble.show{opacity:1;transform:translateY(0) scale(1);}
+.meow-bubble::before{
+  content:'';position:absolute;left:-8px;bottom:6px;
+  width:0;height:0;
+  border:6px solid transparent;border-right-color:var(--accent);border-left:none;
+}
+.meow-bubble::after{
+  content:'';position:absolute;left:-6px;bottom:7px;
+  width:0;height:0;
+  border:5px solid transparent;border-right-color:#fff;border-left:none;
+}
+html[data-theme="dark"] .meow-bubble{background:#2A2520;color:var(--text);}
+html[data-theme="dark"] .meow-bubble::after{border-right-color:#2A2520;}
+
+/* (3) 達標愛心特效 — 從喵頭飄出 */
+.heart-burst{
+  position:absolute;left:36px;top:24px;
+  font-size:18px;pointer-events:none;
+  animation:heartFloat 1.6s ease-out forwards;opacity:0;z-index:6;
+}
+@keyframes heartFloat{
+  0%{opacity:0;transform:translate(0,0) scale(0.6);}
+  20%{opacity:1;transform:translate(0,-8px) scale(1);}
+  100%{opacity:0;transform:translate(var(--hx,20px),-60px) scale(1.2);}
+}
+
+.cat-mood-card{position:relative;}

@@ -101,6 +101,7 @@ const DEFAULT_CATS=[
 ];
 let categories=JSON.parse(localStorage.getItem('btCats')||'null')||DEFAULT_CATS;
 function catById(id){return categories.find(c=>c.id===id)||{label:id,emoji:'📦',color:'#aaa'};}
+function saveCats(){ localStorage.setItem('btCats',JSON.stringify(categories)); }
 
 function dAgo(n){return new Date(NOW.getTime()-n*86400000).toISOString().split('T')[0];}
 
@@ -637,6 +638,17 @@ function renderCatMood(ctx){
   const tier=tierMap[key];
   card.className='cat-mood-card '+tier.cls;
   card.dataset.mood=key;
+  // 確保有尾巴
+  if(!card.querySelector('.cmc-tail')){
+    const tail=document.createElement('div');
+    tail.className='cmc-tail';
+    tail.innerHTML='<svg viewBox="0 0 60 60" width="60" height="60"><path d="M14 50 Q20 30 32 26 Q44 22 50 30" stroke="#D27A3C" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M14 50 Q20 30 32 26 Q44 22 50 30" stroke="#FFB874" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M48 28 Q52 26 54 28" stroke="#D27A3C" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+    card.appendChild(tail);
+  }
+  // 確保有對話泡泡容器
+  if(!card.querySelector('.meow-bubble')){
+    const b=document.createElement('div'); b.className='meow-bubble'; b.id='cmcBubble'; card.appendChild(b);
+  }
   const emojiEl=document.getElementById('cmcEmoji');
   emojiEl.innerHTML=meowCatSvg(key,72);
   emojiEl.style.cursor='pointer';
@@ -646,10 +658,26 @@ function renderCatMood(ctx){
       const k=card.dataset.mood||'mid';
       const arr=CAT_QUOTES[k]||CAT_QUOTES.mid;
       const q=arr[Math.floor(Math.random()*arr.length)];
-      const qEl=document.getElementById('cmcQuote');
-      qEl.style.opacity='0';
-      setTimeout(()=>{qEl.textContent=q;qEl.style.opacity='1';},150);
+      // 對話泡泡（取代之前的 quote 換字）
+      const bub=card.querySelector('.meow-bubble');
+      if(bub){
+        bub.textContent=q;
+        bub.classList.add('show');
+        clearTimeout(bub._t);
+        bub._t=setTimeout(()=>bub.classList.remove('show'),2400);
+      }
       emojiEl.classList.remove('meow-pop');void emojiEl.offsetWidth;emojiEl.classList.add('meow-pop');
+      // 皇室喵點擊冒愛心
+      if(k==='rich'){
+        ['💖','✨','💛','🐟','💖'].forEach((h,i)=>{
+          const el=document.createElement('span');
+          el.className='heart-burst';el.textContent=h;
+          el.style.setProperty('--hx',((i-2)*16)+'px');
+          el.style.animationDelay=(i*0.08)+'s';
+          card.appendChild(el);
+          setTimeout(()=>el.remove(),1700);
+        });
+      }
     });
     emojiEl._meowBound=true;
   }
@@ -670,7 +698,7 @@ function renderCatTabs(){
   el.innerHTML=
     `<button class="cat-tab ${currentCat==='all'?'active':''}" onclick="filterCat('all',this)">全部</button>`
     +categories.map(c=>`<button class="cat-tab ${currentCat===c.id?'active':''}" onclick="filterCat('${c.id}',this)">${c.emoji} ${c.label}</button>`).join('')
-    +`<button class="cat-tab cat-tab-manage" onclick="openCatManagerModal()" title="管理類別">⚙️ 管理</button>`;
+    +`<button class="cat-tab cat-tab-manage" onclick="openCatManagerModal('restock')" title="管理類別">⚙️ 管理</button>`;
 }
 function filterCat(cat,el){
   currentCat=cat;
@@ -4435,12 +4463,31 @@ function catLabel(cat){
   return m[cat]||cat;
 }
 // 🏷 記帳類別管理
-function openCatManagerModal(){
+function openCatManagerModal(mode='expense'){
+  window._catMgrMode=mode;
+  // 切換標題與說明
+  const titleEl=document.querySelector('#catManagerOverlay .modal-title');
+  const descEl =document.querySelector('#catManagerOverlay .cat-mgr-desc');
+  if(titleEl) titleEl.textContent=mode==='restock'?'🏷 管理補貨類別':'🏷 管理記帳類別';
+  if(descEl)  descEl.textContent =mode==='restock'?'新增、編輯或刪除補貨商品的類別。已使用過的類別無法刪除。':'新增、編輯或刪除記帳類別。已使用過的類別無法刪除。';
   renderCatManagerList();
   document.getElementById('catManagerOverlay').classList.add('open');
 }
 function renderCatManagerList(){
   const el=document.getElementById('catManagerList'); if(!el) return;
+  const mode=window._catMgrMode||'expense';
+  if(mode==='restock'){
+    const usedIds=new Set(products.map(p=>p.cat));
+    el.innerHTML=categories.map((c,i)=>{
+      const used=usedIds.has(c.id);
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm)">
+        <input value="${c.emoji}" maxlength="2" oninput="categories[${i}].emoji=this.value;saveCats()" style="width:42px;text-align:center;font-size:18px;border:1px solid var(--border2);border-radius:6px;padding:5px;background:var(--surface);color:var(--text)"/>
+        <input value="${c.label}" oninput="categories[${i}].label=this.value;saveCats()" style="flex:1;border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-size:13px;background:var(--surface);color:var(--text)"/>
+        ${used?`<span style="font-size:10px;color:var(--text3)">使用中</span>`:`<button onclick="deleteRestockCat('${c.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer;padding:0 4px">🗑</button>`}
+      </div>`;
+    }).join('');
+    return;
+  }
   const usedIds=new Set(records.filter(r=>r.type==='life'||r.type==='voucher'||r.type==='easycard').map(r=>r.cat));
   el.innerHTML=expCats.map((c,i)=>{
     const used=usedIds.has(c.id);
@@ -4452,9 +4499,23 @@ function renderCatManagerList(){
   }).join('');
 }
 function addCustomCat(){
+  const mode=window._catMgrMode||'expense';
   const emoji=document.getElementById('newCatEmoji').value.trim()||'📦';
   const label=document.getElementById('newCatLabel').value.trim();
   if(!label){ showToast('請輸入類別名稱','error'); return; }
+  if(mode==='restock'){
+    if(categories.some(c=>c.label===label)){ showToast('類別名稱已存在','error'); return; }
+    const id='custom_'+Date.now();
+    const palette=['#F08A6B','#E5A234','#3FA985','#5C8DC4','#9B6BCB','#E55A4D'];
+    const color=palette[categories.length%palette.length];
+    categories.push({id,label,emoji,color});
+    saveCats();
+    document.getElementById('newCatEmoji').value='';
+    document.getElementById('newCatLabel').value='';
+    renderCatManagerList(); renderCatTabs(); renderProducts();
+    showToast('已新增補貨類別：'+emoji+' '+label,'ok');
+    return;
+  }
   if(expCats.some(c=>c.label===label)){ showToast('類別名稱已存在','error'); return; }
   const id='custom_'+Date.now();
   expCats.push({id,emoji,label});
@@ -4469,6 +4530,12 @@ function deleteCustomCat(id){
   expCats=expCats.filter(c=>c.id!==id);
   saveExpCats();
   renderCatManagerList(); renderHqCats();
+}
+function deleteRestockCat(id){
+  if(categories.length<=1){ showToast('至少需保留一個類別','error'); return; }
+  categories=categories.filter(c=>c.id!==id);
+  saveCats();
+  renderCatManagerList(); renderCatTabs(); renderProducts();
 }
 function saveLifeBudget(){
   const v=parseInt(document.getElementById('lifeBudgetInput').value)||0;
