@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#5b48e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FF8A65" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)">
+<meta name="description" content="MeowFi 喵算 — 跟著小財貓一起記帳！個人收支、薪資、發票對獎、AI 辨識一站式 PWA">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="理財小幫手">
+<meta name="apple-mobile-web-app-title" content="MeowFi">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/svg+xml" href="icon-192.svg">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>理財小幫手</title>
+<title>MeowFi 喵算 — 跟著小財貓一起記帳</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
 </head>
@@ -20,7 +22,7 @@
 
 <div class="header">
   <div class="header-top">
-    <div class="app-name"><span class="a">理財</span><span class="b">小幫手</span></div>
+    <div class="app-name" title="MeowFi 喵算"><img src="icon-192.svg" alt="" class="app-logo" aria-hidden="true"/><span class="a">Meow</span><span class="b">Fi</span><span class="app-zh">喵算</span></div>
     <button class="theme-cycle-btn" id="themeCycleBtn" onclick="cycleTheme()" title="切換深淺色模式" aria-label="切換主題">🖥️</button>
     <div class="month-badge" id="currentMonthBadge"></div>
   </div>
@@ -495,7 +497,7 @@
     <div style="display:flex;align-items:center;gap:12px">
       <div style="font-size:32px">💼</div>
       <div>
-        <div style="font-size:15px;font-weight:700">理財小幫手</div>
+        <div style="font-size:15px;font-weight:700">MeowFi 喵算</div>
         <div style="font-size:11px;color:var(--text2);margin-top:2px">補貨 · 固定支出 · 花費 · 收入管理</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">所有資料僅儲存於本機裝置</div>
       </div>
@@ -2029,7 +2031,7 @@
   <div class="modal" style="max-width:380px;padding:0">
     <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:18px 18px 14px;border-radius:18px 18px 0 0">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div style="font-size:16px;font-weight:700">👋 歡迎使用理財小幫手！</div>
+        <div style="font-size:16px;font-weight:700">� 喵～歡迎使用 MeowFi！</div>
         <button onclick="skipOnboard()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer">跳過</button>
       </div>
       <div style="font-size:11px;opacity:0.9">花 30 秒設定核心數字，之後預算&存款都自動算好</div>

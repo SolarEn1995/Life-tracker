@@ -1,15 +1,21 @@
 {
-  "name": "理財小幫手",
-  "short_name": "理財",
-  "description": "個人記帳、薪資、發票對獎、AI 辨識一站式 PWA",
+  "name": "MeowFi 喵算",
+  "short_name": "MeowFi",
+  "description": "喵～跟著小財貓一起記帳！個人收支、薪資、發票對獎、AI 辨識一站式 PWA",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#5b48e8",
-  "theme_color": "#5b48e8",
+  "background_color": "#FF8A65",
+  "theme_color": "#FF8A65",
   "lang": "zh-TW",
   "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
@@ -20,7 +26,7 @@
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }

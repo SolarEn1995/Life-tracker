@@ -1,1 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#5b48e8"/><text x="50%" y="58%" font-size="320" text-anchor="middle" dominant-baseline="middle">💼</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="55%" stop-color="#FF8A65"/>
+      <stop offset="100%" stop-color="#F06292"/>
+    </linearGradient>
+    <radialGradient id="coinGrad" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0%" stop-color="#FFF3B0"/>
+      <stop offset="60%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#F9A825"/>
+    </radialGradient>
+    <linearGradient id="catFur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB874"/>
+      <stop offset="100%" stop-color="#E08A3C"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M150 180 L180 100 L230 170 Z" fill="url(#catFur)" stroke="#a85a16" stroke-width="3"/>
+  <path d="M362 180 L332 100 L282 170 Z" fill="url(#catFur)" stroke="#a85a16" stroke-width="3"/>
+  <path d="M168 158 L188 120 L218 162 Z" fill="#FFB6C1"/>
+  <path d="M344 158 L324 120 L294 162 Z" fill="#FFB6C1"/>
+  <ellipse cx="256" cy="240" rx="138" ry="120" fill="url(#catFur)" stroke="#a85a16" stroke-width="4"/>
+  <path d="M140 200 q15 -10 30 0" stroke="#c66e1f" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M342 200 q15 -10 30 0" stroke="#c66e1f" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M150 230 q15 -8 30 0" stroke="#c66e1f" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M332 230 q15 -8 30 0" stroke="#c66e1f" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="180" cy="280" rx="22" ry="14" fill="#FFB6C1" opacity="0.7"/>
+  <ellipse cx="332" cy="280" rx="22" ry="14" fill="#FFB6C1" opacity="0.7"/>
+  <path d="M195 232 q15 -16 30 0" stroke="#3a2410" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M287 232 q15 -16 30 0" stroke="#3a2410" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M248 258 L264 258 L256 270 Z" fill="#FF6B9D" stroke="#a8467a" stroke-width="1.5"/>
+  <path d="M256 270 q-10 14 -22 8" stroke="#3a2410" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M256 270 q10 14 22 8" stroke="#3a2410" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <line x1="120" y1="258" x2="170" y2="262" stroke="#5d3a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="120" y1="278" x2="170" y2="276" stroke="#5d3a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="392" y1="258" x2="342" y2="262" stroke="#5d3a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="392" y1="278" x2="342" y2="276" stroke="#5d3a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="256" cy="395" r="62" fill="url(#coinGrad)" stroke="#b8770a" stroke-width="5"/>
+  <circle cx="256" cy="395" r="50" fill="none" stroke="#fff7d6" stroke-width="2.5" opacity="0.7"/>
+  <text x="256" y="425" font-family="DM Mono, monospace" font-size="78" font-weight="900" text-anchor="middle" fill="#7a4d05">$</text>
+  <ellipse cx="194" cy="395" rx="28" ry="22" fill="url(#catFur)" stroke="#a85a16" stroke-width="4"/>
+  <ellipse cx="318" cy="395" rx="28" ry="22" fill="url(#catFur)" stroke="#a85a16" stroke-width="4"/>
+</svg>
