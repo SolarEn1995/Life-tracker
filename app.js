@@ -2274,7 +2274,7 @@ function renderDebts(){
   if(dpt) dpt.textContent=`$${tot.toLocaleString()}`;
   if(dpc) dpc.textContent=`共 ${debts.filter(d=>d.status!=='paid').length} 筆 · 每月還款 $${monthly.toLocaleString()}`;
   if(!debts.length){
-    list.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;background:var(--surface);border-radius:12px">尚無負債紀錄<br>有房貸 / 車貸 / 分期可點上方「＋ 新增負債」</div>`;
+    list.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px;background:var(--surface);border-radius:12px">尚無負債紀錄<br>有房貸 / 車貸 / 分期可點下方「🏦 ＋ 新增負債分期」</div>`;
     return;
   }
   // 按未還清優先 + 剩餘金額大的優先
