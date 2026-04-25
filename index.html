@@ -7,11 +7,11 @@
 <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="?�財小幫??>
+<meta name="apple-mobile-web-app-title" content="理財小幫手">
 <link rel="apple-touch-icon" href="icon-192.svg">
 <link rel="icon" type="image/svg+xml" href="icon-192.svg">
 <link rel="manifest" href="manifest.json">
-<title>?�財小幫??/title>
+<title>理財小幫手</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
 </head>
@@ -19,118 +19,118 @@
 
 <div class="header">
   <div class="header-top">
-    <div class="app-name"><span class="a">?�財</span><span class="b">小幫??/span></div>
-    <button class="theme-cycle-btn" id="themeCycleBtn" onclick="cycleTheme()" title="?��?深淺?�模�? aria-label="?��?主�?">?���?/button>
+    <div class="app-name"><span class="a">理財</span><span class="b">小幫手</span></div>
+    <button class="theme-cycle-btn" id="themeCycleBtn" onclick="cycleTheme()" title="切換深淺色模式" aria-label="切換主題">🖥️</button>
     <div class="month-badge" id="currentMonthBadge"></div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="showPage('home',this)">?? 總覽</button>
-    <button class="tab" onclick="showPage('reminder',this)">??補貨</button>
-    <button class="tab" onclick="showPage('fixed',this)">?�� ?��?</button>
-    <button class="tab" onclick="showPage('record',this)">?? ?�費</button>
-    <button class="tab" onclick="showPage('income',this)">?�� ?�入</button>
-    <button class="tab" onclick="showPage('settings',this)">?��?</button>
+    <button class="tab active" onclick="showPage('home',this)">🏠 總覽</button>
+    <button class="tab" onclick="showPage('reminder',this)">⏰ 補貨</button>
+    <button class="tab" onclick="showPage('fixed',this)">💳 固定</button>
+    <button class="tab" onclick="showPage('record',this)">📊 花費</button>
+    <button class="tab" onclick="showPage('income',this)">💵 收入</button>
+    <button class="tab" onclick="showPage('settings',this)">⚙️</button>
   </div>
 </div>
 
 <!-- HOME -->
 <div class="content page active" id="home">
-  <!-- ?? ?��?中�?（單行�??��??��? -->
+  <!-- 🔔 提醒中心（單行折疊膠囊） -->
   <div id="alertChip" class="alert-chip" style="display:none" role="button" tabindex="0" onclick="toggleAlertStack()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAlertStack();}">
-    <span class="ac-icon">??</span>
-    <span class="ac-text">你�? <span id="alertChipCount">0</span> ?��???/span>
-    <span class="ac-chev" id="alertChipChev">??/span>
+    <span class="ac-icon">🔔</span>
+    <span class="ac-text">你有 <span id="alertChipCount">0</span> 則提醒</span>
+    <span class="ac-chev" id="alertChipChev">▾</span>
   </div>
   <div id="alertStack" style="display:none;margin-bottom:10px">
-    <!-- ?? 補貨?��? -->
+    <!-- 🛒 補貨提醒 -->
     <div id="alertBar" style="display:none;margin-bottom:8px">
       <div class="alert-bar" role="button" tabindex="0" onclick="navTab('reminder')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();navTab('reminder');}">
-        <div class="a-icon">??</div><div class="a-text">?��??�快?��?了�?</div>
+        <div class="a-icon">🛒</div><div class="a-text">有商品快用完了！</div>
         <div class="a-badge" id="alertCountBadge">0</div>
       </div>
     </div>
-    <!-- ?��?警示 -->
+    <!-- 預算警示 -->
     <div id="budgetAlert" style="display:none;margin-bottom:8px"></div>
-    <!-- ?��?引�?橫�? -->
+    <!-- 新手引導橫幅 -->
     <div id="onboardBanner" style="display:none;margin-bottom:8px;background:linear-gradient(135deg,#fb923c,#f59e0b);color:#fff;border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 4px 14px rgba(251,146,60,0.3)" onclick="startOnboarding()">
       <div style="display:flex;align-items:center;gap:12px">
-        <div style="font-size:28px">??</div>
+        <div style="font-size:28px">🚀</div>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:800;margin-bottom:2px">完�??�本設�?</div>
-          <div style="font-size:11px;opacity:0.92;line-height:1.5" id="onboardBannerHint">設�??��??�收?��?APP ?�幫你�?好可?��?�?/div>
+          <div style="font-size:13px;font-weight:800;margin-bottom:2px">完成基本設定</div>
+          <div style="font-size:11px;opacity:0.92;line-height:1.5" id="onboardBannerHint">設定預算與收入，APP 會幫你算好可用餘額</div>
         </div>
-        <div style="font-size:11px;font-weight:700;background:rgba(255,255,255,0.22);padding:6px 10px;border-radius:14px">?��? ??/div>
+        <div style="font-size:11px;font-weight:700;background:rgba(255,255,255,0.22);padding:6px 10px;border-radius:14px">開始 →</div>
       </div>
     </div>
-    <!-- ?�份?��? -->
+    <!-- 備份提醒 -->
     <div id="backupReminder" style="display:none"></div>
   </div>
 
-  <!-- ??章�?：本?��?�?-->
-  <div class="home-section-title">?? ?��?概�?</div>
+  <!-- ▼ 章節：本月概況 -->
+  <div class="home-section-title">📊 本月概況</div>
 
-  <!-- ???��?財�??�?��??�用餘�?（主 KPI，置?��? -->
+  <!-- ① 本月財務狀態：可用餘額（主 KPI，置頂） -->
   <div class="free-card" id="freeCard">
-    <div class="fc-icon" id="freeIcon">?��</div>
+    <div class="fc-icon" id="freeIcon">💰</div>
     <div class="fc-info">
-      <div class="fc-label" id="freeLabel">記�??��?後自?�顯示可?��?�?/div>
-      <div class="fc-value privacy-mask" id="freeValue" style="color:var(--text3);font-size:16px;cursor:pointer" onclick="openFab()" role="button" tabindex="0">點右下�? ?��????��??��? ??/div>
+      <div class="fc-label" id="freeLabel">記錄薪資後自動顯示可用餘額</div>
+      <div class="fc-value privacy-mask" id="freeValue" style="color:var(--text3);font-size:16px;cursor:pointer" onclick="openFab()" role="button" tabindex="0">點右下角 《＋》 新增薪資 →</div>
       <div class="fc-sub" id="freeSub"></div>
       <div class="fc-compare privacy-mask" id="freeCompare" style="display:none"></div>
     </div>
-    <button class="privacy-toggle" id="privacyToggle" onclick="togglePrivacy()" title="?�偷窺�?模�??��?" aria-label="?��??��?模�?">??</button>
+    <button class="privacy-toggle" id="privacyToggle" onclick="togglePrivacy()" title="防偷窺：模糊金額" aria-label="切換隱私模式">👁</button>
   </div>
 
-  <!-- �?Quick Stats 4 小格 -->
+  <!-- � Quick Stats 4 小格 -->
   <div class="quick-stats" id="quickStats" style="display:none">
     <div class="qs-cell">
-      <div class="qs-icon">?��</div>
-      <div class="qs-label">?�收??/div>
+      <div class="qs-icon">📥</div>
+      <div class="qs-label">月收入</div>
       <div class="qs-value privacy-mask" id="qsIncome">$0</div>
     </div>
     <div class="qs-cell">
-      <div class="qs-icon">?��</div>
-      <div class="qs-label">?�支??/div>
+      <div class="qs-icon">📤</div>
+      <div class="qs-label">月支出</div>
       <div class="qs-value privacy-mask" id="qsSpend">$0</div>
     </div>
     <div class="qs-cell">
-      <div class="qs-icon">?��</div>
-      <div class="qs-label">結�?</div>
+      <div class="qs-icon">💰</div>
+      <div class="qs-label">結餘</div>
       <div class="qs-value privacy-mask" id="qsBalance">$0</div>
     </div>
     <div class="qs-cell">
-      <div class="qs-icon">??</div>
-      <div class="qs-label">存款??/div>
-      <div class="qs-value" id="qsSaveRate">??/div>
+      <div class="qs-icon">📊</div>
+      <div class="qs-label">存款率</div>
+      <div class="qs-value" id="qsSaveRate">—</div>
     </div>
   </div>
 
-  <!-- ��???��??�出（�?併卡�? ??+ ?�度條�? -->
+  <!-- �📊 本月支出（合併卡：3 格 + 進度條） -->
   <div class="home-stat-card" style="margin-top:10px">
-    <div class="hsc-title">?? ?��??�出?�細</div>
+    <div class="hsc-title">📊 本月支出明細</div>
     <div class="hsc-grid">
       <div class="hsc-cell">
-        <div class="hsc-icon">??</div>
-        <div class="hsc-label">?�購</div>
+        <div class="hsc-icon">🛍</div>
+        <div class="hsc-label">採購</div>
         <div class="hsc-value privacy-mask" id="totalSpend" style="color:var(--accent2)">$0</div>
         <div class="hsc-budget" id="totalSpendBudget"></div>
       </div>
       <div class="hsc-cell">
-        <div class="hsc-icon">?��</div>
-        <div class="hsc-label">?�活</div>
+        <div class="hsc-icon">💸</div>
+        <div class="hsc-label">生活</div>
         <div class="hsc-value privacy-mask" id="homeLifeTotal" style="color:var(--accent2)">$0</div>
         <div class="hsc-budget" id="homeLifeBudget"></div>
       </div>
       <div class="hsc-cell">
-        <div class="hsc-icon">?��</div>
-        <div class="hsc-label">?��?</div>
+        <div class="hsc-icon">💳</div>
+        <div class="hsc-label">固定</div>
         <div class="hsc-value privacy-mask" id="totalFixed" style="color:var(--fixed)">$0</div>
         <div class="hsc-budget" id="totalFixedBudget"></div>
       </div>
     </div>
     <div class="cashflow-bar cashflow-inline" id="cashflowBar" style="display:none">
       <div class="cf-header">
-        <div class="cf-title">?�出佔�? <span id="homeTotalAll" class="privacy-mask" style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:700;margin-left:6px">$0</span></div>
+        <div class="cf-title">支出佔比 <span id="homeTotalAll" class="privacy-mask" style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:700;margin-left:6px">$0</span></div>
         <div class="cf-income privacy-mask" id="cfIncomeLabel"></div>
       </div>
       <div class="cf-track">
@@ -139,83 +139,83 @@
         <div class="cf-seg seg-fixed" id="cfSegFixed" style="width:0%"></div>
       </div>
       <div class="cf-legend">
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2)"></div>?�購</div>
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2);opacity:0.5"></div>?�活</div>
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--fixed)"></div>?��?</div>
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--bg2)"></div>?��?</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2)"></div>採購</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2);opacity:0.5"></div>生活</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--fixed)"></div>固定</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--bg2)"></div>剩餘</div>
       </div>
     </div>
   </div>
 
-  <!-- ??章�?：�???-->
-  <div class="home-section-title" id="homeSecAssets" style="display:none">?? 資產</div>
+  <!-- ▼ 章節：資產 -->
+  <div class="home-section-title" id="homeSecAssets" style="display:none">💎 資產</div>
 
-  <!-- ??信用?��????next month preview�?-->
+  <!-- ⑤ 信用卡待扣（next month preview） -->
   <div id="cardPendingCard" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-top:10px;box-shadow:var(--shadow)">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:16px">?��</span>
-        <div style="font-size:12px;font-weight:700">下�?信用?��???/div>
+        <span style="font-size:16px">💳</span>
+        <div style="font-size:12px;font-weight:700">下月信用卡待扣</div>
       </div>
       <div id="cardPendingAmount" class="privacy-mask" style="font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--accent)">$0</div>
     </div>
     <div id="cardPendingDetail" class="privacy-mask" style="font-size:10px;color:var(--text3);margin-top:5px"></div>
   </div>
 
-  <!-- ?? 資產淨值總覽�?移至此�?：在?��?款進度?��?上�? -->
+  <!-- 💎 資產淨值總覽（移至此處：在「存款進度」之上） -->
   <div id="netWorthCard" style="display:none;background:var(--surface);border:1px solid var(--border);border-left:3px solid #10b981;border-radius:14px;padding:14px 16px;margin-top:10px;cursor:pointer;box-shadow:var(--shadow)" onclick="toggleNetWorthDetail()">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
       <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-size:18px">??</div>
-        <div style="font-size:12px;font-weight:700;color:var(--text)">資產淨�?/div>
+        <div style="font-size:18px">💎</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text)">資產淨值</div>
       </div>
-      <div style="font-size:10px;color:var(--text3)" id="netWorthToggleHint">點�?展�??�細 ??/div>
+      <div style="font-size:10px;color:var(--text3)" id="netWorthToggleHint">點擊展開明細 ▾</div>
     </div>
     <div class="privacy-mask" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:0.3px;color:#10b981" id="netWorthValue">$0</div>
-    <div class="privacy-mask" style="font-size:11px;color:var(--text2);margin-top:2px" id="netWorthSubLabel">總�???- 負債</div>
+    <div class="privacy-mask" style="font-size:11px;color:var(--text2);margin-top:2px" id="netWorthSubLabel">總資產 - 負債</div>
     <div id="netWorthDetail" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);font-size:12px;line-height:1.9;color:var(--text2)"></div>
   </div>
 
-  <!-- ??章�?：目�?-->
-  <div class="home-section-title" id="homeSecGoals" style="display:none">?�� ?��?</div>
+  <!-- ▼ 章節：目標 -->
+  <div class="home-section-title" id="homeSecGoals" style="display:none">🎯 目標</div>
 
-  <!-- ??存款?��??�度（移?��??��??�為?��?度目標�? -->
+  <!-- ⑥ 存款目標進度（移至最末，因為是月度目標） -->
   <div id="savingGoalCard" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-top:10px;box-shadow:var(--shadow)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">?��</span><div style="font-size:12px;font-weight:700">?��?存款?�度</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🎯</span><div style="font-size:12px;font-weight:700">本月存款進度</div></div>
       <div id="sgCardSummary" style="font-size:11px;color:var(--text2)"></div>
     </div>
     <div class="budget-bar-wrap"><div class="budget-bar-fill ok" id="sgCardFill" style="width:0%"></div></div>
     <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px">
-      <span id="sgCardActual" class="privacy-mask" style="color:var(--accent3);font-weight:600">實�? $0</span>
-      <span id="sgCardTarget" class="privacy-mask" style="color:var(--text2)">?��? $0</span>
+      <span id="sgCardActual" class="privacy-mask" style="color:var(--accent3);font-weight:600">實存 $0</span>
+      <span id="sgCardTarget" class="privacy-mask" style="color:var(--text2)">目標 $0</span>
     </div>
     <div id="sgCardExtra" class="privacy-mask" style="display:none;margin-top:6px;font-size:10px;color:var(--text3);padding-top:6px;border-top:1px dashed var(--border)"></div>
   </div>
 
-  <!-- ?��?節點�?保�? alertCount 以維?�既??JS 引用 -->
+  <!-- 隱藏節點：保留 alertCount 以維持既有 JS 引用 -->
   <span id="alertCount" style="display:none">0</span>
 
 </div>
 
-<!-- REMINDER (補貨主�?，�?總覽移�?�? -->
+<!-- REMINDER (補貨主頁，從總覽移過來) -->
 <div class="content page" id="reminder" style="display:none">
-  <div class="page-section-title">?? 補貨概�?</div>
+  <div class="page-section-title">📊 補貨概況</div>
   <div id="reminderStatsBar" class="page-stats-row">
-    <div class="summary-card items" style="flex:1"><div class="s-icon">?��</div><div class="s-label">?��?總數</div><div class="s-value" id="remTotalCount">0</div></div>
-    <div class="summary-card alert" style="flex:1"><div class="s-icon">?��?</div><div class="s-label">7天內補貨</div><div class="s-value" id="remUrgentCount">0</div></div>
-    <div class="summary-card spend" style="flex:1"><div class="s-icon">?��</div><div class="s-label">?��??�購</div><div class="s-value" id="remMonthSpend">$0</div></div>
+    <div class="summary-card items" style="flex:1"><div class="s-icon">📦</div><div class="s-label">商品總數</div><div class="s-value" id="remTotalCount">0</div></div>
+    <div class="summary-card alert" style="flex:1"><div class="s-icon">⚠️</div><div class="s-label">7天內補貨</div><div class="s-value" id="remUrgentCount">0</div></div>
+    <div class="summary-card spend" style="flex:1"><div class="s-icon">💰</div><div class="s-label">本月採購</div><div class="s-value" id="remMonthSpend">$0</div></div>
   </div>
 
-  <!-- �?補貨?��?（含 5??0 天�??�建議�? -->
-  <div class="page-section-title">�?補貨?��??��???/div>
+  <!-- ⭐ 補貨重點（含 5–10 天比價建議） -->
+  <div class="page-section-title">⭐ 補貨重點與比價</div>
   <div id="homeRestockSummary" style="margin-bottom:14px"></div>
 
-  <div class="page-section-title">?? ?�?��???/div>
+  <div class="page-section-title">📋 所有商品</div>
   <div class="search-pill">
-    <span class="sp-icon">??</span>
-    <input id="productSearchInput" type="search" placeholder="?��??��??�稱 / ?��?" oninput="renderProducts()"/>
-    <button class="sp-clear" onclick="document.getElementById('productSearchInput').value='';renderProducts()">??/button>
+    <span class="sp-icon">🔍</span>
+    <input id="productSearchInput" type="search" placeholder="搜尋商品名稱 / 品牌" oninput="renderProducts()"/>
+    <button class="sp-clear" onclick="document.getElementById('productSearchInput').value='';renderProducts()">✕</button>
   </div>
   <div class="cat-tabs" id="homeCatTabs"></div>
   <div id="productList"></div>
@@ -223,39 +223,39 @@
 
 <!-- FIXED -->
 <div class="content page" id="fixed" style="display:none">
-  <div class="page-section-title">?�� 每�??��??�出</div>
+  <div class="page-section-title">💳 每月固定支出</div>
 
-  <!-- 子�??��?訂閱 vs 負債 -->
+  <!-- 子分頁：訂閱 vs 負債 -->
   <div class="settings-subtabs" id="fixedSubtabs">
-    <button class="active" id="fixedSubBtn-sub" onclick="switchFixedSub('sub',this)">?�� 訂閱／固�?/button>
-    <button id="fixedSubBtn-debt" onclick="switchFixedSub('debt',this)">?�� 負債?��?</button>
+    <button class="active" id="fixedSubBtn-sub" onclick="switchFixedSub('sub',this)">📺 訂閱／固定</button>
+    <button id="fixedSubBtn-debt" onclick="switchFixedSub('debt',this)">💸 負債分期</button>
   </div>
 
-  <!-- 訂閱／固�?-->
+  <!-- 訂閱／固定 -->
   <div class="fixed-sub" id="fixedSub-sub">
     <div class="page-hero hero-fixed">
-      <div class="ph-icon">?��</div>
+      <div class="ph-icon">📺</div>
       <div class="ph-info">
-        <div class="ph-label">每�??��??��?</div>
+        <div class="ph-label">每月固定合計</div>
         <div class="ph-value privacy-mask" id="fixedPageTotal">$0</div>
-        <div class="ph-sub" id="fixedPageCount">??0 ??/div>
+        <div class="ph-sub" id="fixedPageCount">共 0 項</div>
       </div>
     </div>
     <div id="fixedCalendar"></div>
     <div id="fixedList"></div>
   </div>
 
-  <!-- 負債?��? -->
+  <!-- 負債分期 -->
   <div class="fixed-sub" id="fixedSub-debt" style="display:none">
     <div class="page-hero hero-debt">
-      <div class="ph-icon">?��</div>
+      <div class="ph-icon">💸</div>
       <div class="ph-info">
-        <div class="ph-label">負債餘�??��?</div>
+        <div class="ph-label">負債餘額合計</div>
         <div class="ph-value privacy-mask" id="debtPageTotal">$0</div>
-        <div class="ph-sub" id="debtPageCount">??0 �?· 每�??�款 $0</div>
+        <div class="ph-sub" id="debtPageCount">共 0 筆 · 每月還款 $0</div>
       </div>
     </div>
-    <div class="info-banner">?�� ?�貸 / 車貸 / ?��?付款 / 學貸?��??��?款�??��??�入?��??��??��??��??�並從可?��?額扣?��?br><span style="color:var(--text3)">�??��??��?請�??��??�「�??��??????��??��? ???��??�款</span></div>
+    <div class="info-banner">💡 房貸 / 車貸 / 分期付款 / 學貸。每月付款會自動加入「訂閱／固定」分頁並從可用餘額扣除。<br><span style="color:var(--text3)">＋ 新增分期請點右下方「＋」按鈕 → 手動新增 → 分期還款</span></div>
     <div id="debtList"></div>
   </div>
 
@@ -264,227 +264,231 @@
 
 <!-- SETTINGS PAGE -->
 <div class="content page" id="settings" style="display:none">
-  <div class="page-section-title">?��? 財�?設�?</div>
+  <div class="page-section-title">⚙️ 財務設定</div>
 
-  <!-- 子�???-->
+  <!-- 子分頁 -->
   <div class="settings-subtabs" id="settingsSubtabs">
-    <button class="active" id="setSubBtn-budget" onclick="switchSetSub('budget',this)">?�� ?��?</button>
-    <button id="setSubBtn-account" onclick="switchSetSub('account',this)">?�� 帳戶</button>
-    <button id="setSubBtn-ai" onclick="switchSetSub('ai',this)">?? AI</button>
-    <button id="setSubBtn-data" onclick="switchSetSub('data',this)">?? 資�?</button>
+    <button class="active" id="setSubBtn-budget" onclick="switchSetSub('budget',this)">💰 預算</button>
+    <button id="setSubBtn-account" onclick="switchSetSub('account',this)">💳 帳戶</button>
+    <button id="setSubBtn-ai" onclick="switchSetSub('ai',this)">🤖 AI</button>
+    <button id="setSubBtn-data" onclick="switchSetSub('data',this)">📊 資料</button>
   </div>
 
-  <!-- ?�� ?��? -->
+  <!-- 💰 預算 -->
   <div class="set-sub" id="setSub-budget">
   <div class="settings-card">
-    <h3>?�購?��?上�?（�??��?</h3>
-    <div class="card-hint">保�??�、�??��?等�?貨採�?/div>
+    <h3>採購預算上限（每月）</h3>
+    <div class="card-hint">保養品、保健品等補貨採購</div>
     <div class="settings-row">
-      <input class="form-input" id="budgetInput" type="number" placeholder="例�?5000" style="flex:1" readonly/>
-      <button class="btn-sm primary" id="budgetSaveBtn" style="flex:0;padding:9px 14px" onclick="toggleBudgetEdit('budget')">?��? 編輯</button>
+      <input class="form-input" id="budgetInput" type="number" placeholder="例：5000" style="flex:1" readonly/>
+      <button class="btn-sm primary" id="budgetSaveBtn" style="flex:0;padding:9px 14px" onclick="toggleBudgetEdit('budget')">✏️ 編輯</button>
     </div>
     <div id="budgetProgress" style="display:none" class="budget-progress">
       <div class="budget-bar-wrap"><div class="budget-bar-fill ok" id="budgetBarFill" style="width:0%"></div></div>
-      <div class="budget-labels"><span id="budgetSpentLabel">已花 $0</span><span id="budgetLimitLabel">上�? $0</span></div>
+      <div class="budget-labels"><span id="budgetSpentLabel">已花 $0</span><span id="budgetLimitLabel">上限 $0</span></div>
     </div>
   </div>
 
   <div class="settings-card">
-    <h3>?�活?�費?��?（�??��?</h3>
-    <div class="card-hint">餐飲?�社交、治裝、�?樂�??�固定支??/div>
+    <h3>生活花費預算（每月）</h3>
+    <div class="card-hint">餐飲、社交、治裝、娛樂等非固定支出</div>
     <div class="settings-row">
-      <input class="form-input" id="lifeBudgetInput" type="number" placeholder="例�?8000" style="flex:1" readonly/>
-      <button class="btn-sm primary" id="lifeBudgetSaveBtn" style="flex:0;padding:9px 14px" onclick="toggleBudgetEdit('life')">?��? 編輯</button>
+      <input class="form-input" id="lifeBudgetInput" type="number" placeholder="例：8000" style="flex:1" readonly/>
+      <button class="btn-sm primary" id="lifeBudgetSaveBtn" style="flex:0;padding:9px 14px" onclick="toggleBudgetEdit('life')">✏️ 編輯</button>
     </div>
     <div id="lifeBudgetProgress" style="display:none" class="budget-progress">
       <div class="budget-bar-wrap"><div class="budget-bar-fill ok" id="lifeBudgetBarFill" style="width:0%"></div></div>
-      <div class="budget-labels"><span id="lifeBudgetSpentLabel">已花 $0</span><span id="lifeBudgetLimitLabel">上�? $0</span></div>
+      <div class="budget-labels"><span id="lifeBudgetSpentLabel">已花 $0</span><span id="lifeBudgetLimitLabel">上限 $0</span></div>
     </div>
   </div>
 
   <div class="settings-card">
-    <h3>?��??�費?��?上�?（�??��?</h3>
-    <div class="card-hint">?��?費、�??�制等固定扣�?/div>
+    <h3>固定花費預算上限（每月）</h3>
+    <div class="card-hint">手機費、訂閱制等固定扣款</div>
     <div class="settings-row">
-      <input class="form-input" id="fixedBudgetInput" type="number" placeholder="例�?3000" style="flex:1" readonly/>
-      <button class="btn-sm primary" id="fixedBudgetSaveBtn" style="flex:0;padding:9px 14px" onclick="toggleBudgetEdit('fixed')">?��? 編輯</button>
+      <input class="form-input" id="fixedBudgetInput" type="number" placeholder="例：3000" style="flex:1" readonly/>
+      <button class="btn-sm primary" id="fixedBudgetSaveBtn" style="flex:0;padding:9px 14px" onclick="toggleBudgetEdit('fixed')">✏️ 編輯</button>
     </div>
     <div id="fixedBudgetProgress" style="display:none" class="budget-progress">
       <div class="budget-bar-wrap"><div class="budget-bar-fill ok" id="fixedBudgetBarFill" style="width:0%"></div></div>
-      <div class="budget-labels"><span id="fixedBudgetSpentLabel">已花 $0</span><span id="fixedBudgetLimitLabel">上�? $0</span></div>
+      <div class="budget-labels"><span id="fixedBudgetSpentLabel">已花 $0</span><span id="fixedBudgetLimitLabel">上限 $0</span></div>
     </div>
   </div>
 
   <div class="settings-card">
-    <h3>每�?存款?��?</h3>
-    <div class="card-hint" style="margin-bottom:8px">以主業薪資為?��?，副�??��?不影?�此?��?</div>
+    <h3>每月存款目標</h3>
+    <div class="card-hint" style="margin-bottom:8px">以主業薪資為基礎，副業/獎金不影響此目標</div>
     <div style="display:flex;gap:6px;background:var(--bg2);border-radius:8px;padding:3px;margin-bottom:8px">
-      <button class="tab" id="sg-mode-percent" onclick="setSavingGoalMode('percent')" style="flex:1;font-size:11px">?? 主業 %</button>
-      <button class="tab" id="sg-mode-amount" onclick="setSavingGoalMode('amount')" style="flex:1;font-size:11px">?�� ?��??��?</button>
+      <button class="tab" id="sg-mode-percent" onclick="setSavingGoalMode('percent')" style="flex:1;font-size:11px">📊 主業 %</button>
+      <button class="tab" id="sg-mode-amount" onclick="setSavingGoalMode('amount')" style="flex:1;font-size:11px">💰 固定金額</button>
     </div>
     <div class="settings-row">
-      <input class="form-input" id="savingGoalInput" type="number" placeholder="例�?20" style="flex:1"/>
+      <input class="form-input" id="savingGoalInput" type="number" placeholder="例：20" style="flex:1"/>
       <span id="sg-suffix" style="font-size:13px;color:var(--text2);padding:0 4px">%</span>
-      <button class="btn-sm primary" style="flex:0;padding:9px 14px" onclick="saveSavingGoal()">?�� ?��?</button>
+      <button class="btn-sm primary" style="flex:0;padding:9px 14px" onclick="saveSavingGoal()">💾 儲存</button>
     </div>
     <div id="savingGoalProgress" style="display:none;margin-top:10px" class="budget-progress">
       <div class="budget-bar-wrap"><div class="budget-bar-fill ok" id="savingGoalBarFill" style="width:0%"></div></div>
-      <div class="budget-labels"><span id="savingGoalActualLabel">實�? $0</span><span id="savingGoalTargetLabel">?��? $0</span></div>
+      <div class="budget-labels"><span id="savingGoalActualLabel">實存 $0</span><span id="savingGoalTargetLabel">目標 $0</span></div>
     </div>
   </div>
 
   <div class="settings-card">
-    <h3>?��? 年度?��??��?</h3>
-    <div style="font-size:10px;color:var(--text2);margin-bottom:6px">設�?一年�?存�?少�??��??��??��? / 額�??�入?�可一?�撥??/div>
+    <h3>✈️ 年度旅遊預算</h3>
+    <div style="font-size:10px;color:var(--text2);margin-bottom:6px">設定一年要存多少旅遊資金，獎金 / 額外收入時可一鍵撥入</div>
     <div class="settings-row">
-      <input class="form-input" id="travelBudgetYearlyInput" type="number" placeholder="例�?60000" style="flex:1"/>
-      <span style="font-size:13px;color:var(--text2);padding:0 4px">??�?/span>
-      <button class="btn-sm primary" style="flex:0;padding:9px 14px" onclick="saveTravelBudgetYearly()">?�� ?��?</button>
+      <input class="form-input" id="travelBudgetYearlyInput" type="number" placeholder="例：60000" style="flex:1"/>
+      <span style="font-size:13px;color:var(--text2);padding:0 4px">元/年</span>
+      <button class="btn-sm primary" style="flex:0;padding:9px 14px" onclick="saveTravelBudgetYearly()">💾 儲存</button>
     </div>
     <div id="travelFundProgress" style="display:none;margin-top:10px" class="budget-progress">
       <div class="budget-bar-wrap"><div class="budget-bar-fill ok" id="travelFundBarFill" style="width:0%;background:linear-gradient(90deg,#60a5fa,#2563eb)"></div></div>
-      <div class="budget-labels"><span id="travelFundActualLabel" class="privacy-mask">已撥??$0</span><span id="travelFundTargetLabel">?��? $0</span></div>
+      <div class="budget-labels"><span id="travelFundActualLabel" class="privacy-mask">已撥入 $0</span><span id="travelFundTargetLabel">目標 $0</span></div>
       <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--text3)">
         <span id="travelFundUsedLabel" class="privacy-mask">已用 $0</span>
-        <span id="travelFundRemainLabel" class="privacy-mask">餘�? $0</span>
+        <span id="travelFundRemainLabel" class="privacy-mask">餘額 $0</span>
       </div>
     </div>
     <div style="display:flex;gap:6px;margin-top:8px">
-      <button class="btn-sm" style="flex:1;padding:7px;font-size:11px" onclick="openTravelFundLog()">?? ?�款記�?</button>
-      <button class="btn-sm" style="flex:1;padding:7px;font-size:11px" onclick="manualAddTravelFund()">�??��??�入</button>
+      <button class="btn-sm" style="flex:1;padding:7px;font-size:11px" onclick="openTravelFundLog()">📋 撥款記錄</button>
+      <button class="btn-sm" style="flex:1;padding:7px;font-size:11px" onclick="manualAddTravelFund()">＋ 手動撥入</button>
     </div>
   </div>
   </div><!-- /setSub-budget -->
 
-  <!-- ?�� 帳戶 -->
+  <!-- 💳 帳戶 -->
   <div class="set-sub" id="setSub-account" style="display:none">
   <div class="settings-card">
-    <h3>?�� 信用?�管??/h3>
+    <h3>💳 信用卡管理</h3>
     <div class="info-banner">
-      設�?每張?��?結帳?��?繳款?��??�卡?�系統自?�歸?��??�帳?��?份�?br>
-      ?�� 結帳?��??��?之�??��?算當?��?之�?算�??�帳?��?    </div>
+      設定每張卡的結帳日／繳款日，刷卡時系統自動歸到對應帳單月份。<br>
+      🔹 結帳日（含）之前刷的算當期；之後算下期帳單。
+    </div>
     <div id="creditCardList"></div>
-    <button class="btn-sm primary" style="width:100%;padding:10px;margin-top:6px" onclick="openCardModal()">�??��?信用??/button>
+    <button class="btn-sm primary" style="width:100%;padding:10px;margin-top:6px" onclick="openCardModal()">＋ 新增信用卡</button>
   </div>
 
   <div class="settings-card">
-    <h3>?�� 外幣?��?</h3>
+    <h3>💱 外幣匯率</h3>
     <div class="info-banner">
-      ?��?消費 / Bybit Card ??USDT ?�自?��?算�??�幣統�???    </div>
-    <button class="btn-sm primary" style="width:100%;padding:10px" onclick="openFxRatesModal()">?��? 管�??��?</button>
+      出國消費 / Bybit Card 用 USDT 時自動換算成台幣統計。
+    </div>
+    <button class="btn-sm primary" style="width:100%;padding:10px" onclick="openFxRatesModal()">⚙️ 管理匯率</button>
   </div>
   </div><!-- /setSub-account -->
 
-  <!-- ?? AI -->
+  <!-- 🤖 AI -->
   <div class="set-sub" id="setSub-ai" style="display:none">
   <div class="settings-card">
-    <h3>?? AI 辨�?供�???/h3>
+    <h3>🤖 AI 辨識供應商</h3>
     <div class="info-banner">
-      ?�援 Claude ??Gemini?�設定其中�??�即?�使?��???AI ?�能（�??�截?�、薪資單?�中?��?碼�???br>
-      ?�鑰?�儲存於?��?�?localStorage，直?��??�覽?�呼?��???API??    </div>
+      支援 Claude 與 Gemini。設定其中一個即可使用所有 AI 功能（訂單截圖、薪資單、中獎號碼）。<br>
+      金鑰只儲存於本裝置 localStorage，直接從瀏覽器呼叫廠商 API。
+    </div>
     <div class="form-group">
-      <label class="form-label">?��?供�???/label>
+      <label class="form-label">優先供應商</label>
       <div style="display:flex;gap:8px">
-        <button class="btn-sm" id="aiProvClaudeBtn" style="flex:1;padding:9px" onclick="setAiProvider('claude')">?? Claude</button>
-        <button class="btn-sm" id="aiProvGeminiBtn" style="flex:1;padding:9px" onclick="setAiProvider('gemini')">??Gemini</button>
+        <button class="btn-sm" id="aiProvClaudeBtn" style="flex:1;padding:9px" onclick="setAiProvider('claude')">🔗 Claude</button>
+        <button class="btn-sm" id="aiProvGeminiBtn" style="flex:1;padding:9px" onclick="setAiProvider('gemini')">✨ Gemini</button>
       </div>
-      <div class="card-hint" style="margin-top:6px">沒設定�?供�??��??��??��? fallback ?�另一?��?/div>
+      <div class="card-hint" style="margin-top:6px">沒設定的供應商金鑰會自動 fallback 到另一個。</div>
     </div>
 
     <div class="api-key-card">
-      <div class="akc-title">?? Claude（Anthropic�?/div>
+      <div class="akc-title">🔗 Claude（Anthropic）</div>
       <div class="akc-row">
         <input type="password" id="claudeKeyInput" class="akc-input" placeholder="sk-ant-api03-..."/>
-        <button class="btn-sm primary" style="padding:8px 12px" onclick="saveClaudeKey()">?��?</button>
+        <button class="btn-sm primary" style="padding:8px 12px" onclick="saveClaudeKey()">儲存</button>
       </div>
       <div id="claudeKeyStatus" class="akc-status"></div>
       <div class="akc-actions">
-        <button class="btn-sm" onclick="testClaudeKey()">?�� 測試</button>
-        <button class="btn-sm akc-clear" onclick="clearClaudeKey()">?? 清除</button>
+        <button class="btn-sm" onclick="testClaudeKey()">🧪 測試</button>
+        <button class="btn-sm akc-clear" onclick="clearClaudeKey()">🗑 清除</button>
       </div>
-      <div class="card-hint" style="margin-top:6px">?�� <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent)">?��??�鑰</a></div>
+      <div class="card-hint" style="margin-top:6px">💡 <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent)">取得金鑰</a></div>
     </div>
 
     <div class="api-key-card">
-      <div class="akc-title">??Gemini（Google�?/div>
+      <div class="akc-title">✨ Gemini（Google）</div>
       <div class="akc-row">
         <input type="password" id="geminiKeyInput" class="akc-input" placeholder="AIza..."/>
-        <button class="btn-sm primary" style="padding:8px 12px" onclick="saveGeminiKey()">?��?</button>
+        <button class="btn-sm primary" style="padding:8px 12px" onclick="saveGeminiKey()">儲存</button>
       </div>
       <div id="geminiKeyStatus" class="akc-status"></div>
       <div class="akc-actions">
-        <button class="btn-sm" onclick="testGeminiKey()">?�� 測試</button>
-        <button class="btn-sm akc-clear" onclick="clearGeminiKey()">?? 清除</button>
+        <button class="btn-sm" onclick="testGeminiKey()">🧪 測試</button>
+        <button class="btn-sm akc-clear" onclick="clearGeminiKey()">🗑 清除</button>
       </div>
-      <div class="card-hint" style="margin-top:6px">?�� <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">?��??�鑰</a>（�??��?費�?額�?高�?</div>
+      <div class="card-hint" style="margin-top:6px">💡 <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">取得金鑰</a>（每日免費配額較高）</div>
     </div>
 
     <div class="info-banner success" style="margin-top:10px;margin-bottom:0">
-      ?? ?�鑰?�儲存於?��?置�?不�??�至任�?第�??�伺?�器??    </div>
+      🔒 金鑰僅儲存於本裝置，不上傳至任何第三方伺服器。
+    </div>
   </div>
   </div><!-- /setSub-ai -->
 
-  <!-- ?? 資�? -->
+  <!-- 📊 資料 -->
   <div class="set-sub" id="setSub-data" style="display:none">
   <div class="settings-card">
-    <h3>?�� ?�份 / ?��?</h3>
-    <div class="info-banner">?�?��??�儲存於此�?置�?建議定�??�出?�份?�匯?��??��??�現?��??��?/div>
+    <h3>📦 備份 / 還原</h3>
+    <div class="info-banner">所有資料儲存於此裝置，建議定期匯出備份。匯入時會覆蓋現有資料。</div>
     <div id="backupStatusCard" style="padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:12px;line-height:1.5"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn-sm primary" style="flex:1;padding:10px 14px" onclick="quickBackup()" id="quickBackupBtn">??一?��?�?/button>
+      <button class="btn-sm primary" style="flex:1;padding:10px 14px" onclick="quickBackup()" id="quickBackupBtn">⚡ 一鍵備份</button>
       <label class="btn-sm" style="flex:1;padding:10px 14px;text-align:center;cursor:pointer">
-        ?�� ?�入 JSON
+        📥 匯入 JSON
         <input type="file" accept="application/json,.json" onchange="importData(event)" style="display:none"/>
       </label>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-sm" style="flex:1;padding:8px 12px;font-size:11px" onclick="exportData()">?�� 下�? JSON</button>
-      <button class="btn-sm" style="flex:1;padding:8px 12px;font-size:11px" onclick="openBackupSettings()">?��? ?�份設�?</button>
+      <button class="btn-sm" style="flex:1;padding:8px 12px;font-size:11px" onclick="exportData()">📤 下載 JSON</button>
+      <button class="btn-sm" style="flex:1;padding:8px 12px;font-size:11px" onclick="openBackupSettings()">⚙️ 備份設定</button>
     </div>
-    <div class="settings-hint" id="backupHint">?��?��??��?份」�??��?存到上次?��?位置（�? Chrome/Edge 桌面�?/div>
+    <div class="settings-hint" id="backupHint">💡「一鍵備份」會自動存到上次選的位置（需 Chrome/Edge 桌面）</div>
     <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-      <button class="btn-sm primary" style="width:100%;padding:11px" onclick="openExportCenter()">?? ?�出 Excel / PDF ?�表</button>
-      <div class="settings-hint" style="margin-top:6px">?�� ?�匯?��?費�?細、薪資�??�為 Excel；�??��???年�?�?PDF ?�表</div>
+      <button class="btn-sm primary" style="width:100%;padding:11px" onclick="openExportCenter()">📊 匯出 Excel / PDF 報表</button>
+      <div class="settings-hint" style="margin-top:6px">💡 可匯出消費明細、薪資記錄為 Excel；或產生月/年結算 PDF 報表</div>
     </div>
   </div>
   <div class="settings-card">
-    <h3>??�?清除資�?</h3>
-    <div class="info-banner danger">清除後無法復?��?請確認�??�執行�?/div>
+    <h3>🗑️ 清除資料</h3>
+    <div class="info-banner danger">清除後無法復原，請確認後再執行。</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-sm danger" onclick="clearData('records')">清除?�費記�?</button>
-      <button class="btn-sm danger" onclick="clearData('all')">?�置?�部資�?</button>
+      <button class="btn-sm danger" onclick="clearData('records')">清除花費記錄</button>
+      <button class="btn-sm danger" onclick="clearData('all')">重置全部資料</button>
     </div>
   </div>
   <div class="settings-card">
-    <h3>?? ?��?引�?</h3>
-    <div class="card-hint" style="margin-bottom:12px">忘�?設�??��??��?了�?？�??��??��???APP ?�麼?��?</div>
+    <h3>👋 新手引導</h3>
+    <div class="card-hint" style="margin-bottom:12px">忘記設定哪些數字了嗎？或想再看一遍 APP 怎麼用？</div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm primary" style="flex:1;padding:10px 14px" onclick="startOnboarding()">?? ?�新引�?</button>
-      <button class="btn-sm" style="flex:1;padding:10px 14px" onclick="startTour()">?? ?�能巡禮</button>
+      <button class="btn-sm primary" style="flex:1;padding:10px 14px" onclick="startOnboarding()">🚀 重新引導</button>
+      <button class="btn-sm" style="flex:1;padding:10px 14px" onclick="startTour()">📖 功能巡禮</button>
     </div>
   </div>
 
   <div class="settings-card" style="padding:12px 14px">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700">?�� ?�票字�?紀??/div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">已�???<span id="invSeenCount">0</span> �?· ?��??�測 CSV / ??QR ?��??��?</div>
+        <div style="font-size:13px;font-weight:700">🧾 發票字軌紀錄</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">已記錄 <span id="invSeenCount">0</span> 張 · 用來偵測 CSV / 掃 QR 重複登錄</div>
       </div>
     </div>
     <div style="display:flex;gap:6px">
-      <button class="btn-sm primary" style="flex:1;padding:8px;font-size:11px" onclick="openInvoiceSearch()">?? ?�詢?�票</button>
-      <button class="btn-sm" style="flex:1;padding:8px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;border:0" onclick="openLotteryModal()">?�� 對�?</button>
-      <button class="btn-sm" style="padding:8px 10px;font-size:11px;color:var(--danger)" onclick="clearInvoiceSeen()">?? 清除</button>
+      <button class="btn-sm primary" style="flex:1;padding:8px;font-size:11px" onclick="openInvoiceSearch()">🔍 查詢發票</button>
+      <button class="btn-sm" style="flex:1;padding:8px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;border:0" onclick="openLotteryModal()">🎰 對獎</button>
+      <button class="btn-sm" style="padding:8px 10px;font-size:11px;color:var(--danger)" onclick="clearInvoiceSeen()">🗑 清除</button>
     </div>
   </div>
 
   <div class="settings-card">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="font-size:32px">?��</div>
+      <div style="font-size:32px">💼</div>
       <div>
-        <div style="font-size:15px;font-weight:700">?�財小幫??/div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">補貨 · ?��??�出 · ?�費 · ?�入管�?</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">?�?��??��??��??�本機�?�?/div>
+        <div style="font-size:15px;font-weight:700">理財小幫手</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">補貨 · 固定支出 · 花費 · 收入管理</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">所有資料僅儲存於本機裝置</div>
       </div>
     </div>
   </div>
@@ -495,58 +499,58 @@
 <!-- RECORD -->
 <div class="content page" id="record" style="display:none">
   <div class="record-month-nav">
-    <button onclick="changeRecordMonth(-1)">??/button>
+    <button onclick="changeRecordMonth(-1)">‹</button>
     <div class="month-label" id="recordMonthLabel"></div>
-    <button onclick="changeRecordMonth(1)">??/button>
+    <button onclick="changeRecordMonth(1)">›</button>
   </div>
 
-  <!-- ?��?：本?�總?�出 hero -->
+  <!-- 焦點：本月總支出 hero -->
   <div class="page-hero hero-spend">
-    <div class="ph-icon">?��</div>
+    <div class="ph-icon">💸</div>
     <div class="ph-info">
-      <div class="ph-label">?��?總支??/div>
+      <div class="ph-label">本月總支出</div>
       <div class="ph-value privacy-mask" id="recordTotal">$0</div>
       <div class="ph-sub" id="recordTotalSub"></div>
     </div>
   </div>
 
-  <!-- 三大類�???-->
+  <!-- 三大類拆分 -->
   <div class="page-stats-row">
-    <div class="summary-card spend" style="flex:1"><div class="s-icon">??</div><div class="s-label">補貨?�購</div><div class="s-value privacy-mask" id="recordVarTotal">$0</div></div>
-    <div class="summary-card fixed-s" style="flex:1"><div class="s-icon">?��</div><div class="s-label">?��??�出</div><div class="s-value privacy-mask" id="recordFixTotal">$0</div></div>
-    <div class="summary-card alert" style="flex:1"><div class="s-icon">?��</div><div class="s-label">?�活?�費</div><div class="s-value privacy-mask" id="recordLifeTotal">$0</div></div>
+    <div class="summary-card spend" style="flex:1"><div class="s-icon">🛍</div><div class="s-label">補貨採購</div><div class="s-value privacy-mask" id="recordVarTotal">$0</div></div>
+    <div class="summary-card fixed-s" style="flex:1"><div class="s-icon">💳</div><div class="s-label">固定支出</div><div class="s-value privacy-mask" id="recordFixTotal">$0</div></div>
+    <div class="summary-card alert" style="flex:1"><div class="s-icon">💸</div><div class="s-label">生活花費</div><div class="s-value privacy-mask" id="recordLifeTotal">$0</div></div>
   </div>
 
   <!-- budget warning -->
   <div id="lifeBudgetWarn" style="display:none"></div>
 
-  <div class="page-section-title">?? 趨勢?��?�?/div>
+  <div class="page-section-title">📈 趨勢與分類</div>
   <div class="chart-card">
-    <div class="chart-title">�??��?總支??<span id="chartSubtitle"></span></div>
+    <div class="chart-title">近6個月總支出 <span id="chartSubtitle"></span></div>
     <div class="bar-chart" id="barChart"></div>
   </div>
   <div class="cat-breakdown" id="catBreakdown"></div>
 
-  <div class="page-section-title">?? 消費?�細</div>
-  <!-- 篩選?��?chip + ?��??��? -->
+  <div class="page-section-title">📋 消費明細</div>
+  <!-- 篩選列：chip + 選取按鈕 -->
   <input type="hidden" id="recordFilterCat" value="all"/>
   <div class="filter-toolbar">
     <div class="filter-chips" id="recordFilterChips">
-      <button class="chip active" data-val="all" onclick="setRecordFilter('all',this)">?�部</button>
-      <button class="chip" data-val="var" onclick="setRecordFilter('var',this)">?? 補貨</button>
-      <button class="chip" data-val="life" onclick="setRecordFilter('life',this)">?�� ?�活</button>
-      <button class="chip" data-val="fixed" onclick="setRecordFilter('fixed',this)">?�� ?��?</button>
-      <button class="chip" data-val="installment" onclick="setRecordFilter('installment',this)">?�� ?��?</button>
-      <button class="chip" data-val="travel" onclick="setRecordFilter('travel',this)">?��? ?��?</button>
+      <button class="chip active" data-val="all" onclick="setRecordFilter('all',this)">全部</button>
+      <button class="chip" data-val="var" onclick="setRecordFilter('var',this)">🛍 補貨</button>
+      <button class="chip" data-val="life" onclick="setRecordFilter('life',this)">💸 生活</button>
+      <button class="chip" data-val="fixed" onclick="setRecordFilter('fixed',this)">💳 固定</button>
+      <button class="chip" data-val="installment" onclick="setRecordFilter('installment',this)">💸 分期</button>
+      <button class="chip" data-val="travel" onclick="setRecordFilter('travel',this)">✈️ 旅遊</button>
     </div>
-    <button id="recordSelectBtn" class="chip select-chip" onclick="toggleRecordSelectMode()">?��? ?��?</button>
+    <button id="recordSelectBtn" class="chip select-chip" onclick="toggleRecordSelectMode()">✏️ 選取</button>
   </div>
   <div id="recordBatchBar" class="record-batch-bar" style="display:none">
-    <div class="rbb-info">已選 <span id="recordSelCount">0</span> �?/div>
+    <div class="rbb-info">已選 <span id="recordSelCount">0</span> 筆</div>
     <div class="rbb-actions">
-      <button class="btn-sm primary" onclick="openBatchPayModal()">?�� ?��?款方�?/button>
-      <button class="btn-sm" onclick="selectAllRecordsVisible()">???�選</button>
-      <button class="btn-sm" onclick="toggleRecordSelectMode()">???��?</button>
+      <button class="btn-sm primary" onclick="openBatchPayModal()">💳 改付款方式</button>
+      <button class="btn-sm" onclick="selectAllRecordsVisible()">☑ 全選</button>
+      <button class="btn-sm" onclick="toggleRecordSelectMode()">✕ 取消</button>
     </div>
   </div>
   <div id="recordList"></div>
@@ -556,25 +560,25 @@
 <div class="modal-overlay" id="backupSettingsOverlay" onclick="closeModalOutside(event,'backupSettingsOverlay')">
   <div class="modal" style="max-width:380px">
     <div class="modal-header">
-      <div class="modal-title">?��? ?�份設�?</div>
-      <button class="modal-close" onclick="closeModal('backupSettingsOverlay')">??/button>
+      <div class="modal-title">⚙️ 備份設定</div>
+      <button class="modal-close" onclick="closeModal('backupSettingsOverlay')">✕</button>
     </div>
     <div class="modal-body">
       <div style="margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:6px">?? ?�份位置</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px">📁 備份位置</div>
         <div id="backupLocInfo" style="font-size:12px;color:var(--text2);background:var(--bg2);padding:10px;border-radius:8px;margin-bottom:8px;line-height:1.6"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-sm primary" style="flex:1;padding:8px 12px;font-size:12px" onclick="pickBackupLocation()">?? ?��?檔�?</button>
-          <button class="btn-sm" style="flex:1;padding:8px 12px;font-size:12px" onclick="clearBackupLocation()">?? 清除</button>
+          <button class="btn-sm primary" style="flex:1;padding:8px 12px;font-size:12px" onclick="pickBackupLocation()">📂 選擇檔案</button>
+          <button class="btn-sm" style="flex:1;padding:8px 12px;font-size:12px" onclick="clearBackupLocation()">🗑 清除</button>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">?�� 小�?巧�??��?案�???Google Drive / iCloud / OneDrive ?�本機�?步�??�夾，就等於?��??�端?�份�?/div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">💡 小技巧：把檔案存在 Google Drive / iCloud / OneDrive 的本機同步資料夾，就等於自動雲端備份！</div>
       </div>
       <div style="margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:6px">???��??��?</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px">⏰ 提醒頻率</div>
         <div id="backupFreqBtns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
       <div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:6px">?? ?�份?�??/div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px">📊 備份狀態</div>
         <div id="backupHistory" style="font-size:12px;color:var(--text2);background:var(--bg2);padding:10px;border-radius:8px;line-height:1.8"></div>
       </div>
     </div>
@@ -585,15 +589,15 @@
 <div class="modal-overlay" id="invoiceSearchOverlay" onclick="closeModalOutside(event,'invoiceSearchOverlay')">
   <div class="modal" style="max-width:420px">
     <div class="modal-header">
-      <div class="modal-title">?? ?�詢?�票紀??/div>
-      <button class="modal-close" onclick="closeModal('invoiceSearchOverlay')">??/button>
+      <div class="modal-title">🔍 查詢發票紀錄</div>
+      <button class="modal-close" onclick="closeModal('invoiceSearchOverlay')">✕</button>
     </div>
     <div class="modal-body">
-      <input class="form-input" id="invSearchInput" placeholder="輸入?�票?�碼�?4 �?/ �?�� / ?��?" oninput="renderInvoiceSearch()" style="margin-bottom:8px"/>
+      <input class="form-input" id="invSearchInput" placeholder="輸入發票號碼後 4 碼 / 賣方 / 金額" oninput="renderInvoiceSearch()" style="margin-bottom:8px"/>
       <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-        <button class="btn-sm" id="invFilterAll" style="padding:6px 10px;font-size:11px" onclick="setInvoiceFilter('all')">?�部</button>
-        <button class="btn-sm" id="invFilterDup" style="padding:6px 10px;font-size:11px" onclick="setInvoiceFilter('dup')">?��? ?�似?��?</button>
-        <button class="btn-sm" id="invFilterOnly" style="padding:6px 10px;font-size:11px" onclick="setInvoiceFilter('only')">?��?字�?</button>
+        <button class="btn-sm" id="invFilterAll" style="padding:6px 10px;font-size:11px" onclick="setInvoiceFilter('all')">全部</button>
+        <button class="btn-sm" id="invFilterDup" style="padding:6px 10px;font-size:11px" onclick="setInvoiceFilter('dup')">⚠️ 疑似重複</button>
+        <button class="btn-sm" id="invFilterOnly" style="padding:6px 10px;font-size:11px" onclick="setInvoiceFilter('only')">只看字軌</button>
       </div>
       <div id="invSearchSummary" style="font-size:11px;color:var(--text2);margin-bottom:8px"></div>
       <div id="invSearchList" style="max-height:50vh;overflow-y:auto"></div>
@@ -605,11 +609,11 @@
 <div class="modal-overlay" id="batchPayOverlay" onclick="closeModalOutside(event,'batchPayOverlay')">
   <div class="modal" style="max-width:360px">
     <div class="modal-header">
-      <div class="modal-title">?�� ?�次?��?款方�?/div>
-      <button class="modal-close" onclick="closeModal('batchPayOverlay')">??/button>
+      <div class="modal-title">💳 批次改付款方式</div>
+      <button class="modal-close" onclick="closeModal('batchPayOverlay')">✕</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">將選中�? <span id="batchPayCount" style="font-weight:700;color:var(--accent)">0</span> 筆�??�改?��?</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">將選中的 <span id="batchPayCount" style="font-weight:700;color:var(--accent)">0</span> 筆記錄改為：</div>
       <div id="batchPayOptions" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
   </div>
@@ -617,81 +621,82 @@
 
 <!-- INCOME PAGE -->
 <div class="content page" id="income" style="display:none">
-  <!-- sub-tabs (settings-subtabs ?�用�??) -->
+  <!-- sub-tabs (settings-subtabs 共用樣式) -->
   <div class="settings-subtabs" id="incomeSubtabs">
-    <button class="active" id="incTab-salary" onclick="switchIncTab('salary',this)">?�� 主業</button>
-    <button id="incTab-extra" onclick="switchIncTab('extra',this)">?? ?�業</button>
-    <button id="incTab-bonus" onclick="switchIncTab('bonus',this)">?? ?��?</button>
-    <button id="incTab-summary" onclick="switchIncTab('summary',this)">?? 結�?</button>
-    <button id="incTab-savings" onclick="switchIncTab('savings',this)">?�� 存款</button>
-    <button id="incTab-voucher" onclick="switchIncTab('voucher',this)">?�� 禮券</button>
-    <button id="incTab-easycard" onclick="switchIncTab('easycard',this)">?? ?��???/button>
+    <button class="active" id="incTab-salary" onclick="switchIncTab('salary',this)">💵 主業</button>
+    <button id="incTab-extra" onclick="switchIncTab('extra',this)">📈 副業</button>
+    <button id="incTab-bonus" onclick="switchIncTab('bonus',this)">🎁 獎金</button>
+    <button id="incTab-summary" onclick="switchIncTab('summary',this)">📋 結算</button>
+    <button id="incTab-savings" onclick="switchIncTab('savings',this)">💰 存款</button>
+    <button id="incTab-voucher" onclick="switchIncTab('voucher',this)">🎫 禮券</button>
+    <button id="incTab-easycard" onclick="switchIncTab('easycard',this)">🚇 悠遊卡</button>
   </div>
 
   <!-- SALARY SUB-PAGE -->
   <div id="incSub-salary">
     <div class="page-hero hero-income">
-      <div class="ph-icon">?��</div>
+      <div class="ph-icon">💵</div>
       <div class="ph-info">
-        <div class="ph-label">?��??��?（淨?�入�?/div>
+        <div class="ph-label">本月薪資（淨收入）</div>
         <div class="ph-value privacy-mask" id="incThisMonth">$0</div>
-        <div class="ph-sub" id="incHeroSub">尚未記�??��??��?</div>
+        <div class="ph-sub" id="incHeroSub">尚未記錄本月薪資</div>
       </div>
     </div>
 
     <div class="kpi-mini-row">
       <div class="kpi-mini">
-        <div class="kpi-mini-label">?? 今年總收??/div>
+        <div class="kpi-mini-label">📅 今年總收入</div>
         <div class="kpi-mini-value privacy-mask" id="incYearTotal" style="color:var(--accent2)">$0</div>
       </div>
       <div class="kpi-mini">
-        <div class="kpi-mini-label">?? 年度?��?</div>
+        <div class="kpi-mini-label">🎁 年度獎金</div>
         <div class="kpi-mini-value privacy-mask" id="incBonusYear" style="color:var(--accent)">$0</div>
       </div>
     </div>
 
     <div class="chart-card" style="margin-bottom:14px">
-      <div class="chart-title">?? �?12 ?��??�入 <span id="incChartSub" style="font-weight:500;color:var(--text3);font-size:11px"></span></div>
+      <div class="chart-title">📊 近 12 個月收入 <span id="incChartSub" style="font-weight:500;color:var(--text3);font-size:11px"></span></div>
       <div class="bar-chart" id="incBarChart" style="height:90px"></div>
     </div>
 
-    <!-- ?��?結�??��?移設�?-->
+    <!-- 薪資結算月偏移設定 -->
     <div id="salaryShiftBar" style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text2);box-shadow:var(--shadow)">
-      <span style="font-size:14px">??</span>
+      <span style="font-size:14px">📐</span>
       <div style="flex:1;line-height:1.45">
-        <div style="font-weight:600;color:var(--text);margin-bottom:2px">結�??��??��???/div>
-        <div id="salaryShiftDesc">?�薪?��?�?/25 ?�帳�?3 ?��?</div>
+        <div style="font-weight:600;color:var(--text);margin-bottom:2px">結算月對應規則</div>
+        <div id="salaryShiftDesc">領薪當月（3/25 入帳算 3 月）</div>
       </div>
-      <button class="btn-sm" id="salaryShiftBtn" onclick="toggleSalaryShift()" style="padding:6px 10px;font-size:11px;flex-shrink:0">?��?</button>
+      <button class="btn-sm" id="salaryShiftBtn" onclick="toggleSalaryShift()" style="padding:6px 10px;font-size:11px;flex-shrink:0">切換</button>
     </div>
 
-    <div class="page-section-title">?�� ?��?記�?</div>
+    <div class="page-section-title">💵 薪資記錄</div>
     <div id="salaryList"></div>
   </div>
 
-  <!-- EXTRA INCOME SUB-PAGE (?�業/?��?/?�息�? -->
+  <!-- EXTRA INCOME SUB-PAGE (副業/投資/利息等) -->
   <div id="incSub-extra" style="display:none">
     <div class="page-hero" style="background:linear-gradient(135deg,#e8488a,#f59e0b)">
-      <div class="ph-icon">??</div>
+      <div class="ph-icon">📈</div>
       <div class="ph-info">
-        <div class="ph-label">?��??�業?�入</div>
+        <div class="ph-label">本月副業收入</div>
         <div class="ph-value privacy-mask" id="extraThisMonth">$0</div>
-        <div class="ph-sub" id="extraHeroSub">不�??�主?��?計�?</div>
+        <div class="ph-sub" id="extraHeroSub">不納入主預算計算</div>
       </div>
     </div>
     <div class="kpi-mini-row">
       <div class="kpi-mini">
-        <div class="kpi-mini-label">?�� 今年累�?</div>
+        <div class="kpi-mini-label">💼 今年累計</div>
         <div class="kpi-mini-value privacy-mask" id="extraYearTotal" style="color:var(--accent)">$0</div>
       </div>
       <div class="kpi-mini">
-        <div class="kpi-mini-label">?? ?��?</div>
+        <div class="kpi-mini-label">📊 月均</div>
         <div class="kpi-mini-value privacy-mask" id="extraMonthAvg" style="color:var(--accent3)">$0</div>
       </div>
     </div>
     <div class="info-banner warn">
-      ?�� ?�業/?��?不穩定�?<strong>不�?</strong>納入?�購／�?活�?算�?計�??��??��??��?算�?以主業薪資為依�???    </div>
-    <div class="page-section-title">?? ?�入記�?</div>
+      💡 副業/投資不穩定，<strong>不會</strong>納入採購／生活預算的計算基準。每月預算仍以主業薪資為依據。
+    </div>
+    <div class="page-section-title">📋 收入記錄</div>
     <div id="extraIncomeList"></div>
   </div>
 
@@ -699,131 +704,133 @@
   <div id="incSub-bonus" style="display:none">
     <!-- compact year timeline -->
     <div class="chart-card" style="margin-bottom:14px">
-      <div class="chart-title">年度?��??�覽
+      <div class="chart-title">年度獎金預覽
         <span style="font-family:'DM Mono',monospace;color:var(--accent);font-size:13px;font-weight:700" id="bonusTotalLabel">$0</span>
       </div>
       <div id="bonusTimeline"></div>
     </div>
-    <div class="page-section-title" style="margin-bottom:8px">?? ?��?清單</div>
+    <div class="page-section-title" style="margin-bottom:8px">📅 獎金清單</div>
     <div id="bonusCalendar"></div>
   </div>
 
   <!-- MONTHLY SUMMARY SUB-PAGE -->
   <div id="incSub-summary" style="display:none">
     <div style="display:flex;gap:6px;margin-bottom:10px">
-      <button id="sumViewMonthBtn" class="btn-sm primary" style="flex:1;padding:8px;font-size:12px" onclick="setSummaryView('month')">?? ?��?�?/button>
-      <button id="sumViewYearBtn" class="btn-sm" style="flex:1;padding:8px;font-size:12px" onclick="setSummaryView('year')">?? 年度</button>
+      <button id="sumViewMonthBtn" class="btn-sm primary" style="flex:1;padding:8px;font-size:12px" onclick="setSummaryView('month')">📅 月結算</button>
+      <button id="sumViewYearBtn" class="btn-sm" style="flex:1;padding:8px;font-size:12px" onclick="setSummaryView('year')">📈 年度</button>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <button style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);width:34px;height:34px;cursor:pointer;font-size:16px" onclick="changeSummaryPeriod(-1)">??/button>
+      <button style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);width:34px;height:34px;cursor:pointer;font-size:16px" onclick="changeSummaryPeriod(-1)">‹</button>
       <div style="font-size:15px;font-weight:700" id="summaryMonthLabel"></div>
-      <button style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);width:34px;height:34px;cursor:pointer;font-size:16px" onclick="changeSummaryPeriod(1)">??/button>
+      <button style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);width:34px;height:34px;cursor:pointer;font-size:16px" onclick="changeSummaryPeriod(1)">›</button>
     </div>
     <div id="summaryContent"></div>
-    <!-- yearly savings chart (?�年度�??�顯�? -->
+    <!-- yearly savings chart (在年度視圖顯示) -->
     <div id="yearlySavingsWrap" style="display:none">
-      <div class="page-section-title" style="margin-top:6px">?�� 年度?��?統�?</div>
+      <div class="page-section-title" style="margin-top:6px">🏦 年度儲蓄統計</div>
       <div id="yearlySavingsContent"></div>
     </div>
   </div>
 
-  <!-- ?�� SAVINGS SUB-PAGE -->
+  <!-- 💰 SAVINGS SUB-PAGE -->
   <div id="incSub-savings" style="display:none">
     <div class="page-hero hero-savings-green">
-      <div class="ph-icon">?��</div>
+      <div class="ph-icon">🏦</div>
       <div class="ph-info">
-        <div class="ph-label">?��?存款（可?�用�?/div>
+        <div class="ph-label">現金存款（可動用）</div>
         <div class="ph-value privacy-mask" id="savBalance">$0</div>
-        <div class="ph-sub" id="savBalanceHint">尚未設�?起�??��?，�?下方?��???��?存入?��?始�???/div>
+        <div class="ph-sub" id="savBalanceHint">尚未設定起始金額，點下方「📥 手動存入」開始記錄</div>
       </div>
     </div>
 
     <div class="sav-quick-row">
-      <button class="sav-quick-btn withdraw" onclick="openSavWithdrawModal()">?�� ?�款</button>
-      <button class="sav-quick-btn deposit" onclick="openSavDepositModal()">?�� 存入</button>
-      <span class="sav-quick-hint">也可從右下�? �??��?</span>
+      <button class="sav-quick-btn withdraw" onclick="openSavWithdrawModal()">📤 提款</button>
+      <button class="sav-quick-btn deposit" onclick="openSavDepositModal()">📥 存入</button>
+      <span class="sav-quick-hint">也可從右下角 ＋ 新增</span>
     </div>
 
     <div class="summary-row" style="margin-bottom:12px">
       <div class="summary-card" style="border-color:rgba(24,184,124,0.25)">
-        <div class="s-icon">?��</div><div class="s-label">?��?存入</div>
+        <div class="s-icon">📥</div><div class="s-label">本月存入</div>
         <div class="s-value" id="savMonthIn" style="color:var(--accent3)">$0</div>
       </div>
       <div class="summary-card" style="border-color:rgba(232,48,48,0.25)">
-        <div class="s-icon">?��</div><div class="s-label">?��??�款</div>
+        <div class="s-icon">📤</div><div class="s-label">本月提款</div>
         <div class="s-value" id="savMonthOut" style="color:var(--danger)">$0</div>
       </div>
       <div class="summary-card" style="border-color:rgba(232,72,138,0.25)">
-        <div class="s-icon">??</div><div class="s-label">?��??��???/div>
+        <div class="s-icon">📊</div><div class="s-label">投資未計入</div>
         <div class="s-value" id="savInvested" style="color:var(--accent2)">$0</div>
       </div>
     </div>
 
     <div class="info-banner">
-      ?�� <strong style="color:var(--text)">?�麼?��?�?/strong><br>
-      ??<strong>?�款</strong>：�?額�??�本?�可?��?存款??��（適?��?超支�?br>
-      ??<strong>?��?存入</strong>：�??�入存款，�?影響?�用額度<br>
-      ??<strong>?��?結�?</strong>：�??��?彈�?詢�?要�???/ 標�??��? / ?��?決�?<br>
-      ??<strong>?��?不�??��?�?/strong>：�?記為?��??��?額�??�出?�在?�裡
+      💡 <strong style="color:var(--text)">怎麼運作？</strong><br>
+      • <strong>提款</strong>：金額計入本月可用，存款扣除（適合補超支）<br>
+      • <strong>手動存入</strong>：純加入存款，不影響可用額度<br>
+      • <strong>月底結餘</strong>：每月初彈窗詢問要存入 / 標記投資 / 暫不決定<br>
+      • <strong>投資不計入存款</strong>：標記為投資的金額不會出現在這裡
     </div>
 
-    <!-- ?? ?��?追蹤??-->
-    <div class="page-section-title">?? ?��?追蹤</div>
+    <!-- 📊 投資追蹤卡 -->
+    <div class="page-section-title">📊 投資追蹤</div>
     <div style="background:linear-gradient(135deg,rgba(232,72,138,0.08),rgba(91,72,232,0.06));border:1.5px solid rgba(232,72,138,0.25);border-radius:var(--r);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div>
-          <div style="font-size:10px;color:var(--text2);margin-bottom:3px">?�� 累�??�入</div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px">💰 累計投入</div>
           <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)" id="invTotalIn">$0</div>
         </div>
         <div>
-          <div style="font-size:10px;color:var(--text2);margin-bottom:3px">?? ?��?市�?/div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px">📈 目前市值</div>
           <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--accent3)" id="invCurValue">$0</div>
         </div>
       </div>
       <div id="invReturnRow" style="display:none;background:var(--surface);border-radius:var(--r-sm);padding:8px 11px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:11px;color:var(--text2)">?�實?��???/span>
+        <span style="font-size:11px;color:var(--text2)">未實現損益</span>
         <span id="invReturnVal" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700"></span>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn-mini-add" onclick="openInvAddModal()">�??��?</button>
-        <button class="btn-mini-add primary" onclick="openInvUpdateModal()">?��? ?�新市�?/button>
+        <button class="btn-mini-add" onclick="openInvAddModal()">＋ 投資</button>
+        <button class="btn-mini-add primary" onclick="openInvUpdateModal()">✏️ 更新市值</button>
       </div>
       <div style="font-size:10px;color:var(--text3);margin-top:8px;line-height:1.5">
-        ?�� ?�追蹤現?��??��??�入?��? vs 你�??�填?��??��??��?br>
-        ?��??�價走勢請用專業 App（MoneyDJ / Yahoo ?��?）�?      </div>
+        💡 只追蹤現金流向：投入金額 vs 你手動填的最新市值。<br>
+        想看股價走勢請用專業 App（MoneyDJ / Yahoo 股市）。
+      </div>
     </div>
     <div id="invHistoryList"></div>
 
-    <div class="page-section-title" style="margin-top:14px">?? 存款?��?記�?</div>
+    <div class="page-section-title" style="margin-top:14px">📋 存款異動記錄</div>
     <div id="savHistoryList"></div>
   </div>
 
   <!-- VOUCHER SUB-PAGE -->
   <div id="incSub-voucher" style="display:none">
     <div class="info-banner">
-      ?�� ?�享?�錢?��?記�??��?，�?次使?��?填寫購買了�?麼�?系統幫�?追蹤?��??��?
+      💡 即享券錢包：記錄面額，每次使用時填寫購買了什麼，系統幫你追蹤剩餘金額
     </div>
-    <div class="page-section-title">?�� ?��??�享??/div>
+    <div class="page-section-title">🎫 我的即享券</div>
     <div id="voucherList"></div>
   </div>
 
   <!-- EASYCARD SUB-PAGE -->
   <div id="incSub-easycard" style="display:none">
     <div class="page-hero hero-easycard">
-      <div class="ph-icon">??</div>
+      <div class="ph-icon">🚇</div>
       <div class="ph-info">
-        <div class="ph-label">?��???/ ?�值帳?��?�?/div>
+        <div class="ph-label">悠遊卡 / 儲值帳戶餘額</div>
         <div class="ph-value privacy-mask" id="ecBalance">$0</div>
-        <div class="ph-sub" id="ecHint">?�值�?消費不�??��?計入?��??�出</div>
+        <div class="ph-sub" id="ecHint">儲值後消費不會重複計入當月支出</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px">
-      <button class="btn-sm primary" style="flex:1;padding:10px" onclick="openEasyCardTopup()">�??��?/button>
-      <button class="btn-sm" style="flex:1;padding:10px" onclick="openEasyCardAdjust()">?��? 調整餘�?</button>
+      <button class="btn-sm primary" style="flex:1;padding:10px" onclick="openEasyCardTopup()">＋ 儲值</button>
+      <button class="btn-sm" style="flex:1;padding:10px" onclick="openEasyCardAdjust()">✏️ 調整餘額</button>
     </div>
     <div class="info-banner">
-      ?�� ?�用?��??�卡?�iCash?��???��LINE Pay Money 等�?付儲?�錢?�。儲?��?從現?�扣，�?費�??�接從卡?��?額扣，�??��?計入?�支?��?    </div>
-    <div class="page-section-title">?? 交�?紀??/div>
+      💡 適用於悠遊卡、iCash、街口、LINE Pay Money 等預付儲值錢包。儲值時從現金扣，消費時直接從卡內餘額扣，不重複計入月支出。
+    </div>
+    <div class="page-section-title">📋 交易紀錄</div>
     <div id="ecHistoryList"></div>
   </div>
 </div>
@@ -832,32 +839,33 @@
 <div class="modal-overlay" id="easyCardTopupOverlay" onclick="closeModalOutside(event,'easyCardTopupOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="ecModalTitle">?? ?��??�儲??/div>
+    <div class="modal-title" id="ecModalTitle">🚇 悠遊卡儲值</div>
     <div style="background:var(--surface2);border-radius:var(--r);padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
-      ?��?餘�?�?strong id="ecCurBal">$0</strong>
+      目前餘額：<strong id="ecCurBal">$0</strong>
     </div>
     <div class="form-group">
-      <label class="form-label">?�值�?�?(NT$)</label>
-      <input class="form-input" id="ec-topup-amt" type="number" placeholder="例�?500??000"/>
+      <label class="form-label">儲值金額 (NT$)</label>
+      <input class="form-input" id="ec-topup-amt" type="number" placeholder="例：500、1000"/>
     </div>
     <div class="form-group">
-      <label class="form-label">付款?��?</label>
+      <label class="form-label">付款方式</label>
       <div class="cat-grid" style="grid-template-columns:1fr 1fr">
-        <div class="cat-opt selected" data-val="cash" onclick="selectEcTopupPay(this,'cash')">?�� ?��?</div>
-        <div class="cat-opt" data-val="card" onclick="selectEcTopupPay(this,'card')">?�� 信用??/div>
+        <div class="cat-opt selected" data-val="cash" onclick="selectEcTopupPay(this,'cash')">💵 現金</div>
+        <div class="cat-opt" data-val="card" onclick="selectEcTopupPay(this,'card')">💳 信用卡</div>
       </div>
     </div>
     <div id="ec-topup-card-row" style="display:none" class="form-group">
-      <label class="form-label">使用信用??/label>
+      <label class="form-label">使用信用卡</label>
       <select class="form-input" id="ec-topup-card"></select>
     </div>
     <div class="form-group">
-      <label class="form-label">?�註（可?��?</label>
-      <input class="form-input" id="ec-topup-note" placeholder="例�??��?站�??��?"/>
+      <label class="form-label">備註（可選）</label>
+      <input class="form-input" id="ec-topup-note" placeholder="例：捷運站加值機"/>
     </div>
     <div style="background:var(--accent-light);color:var(--accent);font-size:11px;padding:10px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5">
-      ?�� ?�值�?記為一筆「�??�卡?�值」�?活花費�?從現??信用?�扣）�?但日後�??�內消費?��??��??�當?�支?��?    </div>
-    <button class="btn-submit" onclick="saveEasyCardTopup()">確�??��?/button>
+      💡 儲值會記為一筆「悠遊卡儲值」生活花費（從現金/信用卡扣），但日後從卡內消費時不再計入當月支出。
+    </div>
+    <button class="btn-submit" onclick="saveEasyCardTopup()">確認儲值</button>
   </div>
 </div>
 
@@ -865,17 +873,18 @@
 <div class="modal-overlay" id="easyCardAdjustOverlay" onclick="closeModalOutside(event,'easyCardAdjustOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?��? 調整?��??��?�?/div>
+    <div class="modal-title">✏️ 調整悠遊卡餘額</div>
     <div style="background:var(--surface2);border-radius:var(--r);padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
-      ?��?餘�?�?strong id="ecAdjCurBal">$0</strong>
+      目前餘額：<strong id="ecAdjCurBal">$0</strong>
     </div>
     <div class="form-group">
-      <label class="form-label">設�??��?NT$�?/label>
-      <input class="form-input" id="ec-adj-amt" type="number" placeholder="例�?123"/>
+      <label class="form-label">設定為（NT$）</label>
+      <input class="form-input" id="ec-adj-amt" type="number" placeholder="例：123"/>
     </div>
     <div style="background:#fef3c7;color:#92400e;font-size:11px;padding:10px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5">
-      ?��? ?�接調整餘�?不�?建�?任�?消費紀?��??�在你發?�實?��?額�?系統不符?�用來校�?�?    </div>
-    <button class="btn-submit" onclick="saveEasyCardAdjust()">?��?</button>
+      ⚠️ 直接調整餘額不會建立任何消費紀錄，僅在你發現實際餘額與系統不符時用來校正。
+    </div>
+    <button class="btn-submit" onclick="saveEasyCardAdjust()">儲存</button>
   </div>
 </div>
 
@@ -883,23 +892,23 @@
 <div class="modal-overlay" id="manualSalaryOverlay" onclick="closeModalOutside(event,'manualSalaryOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?��? 輸入?��?</div>
+    <div class="modal-title">✏️ 輸入薪資</div>
     <div class="form-group form-row">
       <div><label class="form-label">年份</label><input class="form-input" id="ms-year" type="number" placeholder="2025"/></div>
-      <div><label class="form-label">?�份</label><input class="form-input" id="ms-month" type="number" min="1" max="12" placeholder="4"/></div>
-      <div><label class="form-label">?�放??<span style="color:var(--text3);font-weight:400">??5?��???/span></label><input class="form-input" id="ms-payday" type="number" min="1" max="31" value="25"/></div>
+      <div><label class="form-label">月份</label><input class="form-input" id="ms-month" type="number" min="1" max="12" placeholder="4"/></div>
+      <div><label class="form-label">發放日 <span style="color:var(--text3);font-weight:400">≥25→下月</span></label><input class="form-input" id="ms-payday" type="number" min="1" max="31" value="25"/></div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--accent3);letter-spacing:0.8px;margin-bottom:8px">?? ?�入?�目</div>
+    <div style="font-size:11px;font-weight:700;color:var(--accent3);letter-spacing:0.8px;margin-bottom:8px">💚 收入項目</div>
     <div id="ms-income-rows"></div>
-    <button class="btn-sm" style="width:100%;margin-bottom:14px;border-style:dashed" onclick="addManualRow('income')">�??��??�入?�目</button>
-    <div style="font-size:11px;font-weight:700;color:var(--danger);letter-spacing:0.8px;margin-bottom:8px">?�� ??��?�目</div>
+    <button class="btn-sm" style="width:100%;margin-bottom:14px;border-style:dashed" onclick="addManualRow('income')">＋ 新增收入項目</button>
+    <div style="font-size:11px;font-weight:700;color:var(--danger);letter-spacing:0.8px;margin-bottom:8px">🔴 扣除項目</div>
     <div id="ms-deduction-rows"></div>
-    <button class="btn-sm" style="width:100%;margin-bottom:14px;border-style:dashed" onclick="addManualRow('deduction')">�??��???��?�目</button>
+    <button class="btn-sm" style="width:100%;margin-bottom:14px;border-style:dashed" onclick="addManualRow('deduction')">＋ 新增扣除項目</button>
     <div style="background:linear-gradient(135deg,rgba(24,184,124,0.08),rgba(91,72,232,0.06));border:1.5px solid rgba(24,184,124,0.2);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:13px;font-weight:700">?�� 實�??��?</div>
+      <div style="font-size:13px;font-weight:700">💰 實領薪資</div>
       <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--accent3)" id="ms-net">$0</div>
     </div>
-    <button class="btn-submit" onclick="saveManualSalary()">?��??��?記�?</button>
+    <button class="btn-submit" onclick="saveManualSalary()">儲存薪資記錄</button>
   </div>
 </div>
 
@@ -907,112 +916,113 @@
 <div class="modal-overlay" id="extraIncomeOverlay" onclick="closeModalOutside(event,'extraIncomeOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="extraIncomeTitle">?? ?��?額�??�入</div>
+    <div class="modal-title" id="extraIncomeTitle">📈 新增額外收入</div>
     <input type="hidden" id="ei-id"/>
     <div class="form-group">
-      <label class="form-label">?�稱／�?�?/label>
-      <input class="form-input" id="ei-name" placeholder="例�??��??�股?�、利??/>
+      <label class="form-label">名稱／來源</label>
+      <input class="form-input" id="ei-name" placeholder="例：接案、股利、利息"/>
     </div>
     <div class="form-group">
-      <label class="form-label">類�?</label>
+      <label class="form-label">類型</label>
       <div style="display:flex;gap:7px;flex-wrap:wrap" id="eiSourceSelect">
-        <div class="cat-opt selected" data-val="sidejob" onclick="selectEiSource(this)">?�� ?�業/?��?</div>
-        <div class="cat-opt" data-val="investment" onclick="selectEiSource(this)">?? ?��?/?�利</div>
-        <div class="cat-opt" data-val="interest" onclick="selectEiSource(this)">?�� ?�息</div>
-        <div class="cat-opt" data-val="rebate" onclick="selectEiSource(this)">?�� ?��??��?/div>
-        <div class="cat-opt" data-val="gift" onclick="selectEiSource(this)">?? 禮�?/紅�?</div>
-        <div class="cat-opt" data-val="other" onclick="selectEiSource(this)">?�� ?��?</div>
+        <div class="cat-opt selected" data-val="sidejob" onclick="selectEiSource(this)">💼 副業/接案</div>
+        <div class="cat-opt" data-val="investment" onclick="selectEiSource(this)">📊 投資/股利</div>
+        <div class="cat-opt" data-val="interest" onclick="selectEiSource(this)">🏦 利息</div>
+        <div class="cat-opt" data-val="rebate" onclick="selectEiSource(this)">💸 退稅/退款</div>
+        <div class="cat-opt" data-val="gift" onclick="selectEiSource(this)">🎁 禮金/紅包</div>
+        <div class="cat-opt" data-val="other" onclick="selectEiSource(this)">📦 其他</div>
       </div>
     </div>
     <div class="form-group form-row">
-      <div><label class="form-label">?��? (NT$)</label><input class="form-input" id="ei-amount" type="number" placeholder="例�?5000"/></div>
-      <div><label class="form-label">?��?</label><input class="form-input" id="ei-date" type="date"/></div>
+      <div><label class="form-label">金額 (NT$)</label><input class="form-input" id="ei-amount" type="number" placeholder="例：5000"/></div>
+      <div><label class="form-label">日期</label><input class="form-input" id="ei-date" type="date"/></div>
     </div>
-    <div class="form-group"><label class="form-label">?�註（可?��?</label><input class="form-input" id="ei-note" placeholder=""/></div>
-    <button class="btn-submit" id="ei-submit" onclick="saveExtraIncome()">�??��??�入</button>
+    <div class="form-group"><label class="form-label">備註（可選）</label><input class="form-input" id="ei-note" placeholder=""/></div>
+    <button class="btn-submit" id="ei-submit" onclick="saveExtraIncome()">＋ 新增收入</button>
   </div>
 </div>
 
-<!-- VOUCHER MODAL - ?�享?�新�?-->
+<!-- VOUCHER MODAL - 即享券新增 -->
 <div class="modal-overlay" id="voucherModalOverlay" onclick="closeModalOutside(event,'voucherModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� ?��??�享??/div>
+    <div class="modal-title">🎫 新增即享券</div>
     <div class="form-group">
-      <label class="form-label">?�享?��?�?/label>
-      <input class="form-input" id="vc-name" placeholder="例�?五�??��?節福利?�、年終即享券"/>
+      <label class="form-label">即享券名稱</label>
+      <input class="form-input" id="vc-name" placeholder="例：五一勞動節福利券、年終即享券"/>
     </div>
     <div class="form-group form-row">
-      <div><label class="form-label">?��? (NT$)</label><input class="form-input" id="vc-value" type="number" placeholder="1000"/></div>
-      <div><label class="form-label">Emoji</label><input class="form-input" id="vc-emoji" placeholder="?��" maxlength="2"/></div>
+      <div><label class="form-label">面額 (NT$)</label><input class="form-input" id="vc-value" type="number" placeholder="1000"/></div>
+      <div><label class="form-label">Emoji</label><input class="form-input" id="vc-emoji" placeholder="🎫" maxlength="2"/></div>
     </div>
-    <div class="form-group"><label class="form-label">?�註（可?��?</label><input class="form-input" id="vc-note" placeholder="例�?五�??��?節?��??�到年�?"/></div>
+    <div class="form-group"><label class="form-label">備註（可選）</label><input class="form-input" id="vc-note" placeholder="例：五一勞動節、效期到年底"/></div>
     <div style="background:var(--accent-light);border-radius:var(--r-sm);padding:9px 12px;font-size:11px;color:var(--accent);margin-bottom:12px">
-      ?�� 每張?�享?�獨立�??��?使用?�可?��?購買?��??��??��??�接從�?額扣??    </div>
-    <button class="btn-submit" onclick="addVoucher()">?��??�享??/button>
+      💡 每張即享券獨立記錄，使用時可選擇購買的品項，面額直接從餘額扣除
+    </div>
+    <button class="btn-submit" onclick="addVoucher()">新增即享券</button>
   </div>
 </div>
 
-<!-- VOUCHER USE MODAL - 使用?�享??-->
+<!-- VOUCHER USE MODAL - 使用即享券 -->
 <div class="modal-overlay" id="voucherUseOverlay" onclick="closeModalOutside(event,'voucherUseOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="vucTitle">?�� 使用?�享??/div>
+    <div class="modal-title" id="vucTitle">🎫 使用即享券</div>
     <input type="hidden" id="vuc-id"/>
     <div style="background:var(--surface2);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;text-align:center">
-      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">?�用餘�?</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">可用餘額</div>
       <div style="font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:var(--accent3)" id="vucBalance">$0</div>
     </div>
     <div class="form-group">
-      <label class="form-label">購買了�?麼�?</label>
-      <input class="form-input" id="vuc-item" placeholder="例�?MUJI ?��??�、�?巴�??�啡"/>
+      <label class="form-label">購買了什麼？</label>
+      <input class="form-input" id="vuc-item" placeholder="例：MUJI 收納盒、星巴克咖啡"/>
     </div>
     <div class="form-group">
-      <label class="form-label">?�費?��? (NT$)</label>
-      <input class="form-input" id="vuc-amount" type="number" placeholder="例�?350"/>
+      <label class="form-label">花費金額 (NT$)</label>
+      <input class="form-input" id="vuc-amount" type="number" placeholder="例：350"/>
     </div>
     <div class="form-group">
       <label class="form-label">類別</label>
       <div style="display:flex;gap:7px;flex-wrap:wrap" id="vucCatSelect">
-        <div class="cat-opt selected" data-val="daily" onclick="selectVucCat(this)">?? ?�用??/div>
-        <div class="cat-opt" data-val="food" onclick="selectVucCat(this)">?�� 餐飲</div>
-        <div class="cat-opt" data-val="clothing" onclick="selectVucCat(this)">?? 治�?</div>
-        <div class="cat-opt" data-val="entertainment" onclick="selectVucCat(this)">?�� 娛�?</div>
-        <div class="cat-opt" data-val="health" onclick="selectVucCat(this)">?? 保健</div>
-        <div class="cat-opt" data-val="skin" onclick="selectVucCat(this)">?�� 保�?</div>
-        <div class="cat-opt" data-val="other" onclick="selectVucCat(this)">?�� ?��?</div>
+        <div class="cat-opt selected" data-val="daily" onclick="selectVucCat(this)">🛒 日用品</div>
+        <div class="cat-opt" data-val="food" onclick="selectVucCat(this)">🍽 餐飲</div>
+        <div class="cat-opt" data-val="clothing" onclick="selectVucCat(this)">👗 治裝</div>
+        <div class="cat-opt" data-val="entertainment" onclick="selectVucCat(this)">🎮 娛樂</div>
+        <div class="cat-opt" data-val="health" onclick="selectVucCat(this)">💊 保健</div>
+        <div class="cat-opt" data-val="skin" onclick="selectVucCat(this)">🧴 保養</div>
+        <div class="cat-opt" data-val="other" onclick="selectVucCat(this)">📦 其他</div>
       </div>
     </div>
-    <button class="btn-submit" onclick="confirmUseVoucher()">確�?使用</button>
+    <button class="btn-submit" onclick="confirmUseVoucher()">確認使用</button>
   </div>
 </div>
 
-<!-- QUICK EXPENSE MODAL - 快速�?�?-->
+<!-- QUICK EXPENSE MODAL - 快速記帳 -->
 <div class="modal-overlay" id="quickExpenseOverlay" onclick="closeModalOutside(event,'quickExpenseOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="qeModalTitle">?? 詳細記帳</div>
+    <div class="modal-title" id="qeModalTitle">📝 詳細記帳</div>
     <div class="form-group form-row">
-      <div><label class="form-label">?�費?�目</label><input class="form-input" id="qe-name" placeholder="例�??��??��?程�?"/></div>
-      <div><label class="form-label">?��? (NT$)</label><input class="form-input" id="qe-amount" type="number" placeholder="350" oninput="updateFxHint()"/></div>
+      <div><label class="form-label">花費項目</label><input class="form-input" id="qe-name" placeholder="例：聚餐、計程車"/></div>
+      <div><label class="form-label">金額 (NT$)</label><input class="form-input" id="qe-amount" type="number" placeholder="350" oninput="updateFxHint()"/></div>
     </div>
     <div class="form-group">
-      <label class="form-label">?��?</label>
+      <label class="form-label">日期</label>
       <input class="form-input" id="qe-date" type="date"/>
     </div>
     <div class="form-group">
       <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
         <span>類別</span>
-        <span style="font-size:10px;color:var(--text3);cursor:pointer" onclick="openCatManagerModal()">?��? 管�?類別</span>
+        <span style="font-size:10px;color:var(--text3);cursor:pointer" onclick="openCatManagerModal()">⚙️ 管理類別</span>
       </label>
       <div style="display:flex;gap:7px;flex-wrap:wrap" id="qeCatSelect"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">付款?��?</label>
+      <label class="form-label">付款方式</label>
       <div style="display:flex;gap:7px;flex-wrap:wrap" id="qePaySelect">
-        <div class="cat-opt selected" data-val="cash" onclick="selectQePay(this,'cash')">?�� ?��?/?��???/div>
-        <div class="cat-opt" data-val="card" onclick="selectQePay(this,'card')">?�� 信用??/div>
-        <div class="cat-opt" data-val="voucher" onclick="selectQePay(this,'voucher')">?�� ?�享??/div>
+        <div class="cat-opt selected" data-val="cash" onclick="selectQePay(this,'cash')">💵 現金/金融卡</div>
+        <div class="cat-opt" data-val="card" onclick="selectQePay(this,'card')">💳 信用卡</div>
+        <div class="cat-opt" data-val="voucher" onclick="selectQePay(this,'voucher')">🎫 即享券</div>
       </div>
       <div id="qeCardPicker" style="display:none;margin-top:8px">
         <select class="form-input" id="qeCardSel"></select>
@@ -1022,382 +1032,390 @@
         <select class="form-input" id="qeVoucherSel"></select>
       </div>
     </div>
-    <!-- ?�� 外幣 -->
+    <!-- 💱 外幣 -->
     <div class="form-group">
       <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
-        <span>�?��</span>
-        <span style="font-size:10px;color:var(--text3);cursor:pointer" onclick="openFxRatesModal()">?��? 管�??��?</span>
+        <span>幣別</span>
+        <span style="font-size:10px;color:var(--text3);cursor:pointer" onclick="openFxRatesModal()">⚙️ 管理匯率</span>
       </label>
       <div style="display:flex;gap:7px;flex-wrap:wrap" id="qeCurrencySelect"></div>
       <div id="qeFxHint" style="display:none;margin-top:8px;padding:9px 12px;background:var(--accent-light);border-radius:var(--r-sm);font-size:11px;color:var(--accent)"></div>
     </div>
-    <!-- ?�� 標籤 -->
+    <!-- 🏷 標籤 -->
     <div class="form-group">
-      <label class="form-label">標籤（逗�??��?，選填�?</label>
-      <input class="form-input" id="qe-tags" placeholder="例�??��?, ?�司, ?�差"/>
+      <label class="form-label">標籤（逗號分隔，選填）</label>
+      <input class="form-input" id="qe-tags" placeholder="例：聚餐, 公司, 出差"/>
     </div>
-    <!-- ?�� ?��? -->
+    <!-- 🧾 備忘 -->
     <div class="form-group">
-      <label class="form-label">?��?（選填�?</label>
-      <input class="form-input" id="qe-memo" placeholder="例�??��?餐�?AA ??/>
+      <label class="form-label">備忘（選填）</label>
+      <input class="form-input" id="qe-memo" placeholder="例：慶生餐，AA 制"/>
     </div>
-    <button class="btn-submit" id="qeSubmitBtn" onclick="saveQuickExpense()">記�??�出</button>
+    <button class="btn-submit" id="qeSubmitBtn" onclick="saveQuickExpense()">記錄支出</button>
   </div>
 </div>
 
-<!-- ?�� FX RATES MODAL -->
+<!-- 💱 FX RATES MODAL -->
 <div class="modal-overlay" id="fxRatesOverlay" onclick="closeModalOutside(event,'fxRatesOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� 外幣?��?</div>
+    <div class="modal-title">💱 外幣匯率</div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6">
-      設�? 1 外幣 = 多�? TWD?��?帳�??�自?��?算�??�幣統�???br>
-      ?�� Bybit Card ?�用 USDT；出?��?費可?�當?�幣?��?    </div>
+      設定 1 外幣 = 多少 TWD。記帳時會自動換算成台幣統計。<br>
+      💡 Bybit Card 可用 USDT；出國消費可用當地幣別。
+    </div>
     <div style="display:flex;gap:7px;margin-bottom:10px">
-      <button class="btn-sm" style="flex:1;padding:9px;background:var(--accent-light);border-color:rgba(91,72,232,0.3);color:var(--accent);font-weight:700" onclick="fetchFxRates()">?? 從網路自?�更??/button>
+      <button class="btn-sm" style="flex:1;padding:9px;background:var(--accent-light);border-color:rgba(91,72,232,0.3);color:var(--accent);font-weight:700" onclick="fetchFxRates()">🔄 從網路自動更新</button>
     </div>
     <div id="fxRatesUpdatedAt" style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:8px"></div>
     <div id="fxRatesList"></div>
     <div style="border:1px dashed var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;margin-bottom:6px">�??��??��?�?��</div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px">＋ 新增自訂幣種</div>
       <div style="display:flex;gap:6px;align-items:center">
-        <input class="form-input" id="newFxCode" placeholder="�?�� (�?KRW)" style="flex:1;text-transform:uppercase" maxlength="6"/>
+        <input class="form-input" id="newFxCode" placeholder="代碼 (例 KRW)" style="flex:1;text-transform:uppercase" maxlength="6"/>
         <input class="form-input" id="newFxRate" type="number" step="0.0001" placeholder="1 X = ? TWD" style="flex:1.2"/>
-        <button class="btn-sm primary" style="padding:8px 12px;font-size:12px" onclick="addCustomFxCurrency()">?��?</button>
+        <button class="btn-sm primary" style="padding:8px 12px;font-size:12px" onclick="addCustomFxCurrency()">新增</button>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:6px">輸入 ISO 4217 �?��（�? KRW?�HKD?�GBP）�?系統?�自?��??��??��?/div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">輸入 ISO 4217 代碼（如 KRW、HKD、GBP），系統會自動加入清單。</div>
     </div>
-    <button class="btn-submit" onclick="saveFxRates()">?��??��?</button>
+    <button class="btn-submit" onclick="saveFxRates()">儲存匯率</button>
   </div>
 </div>
 
-<!-- ?�� CARD EDIT MODAL -->
+<!-- 💳 CARD EDIT MODAL -->
 <div class="modal-overlay" id="cardOverlay" onclick="closeModalOutside(event,'cardOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="cardModalTitle">?�� ?��?信用??/div>
+    <div class="modal-title" id="cardModalTitle">💳 新增信用卡</div>
     <input type="hidden" id="cd-id"/>
     <div class="form-group">
-      <label class="form-label">?��??�稱</label>
-      <input class="form-input" id="cd-name" placeholder="例�??�泰 CUBE / ?�山 Pi ?��?"/>
+      <label class="form-label">卡片名稱</label>
+      <input class="form-input" id="cd-name" placeholder="例：國泰 CUBE / 玉山 Pi 拍兔"/>
     </div>
     <div style="display:flex;gap:8px">
       <div class="form-group" style="flex:1">
-        <label class="form-label">?�卡?�行�??�填�?/label>
-        <input class="form-input" id="cd-bank" placeholder="例�??�泰世華"/>
+        <label class="form-label">發卡銀行（選填）</label>
+        <input class="form-input" id="cd-bank" placeholder="例：國泰世華"/>
       </div>
       <div class="form-group" style="width:96px">
-        <label class="form-label">?��?�?/label>
+        <label class="form-label">末四碼</label>
         <input class="form-input" id="cd-last4" placeholder="1234" maxlength="4" inputmode="numeric"/>
       </div>
     </div>
     <div style="display:flex;gap:8px">
       <div class="form-group" style="flex:1">
-        <label class="form-label">每�?結帳??/label>
+        <label class="form-label">每月結帳日</label>
         <input class="form-input" id="cd-stmt" type="number" min="1" max="28" placeholder="5"/>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">該日（含）�??��?消費?�本??/div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">該日（含）之前的消費入本期</div>
       </div>
       <div class="form-group" style="flex:1">
-        <label class="form-label">每�?繳款??/label>
+        <label class="form-label">每月繳款日</label>
         <input class="form-input" id="cd-due" type="number" min="1" max="28" placeholder="15"/>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">下個�??�天要繳�?/div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">下個月哪天要繳費</div>
       </div>
     </div>
-    <button class="btn-submit" onclick="saveCard()">?��??��?</button>
-    <button class="btn-mini" id="cardDelBtn" style="width:100%;margin-top:8px;color:var(--danger);display:none" onclick="deleteCardConfirm()">?? ?�除?�張??/button>
+    <button class="btn-submit" onclick="saveCard()">儲存卡片</button>
+    <button class="btn-mini" id="cardDelBtn" style="width:100%;margin-top:8px;color:var(--danger);display:none" onclick="deleteCardConfirm()">🗑 刪除這張卡</button>
   </div>
 </div>
 
-<!-- ?��? OVERAGE WARNING MODAL -->
+<!-- ⚠️ OVERAGE WARNING MODAL -->
 <div class="modal-overlay" id="overageOverlay" onclick="closeModalOutside(event,'overageOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?��? ?��??�出超出?��?</div>
+    <div class="modal-title">⚠️ 本月支出超出預算</div>
     <div id="overageMsg" style="font-size:13px;line-height:1.7;margin-bottom:14px;padding:12px;background:var(--danger-light);border-radius:var(--r-sm);color:var(--text)"></div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">超支來�?該�?何�??��?</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">超支來源該如何處理？</div>
     <div id="overageActions" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 </div>
 
-<!-- ?�� MONTH SURPLUS PROMPT MODAL -->
+<!-- 💰 MONTH SURPLUS PROMPT MODAL -->
 <div class="modal-overlay" id="surplusOverlay" onclick="closeModalOutside(event,'surplusOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?? 上�??��?餘�?</div>
+    <div class="modal-title">🎉 上月有結餘！</div>
     <div id="surplusMsg" style="font-size:13px;line-height:1.7;margin-bottom:14px;padding:12px;background:var(--accent3-light,rgba(56,176,0,0.1));border-radius:var(--r-sm);color:var(--text)"></div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">?��?結�?要怎麼?��?�?/div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">這筆結餘要怎麼處理？</div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn-submit" style="margin:0;text-align:left;padding:13px 14px" onclick="acceptSurplus()">?�� ?�入?��?存款（可?�用�?/button>
-      <button class="btn-sm" style="padding:13px 14px;text-align:left;background:linear-gradient(135deg,rgba(232,72,138,0.1),rgba(91,72,232,0.08));border-color:rgba(232,72,138,0.3);color:var(--accent2)" onclick="investSurplus()">?? 標�??��?資�?不�??��?款�?</button>
-      <button class="btn-sm" style="padding:11px" onclick="dismissSurplus()">?��?要決�?/button>
+      <button class="btn-submit" style="margin:0;text-align:left;padding:13px 14px" onclick="acceptSurplus()">🏦 加入現金存款（可動用）</button>
+      <button class="btn-sm" style="padding:13px 14px;text-align:left;background:linear-gradient(135deg,rgba(232,72,138,0.1),rgba(91,72,232,0.08));border-color:rgba(232,72,138,0.3);color:var(--accent2)" onclick="investSurplus()">📊 標記為投資（不計入存款）</button>
+      <button class="btn-sm" style="padding:11px" onclick="dismissSurplus()">先不要決定</button>
     </div>
   </div>
 </div>
 
-<!-- ?? SALARY AUTO-FILL MODAL -->
+<!-- 🤖 SALARY AUTO-FILL MODAL -->
 <div class="modal-overlay" id="salaryAutoOverlay" onclick="closeModalOutside(event,'salaryAutoOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="salaryAutoTitle">?? ?��??��??��??�帳�?/div>
+    <div class="modal-title" id="salaryAutoTitle">📅 本月薪資自動入帳？</div>
     <div id="salaryAutoBody" style="font-size:13px;color:var(--text);margin-bottom:14px;line-height:1.7"></div>
     <div style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.6">
-      ?�� 套用後�??��??�薪資�?構�??�建立本?��??��?br>
-      ?��?額�??��??�「�?�?修改?�可?�填後�?調整??    </div>
-    <button class="btn-submit" style="width:100%;margin:0 0 8px 0" onclick="confirmAutoSalary()">??套用上�??��??��?</button>
+      💡 套用後會用上月薪資結構一鍵建立本月紀錄。<br>
+      若金額不同，按「✏️ 修改」可預填後再調整。
+    </div>
+    <button class="btn-submit" style="width:100%;margin:0 0 8px 0" onclick="confirmAutoSalary()">✓ 套用上月相同金額</button>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="editAutoSalary()">?��? 修改</button>
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="skipAutoSalary()">?��??��?</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="editAutoSalary()">✏️ 修改</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="skipAutoSalary()">本月略過</button>
     </div>
   </div>
 </div>
 
-<!-- ?�� INVOICE QR SCANNER MODAL -->
+<!-- 📷 INVOICE QR SCANNER MODAL -->
 <div class="modal-overlay" id="invoiceScanOverlay" onclick="closeModalOutside(event,'invoiceScanOverlay')">
   <div class="modal" style="padding:16px">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� ?�發�?QR Code</div>
+    <div class="modal-title">📷 掃發票 QR Code</div>
     <div id="invScanError" style="display:none;background:#ffebee;color:#c62828;padding:9px 12px;border-radius:var(--r-sm);font-size:12px;margin-bottom:12px;line-height:1.6"></div>
     <div style="position:relative;background:#000;border-radius:var(--r-sm);overflow:hidden;aspect-ratio:1/1;margin-bottom:12px">
       <video id="invScanVideo" playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
       <canvas id="invScanCanvas" style="display:none"></canvas>
       <div style="position:absolute;inset:12%;border:3px dashed rgba(255,255,255,0.6);border-radius:10px;pointer-events:none"></div>
-      <div id="invScanHint" style="position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:11px;text-shadow:0 1px 3px rgba(0,0,0,0.6)">對�??�票左�?�?QR Code</div>
+      <div id="invScanHint" style="position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:11px;text-shadow:0 1px 3px rgba(0,0,0,0.6)">對準發票左下角 QR Code</div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <label class="btn-sm" style="flex:1;padding:11px;text-align:center;cursor:pointer;margin:0">
-        ?? ?��??��?
+        📁 選擇照片
         <input type="file" accept="image/*" multiple style="display:none" onchange="scanInvoiceFiles(this.files);this.value=''"/>
       </label>
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeInvoiceScanner()">?��?</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeInvoiceScanner()">關閉</button>
     </div>
     <div style="font-size:10px;color:var(--text3);text-align:center;line-height:1.6">
-      ?�� 對�??�票<strong>左�?�?/strong>??QR Code（左碼�?，自?�帶?��?額、日?��??��?
+      💡 對準發票<strong>左下角</strong>的 QR Code（左碼），自動帶入金額、日期與品項
     </div>
   </div>
 </div>
 
-<!-- ?�� INVOICE RESULT CONFIRMATION MODAL -->
+<!-- 📷 INVOICE RESULT CONFIRMATION MODAL -->
 <div class="modal-overlay" id="invoiceResultOverlay" onclick="closeModalOutside(event,'invoiceResultOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">??辨�??��?</div>
+    <div class="modal-title">✅ 辨識成功</div>
     <div id="invoiceResultBody" style="margin-bottom:12px"></div>
-    <div class="form-group"><label class="form-label">?��?</label>
+    <div class="form-group"><label class="form-label">分類</label>
       <select class="form-input" id="ir-cat"></select>
     </div>
-    <div class="form-group"><label class="form-label">付款?��?</label>
+    <div class="form-group"><label class="form-label">付款方式</label>
       <select class="form-input" id="ir-pay">
-        <option value="cash">?�� ?��?</option>
-        <option value="card">?�� 信用??/option>
+        <option value="cash">💵 現金</option>
+        <option value="card">💳 信用卡</option>
       </select>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('invoiceResultOverlay')">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmInvoiceRecord()">???�入記帳</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('invoiceResultOverlay')">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmInvoiceRecord()">✓ 加入記帳</button>
     </div>
   </div>
 </div>
 
-<!-- ?�� CSV IMPORT SUMMARY MODAL -->
+<!-- 📥 CSV IMPORT SUMMARY MODAL -->
 <div class="modal-overlay" id="csvImportOverlay" onclick="closeModalOutside(event,'csvImportOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="csvImportTitle">?�� CSV ?�入結�?</div>
+    <div class="modal-title" id="csvImportTitle">📥 CSV 匯入結果</div>
     <div id="csvImportBody" style="margin-bottom:14px"></div>
-    <div class="form-group"><label class="form-label">?�設?��?（適?�新增發票�?</label>
+    <div class="form-group"><label class="form-label">預設分類（適用新增發票）</label>
       <select class="form-input" id="csv-cat"></select>
     </div>
-    <div class="form-group"><label class="form-label">?�設付款?��?</label>
+    <div class="form-group"><label class="form-label">預設付款方式</label>
       <select class="form-input" id="csv-pay">
-        <option value="cash">?�� ?��?</option>
-        <option value="card">?�� 信用??/option>
+        <option value="cash">💵 現金</option>
+        <option value="card">💳 信用卡</option>
       </select>
       <div style="font-size:10px;color:var(--text3);margin-top:4px;line-height:1.5">
-        ?�� 建議?�選?�現?�」大?�匯?��?之�??�到?��???�費?��??�個別調整付款?��???      </div>
+        💡 建議先選「現金」大量匯入，之後再到「📊 花費」頁面個別調整付款方式。
+      </div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('csvImportOverlay');window._csvPending=null">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmCSVImport()" id="csvImportConfirmBtn">???�部?�入</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('csvImportOverlay');window._csvPending=null">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmCSVImport()" id="csvImportConfirmBtn">✓ 全部加入</button>
     </div>
   </div>
 </div>
 
-<!-- ?�� LOTTERY RESULT MODAL -->
+<!-- 🎰 LOTTERY RESULT MODAL -->
 <div class="modal-overlay" id="lotteryOverlay" onclick="closeModalOutside(event,'lotteryOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� 統�??�票對�?</div>
+    <div class="modal-title">🎰 統一發票對獎</div>
     <div id="lotteryBody" style="margin-bottom:12px"></div>
-    <button class="btn-submit" style="margin:0 0 8px 0;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000" onclick="triggerLotteryAIScan()">?�� AI 辨�??��??��?</button>
-    <button class="btn-sm primary" style="width:100%;padding:11px;margin-bottom:8px" onclick="autoFetchLotteryNumbers()">?? ?��??��??�?��???/button>
+    <button class="btn-submit" style="margin:0 0 8px 0;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000" onclick="triggerLotteryAIScan()">📸 AI 辨識獎號截圖</button>
+    <button class="btn-sm primary" style="width:100%;padding:11px;margin-bottom:8px" onclick="autoFetchLotteryNumbers()">🌐 自動抓取最新獎號</button>
     <div style="text-align:center;margin-bottom:10px">
-      <a href="javascript:void(0)" onclick="openLotteryEditModal()" style="font-size:11px;color:var(--text3);text-decoration:underline">?��? ?��?輸入?��?</a>
+      <a href="javascript:void(0)" onclick="openLotteryEditModal()" style="font-size:11px;color:var(--text3);text-decoration:underline">✏️ 手動輸入獎號</a>
     </div>
-    <button class="btn-sm" style="width:100%;padding:11px" onclick="closeModal('lotteryOverlay')">?��?</button>
+    <button class="btn-sm" style="width:100%;padding:11px" onclick="closeModal('lotteryOverlay')">關閉</button>
   </div>
 </div>
 
-<!-- ?�� LOTTERY NUMBERS EDIT MODAL -->
+<!-- 🎰 LOTTERY NUMBERS EDIT MODAL -->
 <div class="modal-overlay" id="lotteryEditOverlay" onclick="closeModalOutside(event,'lotteryEditOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?��? ?�新中�??�碼</div>
+    <div class="modal-title">✏️ 更新中獎號碼</div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.7">
-      ?�財?�部網�??�「統一?�票?��??�App ?��??��??��?碼�?填入?�系統只�?strong>??8 �?/strong>比�???br>
-      <a href="https://invoice.etax.nat.gov.tw/" target="_blank" style="color:var(--accent)">???��?財政?�中?�查�?/a>
+      至財政部網站或「統一發票兌獎」App 查最新一期號碼後填入。系統只存<strong>末 8 碼</strong>比對。<br>
+      <a href="https://invoice.etax.nat.gov.tw/" target="_blank" style="color:var(--accent)">→ 開啟財政部中獎查詢</a>
     </div>
-    <div class="form-group"><label class="form-label">?�別</label>
-      <input class="form-input" id="lot-period" placeholder="例�?113-03-04�?13�?-4?��?�?/>
+    <div class="form-group"><label class="form-label">期別</label>
+      <input class="form-input" id="lot-period" placeholder="例：113-03-04（113年3-4月期）"/>
     </div>
-    <div class="form-group"><label class="form-label">?�別??($1,000?? · ??�?/label>
+    <div class="form-group"><label class="form-label">特別獎 ($1,000萬) · 末8碼</label>
       <input class="form-input" id="lot-special" placeholder="12345678" maxlength="8"/>
     </div>
-    <div class="form-group"><label class="form-label">?��? ($200?? · ??�?/label>
+    <div class="form-group"><label class="form-label">特獎 ($200萬) · 末8碼</label>
       <input class="form-input" id="lot-grand" placeholder="87654321" maxlength="8"/>
     </div>
-    <div class="form-group"><label class="form-label">?��? ($20?? · ??碼�??��?組�??��?/空格?��?�?/label>
+    <div class="form-group"><label class="form-label">頭獎 ($20萬) · 末8碼（最多3組，逗號/空格分隔）</label>
       <textarea class="form-input" id="lot-first" rows="2" placeholder="11112222, 33334444, 55556666"></textarea>
     </div>
-    <div class="form-group"><label class="form-label">增�??��? ($200) · ??碼�??�填，逗�??��?�?/label>
+    <div class="form-group"><label class="form-label">增開六獎 ($200) · 末3碼（選填，逗號分隔）</label>
       <input class="form-input" id="lot-sixth" placeholder="123, 456"/>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('lotteryEditOverlay')">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="saveLotteryNumbers()">???��?</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('lotteryEditOverlay')">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="saveLotteryNumbers()">✓ 儲存</button>
     </div>
   </div>
 </div>
 
-<!-- ?? EXPORT CENTER MODAL -->
+<!-- 📊 EXPORT CENTER MODAL -->
 <div class="modal-overlay" id="exportCenterOverlay" onclick="closeModalOutside(event,'exportCenterOverlay')">
   <div class="modal" style="max-width:380px">
     <div class="modal-handle"></div>
-    <div class="modal-title">?? ?�出?�表</div>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;text-align:center">?��?要匯?��?資�?類�?</div>
+    <div class="modal-title">📊 匯出報表</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;text-align:center">選擇要匯出的資料類型</div>
     <div style="display:flex;flex-direction:column;gap:9px">
       <button class="ai-choose-btn" onclick="exportRecordsExcel()" style="background:linear-gradient(135deg,#16a974,#10b981)">
-        <span style="font-size:22px">??</span>
+        <span style="font-size:22px">📋</span>
         <div style="text-align:left">
-          <div style="font-size:13px;font-weight:700">消費?�細 (Excel)</div>
-          <div style="font-size:10.5px;opacity:0.85">?�?��???· ?��?/類別/?��?/?�註</div>
+          <div style="font-size:13px;font-weight:700">消費明細 (Excel)</div>
+          <div style="font-size:10.5px;opacity:0.85">所有記錄 · 日期/類別/金額/備註</div>
         </div>
       </button>
       <button class="ai-choose-btn" onclick="exportSalaryExcel()" style="background:linear-gradient(135deg,#5b48e8,#8b6bf2)">
-        <span style="font-size:22px">?��</span>
+        <span style="font-size:22px">💵</span>
         <div style="text-align:left">
-          <div style="font-size:13px;font-weight:700">?��?記�? (Excel)</div>
-          <div style="font-size:10.5px;opacity:0.85">?��?算�??�收????��?�目</div>
+          <div style="font-size:13px;font-weight:700">薪資記錄 (Excel)</div>
+          <div style="font-size:10.5px;opacity:0.85">含結算月、收入/扣繳項目</div>
         </div>
       </button>
       <button class="ai-choose-btn" onclick="exportMonthPDF()" style="background:linear-gradient(135deg,#e8488a,#f59e0b)">
-        <span style="font-size:22px">??</span>
+        <span style="font-size:22px">📅</span>
         <div style="text-align:left">
-          <div style="font-size:13px;font-weight:700">?��?�?PDF</div>
-          <div style="font-size:10.5px;opacity:0.85">?��??��??�份 · ?��?類統計�??�細</div>
+          <div style="font-size:13px;font-weight:700">月結算 PDF</div>
+          <div style="font-size:10.5px;opacity:0.85">當前選擇月份 · 含分類統計與明細</div>
         </div>
       </button>
       <button class="ai-choose-btn" onclick="exportYearPDF()" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">
-        <span style="font-size:22px">??</span>
+        <span style="font-size:22px">📈</span>
         <div style="text-align:left">
-          <div style="font-size:13px;font-weight:700">年度結�? PDF</div>
-          <div style="font-size:10.5px;opacity:0.85">12 ?��??�支 + Top 10 類別</div>
+          <div style="font-size:13px;font-weight:700">年度結算 PDF</div>
+          <div style="font-size:10.5px;opacity:0.85">12 個月收支 + Top 10 類別</div>
         </div>
       </button>
     </div>
     <div style="font-size:10px;color:var(--text3);margin-top:14px;text-align:center;line-height:1.6">
-      ?�� Excel 使用 .xls ?��?（Excel/Numbers/WPS ?�可?��?�?br>
-      ?�� PDF ?��??�覽?��??��?話�??��?（選?�儲存為 PDF?��?
+      💡 Excel 使用 .xls 格式（Excel/Numbers/WPS 皆可開啟）<br>
+      💡 PDF 透過瀏覽器列印對話框產生（選「儲存為 PDF」）
     </div>
-    <button class="btn-sm" style="width:100%;padding:11px;margin-top:14px" onclick="closeModal('exportCenterOverlay')">?��?</button>
+    <button class="btn-sm" style="width:100%;padding:11px;margin-top:14px" onclick="closeModal('exportCenterOverlay')">關閉</button>
   </div>
 </div>
 
-<!-- �?INVESTMENT ADD MODAL -->
+<!-- � INVESTMENT ADD MODAL -->
 <div class="modal-overlay" id="invAddOverlay" onclick="closeModalOutside(event,'invAddOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?? ?��??��?</div>
+    <div class="modal-title">📊 新增投資</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
-      記�?一筆�??��?額�?<strong>不�?</strong>影響存款餘�?（已視為?�出）�?    </div>
-    <div class="form-group"><label class="form-label">?��?標�?</label><input class="form-input" id="iv-name" placeholder="例�?0050?�台積電?��???ETF"/></div>
-    <div class="form-group form-row">
-      <div><label class="form-label">?�入?��? (NT$)</label><input class="form-input" id="iv-amount" type="number" placeholder="例�?50000"/></div>
-      <div><label class="form-label">?��?</label><input class="form-input" id="iv-date" type="date"/></div>
+      記錄一筆投入金額，<strong>不會</strong>影響存款餘額（已視為支出）。
     </div>
-    <div class="form-group"><label class="form-label">?�註（選填�?</label><input class="form-input" id="iv-note" placeholder="例�?定�?定�? / ?�碼"/></div>
+    <div class="form-group"><label class="form-label">投資標的</label><input class="form-input" id="iv-name" placeholder="例：0050、台積電、富邦 ETF"/></div>
+    <div class="form-group form-row">
+      <div><label class="form-label">投入金額 (NT$)</label><input class="form-input" id="iv-amount" type="number" placeholder="例：50000"/></div>
+      <div><label class="form-label">日期</label><input class="form-input" id="iv-date" type="date"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">備註（選填）</label><input class="form-input" id="iv-note" placeholder="例：定期定額 / 加碼"/></div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('invAddOverlay')">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmAddInv()">???��?</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('invAddOverlay')">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmAddInv()">✓ 新增</button>
     </div>
   </div>
 </div>
 
-<!-- ?? INVESTMENT UPDATE VALUE MODAL -->
+<!-- 📈 INVESTMENT UPDATE VALUE MODAL -->
 <div class="modal-overlay" id="invUpdateOverlay" onclick="closeModalOutside(event,'invUpdateOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?��? ?�新?��?市�?/div>
+    <div class="modal-title">✏️ 更新目前市值</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
-      ?��?填入<strong>?�?��?資�??��?總�???/strong>（�??��? App ?��??�總額即?��???br>
-      系統?�自?��??�未實現?��?，�??�要�?每�???    </div>
+      手動填入<strong>所有投資的當前總市值</strong>（從券商 App 看一眼總額即可）。<br>
+      系統會自動算出未實現損益，不需要記每檔。
+    </div>
     <div id="invUpdateBalance" style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;text-align:center"></div>
-    <div class="form-group"><label class="form-label">?��?總�???(NT$)</label><input class="form-input" id="iu-value" type="number" placeholder="例�?520000"/></div>
-    <div class="form-group"><label class="form-label">?�註（選填�?</label><input class="form-input" id="iu-note" placeholder="例�?4?��?結�?"/></div>
+    <div class="form-group"><label class="form-label">目前總市值 (NT$)</label><input class="form-input" id="iu-value" type="number" placeholder="例：520000"/></div>
+    <div class="form-group"><label class="form-label">備註（選填）</label><input class="form-input" id="iu-note" placeholder="例：4月底結算"/></div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('invUpdateOverlay')">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmUpdateInv()">???�新</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('invUpdateOverlay')">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmUpdateInv()">✓ 更新</button>
     </div>
   </div>
 </div>
 
-<!-- ��??SAVINGS WITHDRAW MODAL -->
+<!-- �💰 SAVINGS WITHDRAW MODAL -->
 <div class="modal-overlay" id="savWithdrawOverlay" onclick="closeModalOutside(event,'savWithdrawOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� 從�?款�?�?/div>
+    <div class="modal-title">🏦 從存款提款</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
-      ?�款後此?��???strong style="color:var(--accent3)">計入?��??�用額度</strong>，並從現?��?款扣?��?br>
-      ?��?：本?��??��??�用?��??�特殊大筆支?��?    </div>
-    <div id="savWithdrawBalance" style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;text-align:center">?��?存款�?0</div>
-    <div class="form-group"><label class="form-label">?�款?��? (NT$)</label><input class="form-input" id="sw-amount" type="number" placeholder="例�?10000"/></div>
-    <div class="form-group"><label class="form-label">?�途�?註�??�填�?/label><input class="form-input" id="sw-note" placeholder="例�??��?超支補�? / ?��??��?"/></div>
+      提款後此金額會<strong style="color:var(--accent3)">計入本月可用額度</strong>，並從現金存款扣除。<br>
+      適合：本月超支需動用儲蓄、特殊大筆支出。
+    </div>
+    <div id="savWithdrawBalance" style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;text-align:center">目前存款：$0</div>
+    <div class="form-group"><label class="form-label">提款金額 (NT$)</label><input class="form-input" id="sw-amount" type="number" placeholder="例：10000"/></div>
+    <div class="form-group"><label class="form-label">用途備註（選填）</label><input class="form-input" id="sw-note" placeholder="例：本月超支補洞 / 旅遊基金"/></div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('savWithdrawOverlay')">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmSavWithdraw()">??確�??�款</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('savWithdrawOverlay')">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmSavWithdraw()">✓ 確認提款</button>
     </div>
   </div>
 </div>
 
-<!-- ?�� SAVINGS DEPOSIT MODAL -->
+<!-- 💰 SAVINGS DEPOSIT MODAL -->
 <div class="modal-overlay" id="savDepositOverlay" onclick="closeModalOutside(event,'savDepositOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� ?��?存入</div>
+    <div class="modal-title">💰 手動存入</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
-      ?�現???��?/紅�?等�??��?款�?strong>不�?</strong>影響?��??�用額度??    </div>
-    <div class="form-group"><label class="form-label">存入?��? (NT$)</label><input class="form-input" id="sd-amount" type="number" placeholder="例�?5000"/></div>
-    <div class="form-group"><label class="form-label">來�??�註（選填�?</label><input class="form-input" id="sd-note" placeholder="例�?壓歲??/ ?�業?�入轉�?"/></div>
+      把現金/獎金/紅包等加入存款。<strong>不會</strong>影響本月可用額度。
+    </div>
+    <div class="form-group"><label class="form-label">存入金額 (NT$)</label><input class="form-input" id="sd-amount" type="number" placeholder="例：5000"/></div>
+    <div class="form-group"><label class="form-label">來源備註（選填）</label><input class="form-input" id="sd-note" placeholder="例：壓歲錢 / 副業收入轉存"/></div>
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('savDepositOverlay')">?��?</button>
-      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmSavDeposit()">??確�?存入</button>
+      <button class="btn-sm" style="flex:1;padding:11px" onclick="closeModal('savDepositOverlay')">取消</button>
+      <button class="btn-submit" style="flex:1.5;margin:0" onclick="confirmSavDeposit()">✓ 確認存入</button>
     </div>
   </div>
 </div>
 
-<!-- ?�� CATEGORY MANAGER MODAL -->
+<!-- 🏷 CATEGORY MANAGER MODAL -->
 <div class="modal-overlay" id="catManagerOverlay" onclick="closeModalOutside(event,'catManagerOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� 管�?記帳類別</div>
+    <div class="modal-title">🏷 管理記帳類別</div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.6">
-      ?��??�編輯�??�除記帳類別?�已使用?��?類別?��??�除??    </div>
+      新增、編輯或刪除記帳類別。已使用過的類別無法刪除。
+    </div>
     <div id="catManagerList"></div>
     <div style="display:flex;gap:7px;margin-bottom:10px;margin-top:10px">
-      <input class="form-input" id="newCatEmoji" placeholder="??" maxlength="2" style="width:60px;text-align:center"/>
-      <input class="form-input" id="newCatLabel" placeholder="?��??��?�? style="flex:1"/>
-      <button class="btn-sm primary" style="padding:0 16px" onclick="addCustomCat()">�?/button>
+      <input class="form-input" id="newCatEmoji" placeholder="🎁" maxlength="2" style="width:60px;text-align:center"/>
+      <input class="form-input" id="newCatLabel" placeholder="新類別名稱" style="flex:1"/>
+      <button class="btn-sm primary" style="padding:0 16px" onclick="addCustomCat()">＋</button>
     </div>
-    <button class="btn-submit" onclick="closeModal('catManagerOverlay')">完�?</button>
+    <button class="btn-submit" onclick="closeModal('catManagerOverlay')">完成</button>
   </div>
 </div>
 
@@ -1405,31 +1423,31 @@
 <div class="modal-overlay" id="salaryDetailOverlay" onclick="closeModalOutside(event,'salaryDetailOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="sdTitle">?�� ?��??�細</div>
+    <div class="modal-title" id="sdTitle">💵 薪資明細</div>
     <div id="sdSourceTag" style="font-size:11px;color:var(--text2);margin-bottom:10px"></div>
 
     <div style="background:linear-gradient(135deg,var(--accent3),#4dd9a0);border-radius:var(--r-sm);padding:13px;text-align:center;margin-bottom:14px;color:white">
-      <div style="font-size:11px;opacity:0.85;margin-bottom:3px">實�?淨�?</div>
+      <div style="font-size:11px;opacity:0.85;margin-bottom:3px">實領淨額</div>
       <div id="sdNetPay" style="font-family:'DM Mono',monospace;font-size:24px;font-weight:600">$0</div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div style="background:var(--bg2);border-radius:var(--r-sm);padding:10px">
-        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">?? ?��??��?</div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">📈 加項合計</div>
         <div id="sdIncomeTotal" style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:var(--accent3)">$0</div>
       </div>
       <div style="background:var(--bg2);border-radius:var(--r-sm);padding:10px">
-        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">?? ????��?</div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">📉 扣項合計</div>
         <div id="sdDeductTotal" style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:var(--danger)">$0</div>
       </div>
     </div>
 
-    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">?�細?�目</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">明細項目</div>
     <div id="sdFieldList" style="max-height:280px;overflow-y:auto;margin-bottom:14px"></div>
 
     <div style="display:flex;gap:8px">
-      <button class="btn-sm" style="flex:0;padding:11px 16px;color:var(--danger)" onclick="deleteSalaryFromDetail()">?? ?�除</button>
-      <button class="btn-submit" style="flex:1" onclick="closeModal('salaryDetailOverlay')">?��?</button>
+      <button class="btn-sm" style="flex:0;padding:11px 16px;color:var(--danger)" onclick="deleteSalaryFromDetail()">🗑 刪除</button>
+      <button class="btn-submit" style="flex:1" onclick="closeModal('salaryDetailOverlay')">關閉</button>
     </div>
   </div>
 </div>
@@ -1438,47 +1456,49 @@
 <div class="modal-overlay" id="payslipModalOverlay" onclick="closeModalOutside(event,'payslipModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?? ?��??��???/div>
+    <div class="modal-title">📄 掃描薪資單</div>
     <div id="psStep1">
       <label class="import-drop-zone" for="psFileInput" style="display:block;cursor:pointer">
         <input type="file" accept="image/*" id="psFileInput" onchange="handlePayslipFile(event)" style="position:absolute;opacity:0;width:0;height:0"/>
-        <div class="import-drop-icon">??</div>
-        <div class="import-drop-text">點�?上傳?��??�截??/div>
-        <div class="import-drop-hint">?�援?�種?��??��??�細?��?</div>
+        <div class="import-drop-icon">📄</div>
+        <div class="import-drop-text">點擊上傳薪資單截圖</div>
+        <div class="import-drop-hint">支援各種格式薪資明細截圖</div>
       </label>
       <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;line-height:1.6">
-        ?? ?��??�傳?�至 Claude API 辨�?，�??��??�任何第三方伺�???      </div>
+        🔒 圖片僅傳送至 Claude API 辨識，不儲存至任何第三方伺服器
+      </div>
     </div>
     <div id="psStep2" style="display:none">
-      <img id="psPreviewImg" class="import-preview-img" src="" alt="?�覽"/>
+      <img id="psPreviewImg" class="import-preview-img" src="" alt="預覽"/>
       <div class="import-loading">
-        <div class="spin">??</div>
-        <div style="font-size:13px;font-weight:600">AI �?��辨�??��??�細??/div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px">?�常?��?5??0 �?/div>
+        <div class="spin">🤖</div>
+        <div style="font-size:13px;font-weight:600">AI 正在辨識薪資明細…</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">通常需要 5–10 秒</div>
       </div>
     </div>
     <div id="psStep3" style="display:none">
       <div style="background:var(--warn-light);border:1px solid rgba(232,124,32,0.2);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--warn);font-weight:500">
-        ?��? 請�?細核對�??�數字�??�誤?�接修改?�儲�?      </div>
+        ⚠️ 請仔細核對每個數字，有誤直接修改再儲存
+      </div>
       <div class="form-row" style="margin-bottom:12px">
-        <div><label class="form-label">?��?年份</label><input class="form-input" id="ps-year" type="number" placeholder="2025"/></div>
-        <div><label class="form-label">?��??�份</label><input class="form-input" id="ps-month" type="number" min="1" max="12" placeholder="1??2"/></div>
+        <div><label class="form-label">薪資年份</label><input class="form-input" id="ps-year" type="number" placeholder="2025"/></div>
+        <div><label class="form-label">薪資月份</label><input class="form-input" id="ps-month" type="number" min="1" max="12" placeholder="1–12"/></div>
       </div>
       <div id="psFieldList"></div>
       <div style="background:linear-gradient(135deg,rgba(24,184,124,0.08),rgba(91,72,232,0.06));border:1.5px solid rgba(24,184,124,0.2);border-radius:var(--r);padding:12px 14px;margin:10px 0;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:13px;font-weight:700">?�� 實�??��?</div>
+        <div style="font-size:13px;font-weight:700">💰 實領薪資</div>
         <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--accent3)" id="psNetPay">$0</div>
       </div>
       <div class="import-actions">
-        <button class="btn-mini" onclick="resetPayslip()">?�新上傳</button>
-        <button class="btn-mini confirm" onclick="confirmPayslip()">??確�??��?</button>
+        <button class="btn-mini" onclick="resetPayslip()">重新上傳</button>
+        <button class="btn-mini confirm" onclick="confirmPayslip()">✓ 確認儲存</button>
       </div>
     </div>
     <div id="psStep4" style="display:none;text-align:center;padding:24px 0">
-      <div style="font-size:48px;margin-bottom:12px">??/div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px" id="psDoneText">?��?記�?已儲存�?</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:20px">已更?��??�入設�??�年度統�?/div>
-      <button class="btn-submit" onclick="closeModal('payslipModalOverlay');resetPayslip()">完�?</button>
+      <div style="font-size:48px;margin-bottom:12px">✅</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px" id="psDoneText">薪資記錄已儲存！</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:20px">已更新月收入設定與年度統計</div>
+      <button class="btn-submit" onclick="closeModal('payslipModalOverlay');resetPayslip()">完成</button>
     </div>
   </div>
 </div>
@@ -1487,44 +1507,44 @@
 <div class="modal-overlay" id="bonusModalOverlay" onclick="closeModalOutside(event,'bonusModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="bonusModalTitle">?? ?��??��??��?</div>
-    <div class="form-group"><label class="form-label">?��??�稱</label><input class="form-input" id="bn-name" placeholder="例�?年�??��??�績?��??�、�?節禮�?"/></div>
+    <div class="modal-title" id="bonusModalTitle">🎁 新增獎金預期</div>
+    <div class="form-group"><label class="form-label">獎金名稱</label><input class="form-input" id="bn-name" placeholder="例：年終獎金、績效獎金、三節禮金"/></div>
     <div class="form-group form-row">
       <div>
-        <label class="form-label">?��??�放?�份</label>
+        <label class="form-label">預計發放月份</label>
         <select class="form-input" id="bn-month">
-          <option value="1">1??/option><option value="2">2??/option><option value="3">3??/option>
-          <option value="4">4??/option><option value="5">5??/option><option value="6">6??/option>
-          <option value="7">7??/option><option value="8">8??/option><option value="9">9??/option>
-          <option value="10">10??/option><option value="11">11??/option><option value="12">12??/option>
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+          <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+          <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+          <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
         </select>
       </div>
-      <div><label class="form-label">?��??��? (NT$)</label><input class="form-input" id="bn-amount" type="number" placeholder="例�?50000"/></div>
+      <div><label class="form-label">預計金額 (NT$)</label><input class="form-input" id="bn-amount" type="number" placeholder="例：50000"/></div>
     </div>
     <div class="form-group form-row">
       <div>
-        <label class="form-label">?�放??<span style="color:var(--text3);font-weight:400">（≥25 算�??��?</span></label>
+        <label class="form-label">發放日 <span style="color:var(--text3);font-weight:400">（≥25 算下月）</span></label>
         <input class="form-input" id="bn-payday" type="number" min="1" max="31" value="25"/>
       </div>
-      <div><label class="form-label">Emoji</label><input class="form-input" id="bn-emoji" placeholder="??" maxlength="2"/></div>
+      <div><label class="form-label">Emoji</label><input class="form-input" id="bn-emoji" placeholder="🎁" maxlength="2"/></div>
     </div>
-    <div class="form-group"><label class="form-label">?�註（選填�?</label><input class="form-input" id="bn-note" placeholder="例�??�常?��??�放"/></div>
+    <div class="form-group"><label class="form-label">備註（選填）</label><input class="form-input" id="bn-note" placeholder="例：通常月底發放"/></div>
     <div class="form-group">
-      <label class="form-label">?��??��?要怎麼?��?�?/label>
+      <label class="form-label">這筆獎金要怎麼處理？</label>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--bg2);border-radius:8px;padding:3px">
-        <button type="button" class="tab active" id="bn-mode-budget" onclick="setBonusMode('budget')" style="font-size:11px;padding:8px 4px">?? ?��??�用</button>
-        <button type="button" class="tab" id="bn-mode-travel" onclick="setBonusMode('travel')" style="font-size:11px;padding:8px 4px">?��? ?��?額度</button>
-        <button type="button" class="tab" id="bn-mode-savings" onclick="setBonusMode('savings')" style="font-size:11px;padding:8px 4px">?�� 存款</button>
+        <button type="button" class="tab active" id="bn-mode-budget" onclick="setBonusMode('budget')" style="font-size:11px;padding:8px 4px">📊 當月可用</button>
+        <button type="button" class="tab" id="bn-mode-travel" onclick="setBonusMode('travel')" style="font-size:11px;padding:8px 4px">✈️ 旅遊額度</button>
+        <button type="button" class="tab" id="bn-mode-savings" onclick="setBonusMode('savings')" style="font-size:11px;padding:8px 4px">🐷 存款</button>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.5" id="bn-mode-hint">?? 此�??��??��??�當?�可?�用?��?（拿?�就?�以?��?</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.5" id="bn-mode-hint">📊 此筆獎金會加進當月可動用金額（拿到就可以花）</div>
     </div>
-    <button class="btn-submit" id="bonusSubmitBtn" onclick="saveBonus()">?��??��??��?</button>
+    <button class="btn-submit" id="bonusSubmitBtn" onclick="saveBonus()">新增獎金預期</button>
   </div>
 </div>
 
 <!-- FAB -->
 <div class="fab-wrap" id="fabWrap">
-  <button class="fab" id="mainFab" onclick="toggleFab()">�?/button>
+  <button class="fab" id="mainFab" onclick="toggleFab()">＋</button>
   <input type="file" id="lotteryAIInput" accept="image/*" style="display:none" onchange="onLotteryAIPick(event)"/>
   <input type="file" id="fabCsvInput" accept=".csv" multiple style="display:none" onchange="importInvoiceCSV(event);closeFab()"/>
 </div>
@@ -1533,137 +1553,137 @@
 <div class="fab-sheet-overlay" id="fabSheetOverlay" onclick="if(event.target===this)closeFab()">
   <div class="fab-sheet" id="fabSheet">
     <div class="fab-sheet-handle"></div>
-    <div class="fab-sheet-title">�??��?</div>
+    <div class="fab-sheet-title">＋ 新增</div>
 
-    <div class="fab-section-label">?�� ?�出?��?�?/div>
+    <div class="fab-section-label">💸 支出與補貨</div>
     <div class="fab-sheet-grid fab-grid-compact">
       <button class="fab-card" onclick="closeFab();openQuickExpense()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">記�?�?/div>
-        <div class="fab-card-sub">?�常?�費</div>
+        <div class="fab-card-emoji">📝</div>
+        <div class="fab-card-title">記消費</div>
+        <div class="fab-card-sub">日常花費</div>
       </button>
       <button class="fab-card" onclick="closeFab();openProductModal()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">補貨?��?</div>
-        <div class="fab-card-sub">?��?消�?/div>
+        <div class="fab-card-emoji">📦</div>
+        <div class="fab-card-title">補貨品項</div>
+        <div class="fab-card-sub">週期消耗</div>
       </button>
       <button class="fab-card" onclick="closeFab();openFixedModal()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?��??�出</div>
-        <div class="fab-card-sub">?�費訂閱</div>
+        <div class="fab-card-emoji">💳</div>
+        <div class="fab-card-title">固定支出</div>
+        <div class="fab-card-sub">月費訂閱</div>
       </button>
       <button class="fab-card" onclick="closeFab();openDebtModal()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?��?負債</div>
-        <div class="fab-card-sub">大�??��?</div>
+        <div class="fab-card-emoji">💸</div>
+        <div class="fab-card-title">分期負債</div>
+        <div class="fab-card-sub">大額分期</div>
       </button>
     </div>
 
-    <div class="fab-section-label">?�� ?�入</div>
+    <div class="fab-section-label">💰 收入</div>
     <div class="fab-sheet-grid fab-grid-compact">
       <button class="fab-card" onclick="closeFab();openManualSalaryModal()">
-        <div class="fab-card-emoji">?��?</div>
-        <div class="fab-card-title">輸入?��?</div>
-        <div class="fab-card-sub">?�薪?�班</div>
+        <div class="fab-card-emoji">✏️</div>
+        <div class="fab-card-title">輸入薪資</div>
+        <div class="fab-card-sub">月薪加班</div>
       </button>
       <button class="fab-card" onclick="closeFab();openExtraIncomeModal()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">額�??�入</div>
-        <div class="fab-card-sub">?�業／兼�?/div>
+        <div class="fab-card-emoji">📈</div>
+        <div class="fab-card-title">額外收入</div>
+        <div class="fab-card-sub">副業／兼差</div>
       </button>
       <button class="fab-card" onclick="closeFab();openBonusModal()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">?��??��?</div>
-        <div class="fab-card-sub">年�??��?</div>
+        <div class="fab-card-emoji">🎁</div>
+        <div class="fab-card-title">獎金預期</div>
+        <div class="fab-card-sub">年終分紅</div>
       </button>
       <button class="fab-card" onclick="closeFab();openVoucherModal()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?�享??/div>
+        <div class="fab-card-emoji">🎫</div>
+        <div class="fab-card-title">即享券</div>
         <div class="fab-card-sub">紙本／數位券</div>
       </button>
     </div>
 
-    <div class="fab-section-label">?�� 資產?�工??/div>
+    <div class="fab-section-label">🏦 資產與工具</div>
     <div class="fab-sheet-grid fab-grid-compact">
       <button class="fab-card" onclick="closeFab();openSavDepositModal()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?��?存入</div>
-        <div class="fab-card-sub">?�入存款</div>
+        <div class="fab-card-emoji">💰</div>
+        <div class="fab-card-title">手動存入</div>
+        <div class="fab-card-sub">加入存款</div>
       </button>
       <button class="fab-card" onclick="closeFab();openSavWithdrawModal()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?�款?�用</div>
-        <div class="fab-card-sub">???存款</div>
+        <div class="fab-card-emoji">🏧</div>
+        <div class="fab-card-title">提款動用</div>
+        <div class="fab-card-sub">扣減存款</div>
       </button>
       <button class="fab-card" onclick="closeFab();openInvAddModal()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">?��??��?</div>
-        <div class="fab-card-sub">?�票／基??/div>
+        <div class="fab-card-emoji">📊</div>
+        <div class="fab-card-title">新增投資</div>
+        <div class="fab-card-sub">股票／基金</div>
       </button>
       <button class="fab-card" onclick="closeFab();openInvUpdateModal()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">?�新市�?/div>
-        <div class="fab-card-sub">?��?估價</div>
+        <div class="fab-card-emoji">📈</div>
+        <div class="fab-card-title">更新市值</div>
+        <div class="fab-card-sub">投資估價</div>
       </button>
       <button class="fab-card" onclick="closeFab();manualAddTravelFund()">
-        <div class="fab-card-emoji">?��?</div>
-        <div class="fab-card-title">?��??�入</div>
-        <div class="fab-card-sub">年度?��?</div>
+        <div class="fab-card-emoji">✈️</div>
+        <div class="fab-card-title">旅遊撥入</div>
+        <div class="fab-card-sub">年度預算</div>
       </button>
       <button class="fab-card" onclick="closeFab();openEasyCardTopup()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">?��??�儲??/div>
-        <div class="fab-card-sub">?�值�???/div>
+        <div class="fab-card-emoji">🚇</div>
+        <div class="fab-card-title">悠遊卡儲值</div>
+        <div class="fab-card-sub">儲值加值</div>
       </button>
       <button class="fab-card" onclick="closeFab();openAIChooser()">
-        <div class="fab-card-emoji">??</div>
-        <div class="fab-card-title">AI 辨�?</div>
-        <div class="fab-card-sub">?��?/訂單</div>
+        <div class="fab-card-emoji">🤖</div>
+        <div class="fab-card-title">AI 辨識</div>
+        <div class="fab-card-sub">薪資/訂單</div>
       </button>
       <button class="fab-card" onclick="closeFab();openInvoiceScanner()">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?�發�?QR</div>
-        <div class="fab-card-sub">?��??�票條碼</div>
+        <div class="fab-card-emoji">📷</div>
+        <div class="fab-card-title">掃發票 QR</div>
+        <div class="fab-card-sub">電子發票條碼</div>
       </button>
       <label class="fab-card" for="fabCsvInput" style="cursor:pointer">
-        <div class="fab-card-emoji">?��</div>
-        <div class="fab-card-title">?�票 CSV</div>
-        <div class="fab-card-sub">財政?��?</div>
+        <div class="fab-card-emoji">📥</div>
+        <div class="fab-card-title">發票 CSV</div>
+        <div class="fab-card-sub">財政部檔</div>
       </label>
     </div>
   </div>
 </div>
 
-<!-- ?? AI 辨�??��???-->
+<!-- 🤖 AI 辨識選擇器 -->
 <div class="modal-overlay" id="aiChooserOverlay" onclick="closeModalOutside(event,'aiChooserOverlay')">
   <div class="modal" style="max-width:360px">
     <div class="modal-handle"></div>
-    <div class="modal-title">?? AI 要辨識�?麼�?</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:14px;text-align:center;line-height:1.6">?��?要辨識�??��?類�?</div>
+    <div class="modal-title">🤖 AI 要辨識什麼？</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px;text-align:center;line-height:1.6">選擇要辨識的圖片類型</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <button class="ai-choose-btn" onclick="closeModal('aiChooserOverlay');closeFab();openPayslipModal()" style="background:linear-gradient(135deg,#5b48e8,#8b6bf2)">
-        <span style="font-size:24px">??</span>
+        <span style="font-size:24px">📄</span>
         <div style="text-align:left">
-          <div style="font-size:14px;font-weight:700">?��???/div>
-          <div style="font-size:11px;opacity:0.85">辨�?每�??��??��??�費?�扣繳�???/div>
+          <div style="font-size:14px;font-weight:700">薪資單</div>
+          <div style="font-size:11px;opacity:0.85">辨識每月薪資、加班費、扣繳項目</div>
         </div>
       </button>
       <button class="ai-choose-btn" onclick="closeModal('aiChooserOverlay');closeFab();openImportModal()" style="background:linear-gradient(135deg,#18b87c,#4dd9a0)">
-        <span style="font-size:24px">?��</span>
+        <span style="font-size:24px">📸</span>
         <div style="text-align:left">
-          <div style="font-size:14px;font-weight:700">訂單?��?</div>
-          <div style="font-size:11px;opacity:0.85">?�皮 / momo / PChome 等電?��???/div>
+          <div style="font-size:14px;font-weight:700">訂單截圖</div>
+          <div style="font-size:11px;opacity:0.85">蝦皮 / momo / PChome 等電商訂單</div>
         </div>
       </button>
       <button class="ai-choose-btn" onclick="closeModal('aiChooserOverlay');closeFab();triggerLotteryAIScan()" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000">
-        <span style="font-size:24px">?��</span>
+        <span style="font-size:24px">🎰</span>
         <div style="text-align:left">
-          <div style="font-size:14px;font-weight:700">?�票中�??�碼</div>
-          <div style="font-size:11px;opacity:0.85">財政?�公布�?中�??�碼?��?</div>
+          <div style="font-size:14px;font-weight:700">發票中獎號碼</div>
+          <div style="font-size:11px;opacity:0.85">財政部公布的中獎號碼截圖</div>
         </div>
       </button>
     </div>
-    <div style="font-size:10px;color:var(--text3);margin-top:14px;text-align:center;line-height:1.6">?�� ?��??�用??AI 辨�?，�??��??�到任�?伺�???br>?�?�在 ?��? 設�? ???? AI 辨�? 填入 API ?�鑰</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:14px;text-align:center;line-height:1.6">💡 圖片僅用於 AI 辨識，不會上傳到任何伺服器<br>需先在 ⚙️ 設定 → 🤖 AI 辨識 填入 API 金鑰</div>
   </div>
 </div>
 
@@ -1671,62 +1691,62 @@
 <div class="modal-overlay" id="productModalOverlay" onclick="closeModalOutside(event,'productModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="productModalTitle">?�� ?��?補貨?��?</div>
-    <div class="form-group"><label class="form-label">?��??�稱</label><input class="form-input" id="f-name" placeholder="例�?EPA 1200 ?��?魚油"/></div>
-    <div class="form-group"><label class="form-label">?��?</label><input class="form-input" id="f-brand" placeholder="例�?大�??�醫"/></div>
+    <div class="modal-title" id="productModalTitle">📦 新增補貨品項</div>
+    <div class="form-group"><label class="form-label">商品名稱</label><input class="form-input" id="f-name" placeholder="例：EPA 1200 頂級魚油"/></div>
+    <div class="form-group"><label class="form-label">品牌</label><input class="form-input" id="f-brand" placeholder="例：大研生醫"/></div>
     <div class="form-group form-row">
-      <div><label class="form-label">?�價 (NT$)</label><input class="form-input" id="f-price" type="number" placeholder="1327"/></div>
-      <div><label class="form-label">定價（選填�?</label><input class="form-input" id="f-origprice" type="number" placeholder="例�?2520" title="填�??�可顯示?�扣 %"/></div>
+      <div><label class="form-label">售價 (NT$)</label><input class="form-input" id="f-price" type="number" placeholder="1327"/></div>
+      <div><label class="form-label">定價（選填）</label><input class="form-input" id="f-origprice" type="number" placeholder="例：2520" title="填定價可顯示折扣 %"/></div>
     </div>
     <div class="form-group form-row">
       <div><label class="form-label">使用天數</label><input class="form-input" id="f-days" type="number" placeholder="30"/></div>
-      <div><label class="form-label">Emoji</label><input class="form-input" id="f-emoji" placeholder="??" maxlength="2"/></div>
+      <div><label class="form-label">Emoji</label><input class="form-input" id="f-emoji" placeholder="💊" maxlength="2"/></div>
     </div>
     <div class="form-group form-row">
-      <div><label class="form-label">容�? / 規格</label><input class="form-input" id="f-volume" type="number" placeholder="例�?200" step="any"/></div>
-      <div><label class="form-label">?��?</label>
+      <div><label class="form-label">容量 / 規格</label><input class="form-input" id="f-volume" type="number" placeholder="例：200" step="any"/></div>
+      <div><label class="form-label">單位</label>
         <select class="form-input" id="f-unit">
-          <option value="">??/option>
+          <option value="">—</option>
           <option value="ml">ml</option>
           <option value="g">g</option>
-          <option value="??>??/option>
-          <option value="�?>�?/option>
-          <option value="�?>�?/option>
-          <option value="??>??/option>
-          <option value="??>??/option>
-          <option value="??>??/option>
-          <option value="??>??/option>
+          <option value="錠">錠</option>
+          <option value="顆">顆</option>
+          <option value="粒">粒</option>
+          <option value="包">包</option>
+          <option value="片">片</option>
+          <option value="瓶">瓶</option>
+          <option value="入">入</option>
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">�?補貨???（選填�?<span style="font-weight:400;color:var(--text3);font-size:10px;margin-left:4px">?�皮 / momo / PChome ?�可</span></label>
-      <div class="shopee-input-wrap"><span class="s-prefix">??</span><input class="form-input" id="f-shopee" type="url" placeholder="https://..."/></div>
+      <label class="form-label">� 補貨連結（選填）<span style="font-weight:400;color:var(--text3);font-size:10px;margin-left:4px">蝦皮 / momo / PChome 皆可</span></label>
+      <div class="shopee-input-wrap"><span class="s-prefix">🔗</span><input class="form-input" id="f-shopee" type="url" placeholder="https://..."/></div>
     </div>
     <div class="form-group">
-      <label class="form-label">?��?</label>
+      <label class="form-label">分類</label>
       <div class="cat-select-wrap" id="catOptWrap"></div>
-      <button class="cat-add-btn" onclick="toggleNewCatForm()">�??��??��?類別</button>
+      <button class="cat-add-btn" onclick="toggleNewCatForm()">＋ 新增自訂類別</button>
       <div class="new-cat-form" id="newCatForm">
-        <label class="form-label">類別?�稱</label>
+        <label class="form-label">類別名稱</label>
         <div class="new-cat-row">
-          <input class="form-input" id="nc-name" placeholder="例�?清�??��?" style="flex:1"/>
+          <input class="form-input" id="nc-name" placeholder="例：清潔用品" style="flex:1"/>
           <select class="form-input" id="nc-color" style="width:80px;flex:0">
-            <option value="#5b48e8">?�� �?/option><option value="#e8488a">?�� �?/option>
-            <option value="#18b87c">?�� �?/option><option value="#e87c20">?? �?/option>
-            <option value="#2196f3">?�� ??/option><option value="#9c27b0">?�� 深紫</option>
-            <option value="#e83030">?�� �?/option><option value="#607d8b">????/option>
+            <option value="#5b48e8">🟣 紫</option><option value="#e8488a">🩷 粉</option>
+            <option value="#18b87c">🟢 綠</option><option value="#e87c20">🟠 橘</option>
+            <option value="#2196f3">🔵 藍</option><option value="#9c27b0">🟤 深紫</option>
+            <option value="#e83030">🔴 紅</option><option value="#607d8b">⚫ 灰</option>
           </select>
         </div>
-        <label class="form-label" style="margin-top:8px">Emoji ?�示</label>
+        <label class="form-label" style="margin-top:8px">Emoji 圖示</label>
         <div class="emoji-grid" id="emojiGrid"></div>
         <div class="new-cat-actions">
-          <button class="btn-mini" onclick="toggleNewCatForm()">?��?</button>
-          <button class="btn-mini confirm" onclick="addNewCategory()">??建�?類別</button>
+          <button class="btn-mini" onclick="toggleNewCatForm()">取消</button>
+          <button class="btn-mini confirm" onclick="addNewCategory()">✓ 建立類別</button>
         </div>
       </div>
     </div>
-    <button class="btn-submit" id="productSubmitBtn" onclick="addProduct()">?��??��?</button>
+    <button class="btn-submit" id="productSubmitBtn" onclick="addProduct()">新增品項</button>
   </div>
 </div>
 
@@ -1734,45 +1754,45 @@
 <div class="modal-overlay" id="fixedModalOverlay" onclick="closeModalOutside(event,'fixedModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="fixedModalTitle">?�� ?��??��??�出</div>
+    <div class="modal-title" id="fixedModalTitle">💳 新增固定支出</div>
     <input type="hidden" id="fx-id"/>
-    <div class="form-group"><label class="form-label">?�稱</label><input class="form-input" id="fx-name" placeholder="例�?Netflix?��?機費?�健身房"/></div>
+    <div class="form-group"><label class="form-label">名稱</label><input class="form-input" id="fx-name" placeholder="例：Netflix、手機費、健身房"/></div>
     <div class="form-group form-row">
-      <div><label class="form-label">每�??��? (NT$)</label><input class="form-input" id="fx-amount" type="number" placeholder="390"/></div>
-      <div><label class="form-label">Emoji</label><input class="form-input" id="fx-emoji" placeholder="?��" maxlength="2"/></div>
+      <div><label class="form-label">每月金額 (NT$)</label><input class="form-input" id="fx-amount" type="number" placeholder="390"/></div>
+      <div><label class="form-label">Emoji</label><input class="form-input" id="fx-emoji" placeholder="📺" maxlength="2"/></div>
     </div>
     <div class="form-group" id="fxDayWrap">
-      <label class="form-label" id="fxDayLabel">每�???��??/label>
+      <label class="form-label" id="fxDayLabel">每月扣款日</label>
       <div class="form-row" id="fxDayRow">
         <div id="fxMonthCol" style="display:none">
-          <input class="form-input" id="fx-month" type="number" min="1" max="12" placeholder="?��?1-12�?/>
+          <input class="form-input" id="fx-month" type="number" min="1" max="12" placeholder="月（1-12）"/>
         </div>
         <div>
-          <input class="form-input" id="fx-day" type="number" min="1" max="31" placeholder="例�?15"/>
+          <input class="form-input" id="fx-day" type="number" min="1" max="31" placeholder="例：15"/>
         </div>
       </div>
-      <div id="fxDayHint" style="font-size:11px;color:var(--text3);margin-top:4px">輸入 1-31 ??/div>
+      <div id="fxDayHint" style="font-size:11px;color:var(--text3);margin-top:4px">輸入 1-31 號</div>
     </div>
     <div class="form-group">
-      <label class="form-label">?��?</label>
+      <label class="form-label">週期</label>
       <div class="type-select">
-        <div class="type-opt selected" data-val="monthly" onclick="selectCycle(this)">每�?</div>
+        <div class="type-opt selected" data-val="monthly" onclick="selectCycle(this)">每月</div>
         <div class="type-opt" data-val="yearly" onclick="selectCycle(this)">每年</div>
-        <div class="type-opt" data-val="weekly" onclick="selectCycle(this)">每�?/div>
+        <div class="type-opt" data-val="weekly" onclick="selectCycle(this)">每週</div>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">付款?��?</label>
+      <label class="form-label">付款方式</label>
       <div class="type-select" id="fxPaySelect">
-        <div class="type-opt selected" data-val="cash" onclick="selectFxPay(this)">?�� ?��?/轉帳</div>
-        <div class="type-opt" data-val="card" onclick="selectFxPay(this)">?�� 信用??/div>
+        <div class="type-opt selected" data-val="cash" onclick="selectFxPay(this)">💵 現金/轉帳</div>
+        <div class="type-opt" data-val="card" onclick="selectFxPay(this)">💳 信用卡</div>
       </div>
       <div id="fxCardPicker" style="display:none;margin-top:8px">
         <select class="form-input" id="fx-cardId"></select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">?�註（可?��?</label><input class="form-input" id="fx-note" placeholder="例�?家庭?��?"/></div>
-    <button class="btn-submit blue" id="fixedSubmitBtn" onclick="saveFixed()">?��??��??�出</button>
+    <div class="form-group"><label class="form-label">備註（可選）</label><input class="form-input" id="fx-note" placeholder="例：家庭方案"/></div>
+    <button class="btn-submit blue" id="fixedSubmitBtn" onclick="saveFixed()">新增固定支出</button>
   </div>
 </div>
 
@@ -1780,38 +1800,39 @@
 <div class="modal-overlay" id="debtModalOverlay" onclick="closeModalOutside(event,'debtModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="debtModalTitle">?�� ?��?負債</div>
+    <div class="modal-title" id="debtModalTitle">💸 新增負債</div>
     <input type="hidden" id="debt-id"/>
     <div class="form-group form-row">
-      <div><label class="form-label">?�稱</label><input class="form-input" id="debt-name" placeholder="例�??�貸?��?貸、iPhone ?��?"/></div>
-      <div><label class="form-label">Emoji</label><input class="form-input" id="debt-emoji" placeholder="??" maxlength="2"/></div>
+      <div><label class="form-label">名稱</label><input class="form-input" id="debt-name" placeholder="例：房貸、車貸、iPhone 分期"/></div>
+      <div><label class="form-label">Emoji</label><input class="form-input" id="debt-emoji" placeholder="🏠" maxlength="2"/></div>
     </div>
     <div class="form-group form-row">
-      <div><label class="form-label">?��?總�? (NT$)</label><input class="form-input" id="debt-total" type="number" placeholder="例�?1500000"/></div>
-      <div><label class="form-label">每�??�款 (NT$)</label><input class="form-input" id="debt-monthly" type="number" placeholder="例�?12500"/></div>
+      <div><label class="form-label">本金總額 (NT$)</label><input class="form-input" id="debt-total" type="number" placeholder="例：1500000"/></div>
+      <div><label class="form-label">每月還款 (NT$)</label><input class="form-input" id="debt-monthly" type="number" placeholder="例：12500"/></div>
     </div>
     <div class="form-group form-row">
-      <div><label class="form-label">總�??��??��?</label><input class="form-input" id="debt-months" type="number" placeholder="例�?240"/></div>
-      <div><label class="form-label">已�??�數</label><input class="form-input" id="debt-paid" type="number" min="0" placeholder="例�?12" value="0"/></div>
+      <div><label class="form-label">總期數（月）</label><input class="form-input" id="debt-months" type="number" placeholder="例：240"/></div>
+      <div><label class="form-label">已付期數</label><input class="form-input" id="debt-paid" type="number" min="0" placeholder="例：12" value="0"/></div>
     </div>
     <div class="form-group form-row">
-      <div><label class="form-label">??��??/label><input class="form-input" id="debt-day" type="number" min="1" max="31" placeholder="例�?5" value="5"/></div>
-      <div><label class="form-label">年利??% (?�選)</label><input class="form-input" id="debt-rate" type="number" step="0.01" placeholder="例�?2.05"/></div>
+      <div><label class="form-label">扣款日</label><input class="form-input" id="debt-day" type="number" min="1" max="31" placeholder="例：5" value="5"/></div>
+      <div><label class="form-label">年利率 % (可選)</label><input class="form-input" id="debt-rate" type="number" step="0.01" placeholder="例：2.05"/></div>
     </div>
     <div class="form-group">
-      <label class="form-label">付款?��?</label>
+      <label class="form-label">付款方式</label>
       <div class="type-select" id="debtPaySelect">
-        <div class="type-opt selected" data-val="cash" onclick="selectDebtPay(this)">?�� ?��?/轉帳</div>
-        <div class="type-opt" data-val="card" onclick="selectDebtPay(this)">?�� 信用??/div>
+        <div class="type-opt selected" data-val="cash" onclick="selectDebtPay(this)">💵 現金/轉帳</div>
+        <div class="type-opt" data-val="card" onclick="selectDebtPay(this)">💳 信用卡</div>
       </div>
       <div id="debtCardPicker" style="display:none;margin-top:8px">
         <select class="form-input" id="debt-cardId"></select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">?�註（可?��?</label><input class="form-input" id="debt-note" placeholder="例�??�山?��?/ ?��? 2046"/></div>
+    <div class="form-group"><label class="form-label">備註（可選）</label><input class="form-input" id="debt-note" placeholder="例：玉山銀行 / 期限 2046"/></div>
     <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:12px">
-      ?�� ?��?後�??��?建�?一筆「固定支?�」�?每�???��?��?清�??�自?��??��??�出移除??    </div>
-    <button class="btn-submit blue" id="debtSubmitBtn" onclick="saveDebt()">?��?負債</button>
+      💡 儲存後會自動建立一筆「固定支出」，每月扣款。還清後會自動從固定支出移除。
+    </div>
+    <button class="btn-submit blue" id="debtSubmitBtn" onclick="saveDebt()">新增負債</button>
   </div>
 </div>
 
@@ -1819,77 +1840,77 @@
 <div class="modal-overlay" id="importModalOverlay" onclick="closeModalOutside(event,'importModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">?�� ?�入訂單?��?</div>
+    <div class="modal-title">📸 匯入訂單截圖</div>
 
     <!-- Step 1: upload -->
     <div id="importStep1">
       <label class="import-drop-zone" for="importFileInput" style="display:block;cursor:pointer">
         <input type="file" accept="image/*" id="importFileInput" onchange="handleImportFile(event)" style="position:absolute;opacity:0;width:0;height:0"/>
-        <div class="import-drop-icon">?���?/div>
-        <div class="import-drop-text">點�?上傳訂單?��?</div>
-        <div class="import-drop-hint">?�援?�皮?�momo 等�??��??�截??/div>
+        <div class="import-drop-icon">🖼️</div>
+        <div class="import-drop-text">點擊上傳訂單截圖</div>
+        <div class="import-drop-hint">支援蝦皮、momo 等訂單頁面截圖</div>
       </label>
-      <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">?��??�用??AI 辨�?，�??��??�至任�?伺�???/div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">圖片僅用於 AI 辨識，不會上傳至任何伺服器</div>
     </div>
 
     <!-- Step 2: loading -->
     <div id="importStep2" style="display:none">
-      <img id="importPreviewImg" class="import-preview-img" src="" alt="?�覽"/>
+      <img id="importPreviewImg" class="import-preview-img" src="" alt="預覽"/>
       <div class="import-loading">
-        <div class="spin">??</div>
-        <div style="font-size:13px;font-weight:600">AI �?��辨�?訂單?�容??/div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px">?�常?��?5??0 �?/div>
+        <div class="spin">🤖</div>
+        <div style="font-size:13px;font-weight:600">AI 正在辨識訂單內容…</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">通常需要 5–10 秒</div>
       </div>
     </div>
 
     <!-- Step 3: review results -->
     <div id="importStep3" style="display:none">
-      <img id="importPreviewImg2" class="import-preview-img" src="" alt="?�覽"/>
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px" id="importResultTitle">辨�???0 件�???/div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">請確�?AI ?��?結�?，可編輯?��?消勾?��??��??�更???��??�模�?/div>
+      <img id="importPreviewImg2" class="import-preview-img" src="" alt="預覽"/>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px" id="importResultTitle">辨識到 0 件商品</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">請確認 AI 分類結果，可編輯、取消勾選或切換「更新/新增」模式</div>
       <div id="importSummaryCard" style="display:none;background:linear-gradient(135deg,rgba(91,72,232,0.08),rgba(24,184,124,0.06));border:1.5px solid rgba(91,72,232,0.25);border-radius:var(--r);padding:12px 14px;margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.6px;margin-bottom:6px">?? AI ?��?結�?</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.6px;margin-bottom:6px">🤖 AI 分類結果</div>
         <div id="importSummaryText" style="font-size:13px;font-weight:600;line-height:1.7"></div>
       </div>
       <div id="importResultList"></div>
       <div class="import-actions">
-        <button class="btn-mini" onclick="resetImport()">?�新上傳</button>
-        <button class="btn-mini confirm" id="importConfirmBtn" onclick="confirmImport()">??確�??�入?��??��?</button>
+        <button class="btn-mini" onclick="resetImport()">重新上傳</button>
+        <button class="btn-mini confirm" id="importConfirmBtn" onclick="confirmImport()">✓ 確認加入選取品項</button>
       </div>
     </div>
 
     <!-- Step 4: done -->
     <div id="importStep4" style="display:none;text-align:center;padding:24px 0">
-      <div style="font-size:48px;margin-bottom:12px">??</div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px" id="importDoneText">?��??�入 0 ?��??��?</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:20px">已自?��??�到你�?清單，�?得設定正確�?使用天數</div>
-      <button class="btn-submit" onclick="closeModal('importModalOverlay');resetImport()">完�?</button>
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px" id="importDoneText">成功加入 0 個品項！</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:20px">已自動加入到你的清單，記得設定正確的使用天數</div>
+      <button class="btn-submit" onclick="closeModal('importModalOverlay');resetImport()">完成</button>
     </div>
   </div>
 </div>
 
-<!-- RECORD & PRICE MODAL - 記�?購買+?�格記�??��? -->
+<!-- RECORD & PRICE MODAL - 記錄購買+價格記錄整合 -->
 <div class="modal-overlay" id="recordPriceOverlay" onclick="closeModalOutside(event,'recordPriceOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="rpTitle">?? 記�?購買</div>
+    <div class="modal-title" id="rpTitle">📝 記錄購買</div>
     <input type="hidden" id="rp-pid"/>
     <!-- price entry -->
     <div style="background:var(--surface2);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;border:1px solid var(--border)">
-      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.8px;margin-bottom:8px">?�� ?�次購買?�格</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.8px;margin-bottom:8px">💰 本次購買價格</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <input class="form-input" id="rp-price" type="number" placeholder="輸入實�?購買?��?" style="flex:1"/>
+        <input class="form-input" id="rp-price" type="number" placeholder="輸入實際購買金額" style="flex:1"/>
         <div style="font-size:12px;color:var(--text2);flex-shrink:0">NT$</div>
       </div>
       <div style="font-size:11px;color:var(--text3);margin-top:6px" id="rpPriceHint"></div>
     </div>
     <!-- price history mini chart -->
     <div id="rpHistorySection" style="display:none;margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.8px;margin-bottom:8px">?? 歷史?�格</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.8px;margin-bottom:8px">📈 歷史價格</div>
       <div id="rpHistoryList"></div>
     </div>
-    <button class="btn-submit" onclick="saveRecordAndPrice()">?? 補貨並�?帳�??�置使用天數�?/button>
-    <button class="btn-mini" style="width:100%;margin-top:8px" onclick="saveRecordOnly()">?��??�花費�?不�?補貨</button>
+    <button class="btn-submit" onclick="saveRecordAndPrice()">🛒 補貨並記帳（重置使用天數）</button>
+    <button class="btn-mini" style="width:100%;margin-top:8px" onclick="saveRecordOnly()">僅記錄花費，不算補貨</button>
   </div>
 </div>
 
@@ -1897,13 +1918,13 @@
 <div class="modal-overlay" id="priceModalOverlay" onclick="closeModalOutside(event,'priceModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="priceModalTitle">?? 補貨?�格記�?</div>
+    <div class="modal-title" id="priceModalTitle">📈 補貨價格記錄</div>
     <div class="ph-add-row">
-      <input class="form-input" id="ph-price" type="number" placeholder="?�次購買?�格 NT$" style="flex:1"/>
-      <button class="btn-sm primary" style="flex:0;padding:10px 14px;white-space:nowrap" onclick="addPriceRecord()">�?記�?</button>
+      <input class="form-input" id="ph-price" type="number" placeholder="本次購買價格 NT$" style="flex:1"/>
+      <button class="btn-sm primary" style="flex:0;padding:10px 14px;white-space:nowrap" onclick="addPriceRecord()">＋ 記錄</button>
     </div>
     <div id="priceHistoryList"></div>
-    <button class="btn-submit" onclick="closeModal('priceModalOverlay')">?��?</button>
+    <button class="btn-submit" onclick="closeModal('priceModalOverlay')">關閉</button>
   </div>
 </div>
 
@@ -1913,48 +1934,48 @@
 <div class="modal-overlay" id="compareModalOverlay" onclick="closeModalOutside(event,'compareModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="cmpTitle">?? 比價?�薦</div>
+    <div class="modal-title" id="cmpTitle">🛒 比價推薦</div>
     <div id="cmpContent"></div>
   </div>
 </div>
 
-<!-- INVENTORY MODAL (Bug Fix: ?��? openInventoryModal ?��??��?素�?崩潰) -->
+<!-- INVENTORY MODAL (Bug Fix: 先前 openInventoryModal 找不到元素會崩潰) -->
 <div class="modal-overlay" id="inventoryModalOverlay" onclick="closeModalOutside(event,'inventoryModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="invModalTitle">?�� 庫�?管�?</div>
+    <div class="modal-title" id="invModalTitle">📦 庫存管理</div>
     <div id="invModalContent"></div>
-    <button class="btn-mini" style="width:100%;margin-top:10px" onclick="closeModal('inventoryModalOverlay')">?��?</button>
+    <button class="btn-mini" style="width:100%;margin-top:10px" onclick="closeModal('inventoryModalOverlay')">關閉</button>
   </div>
 </div>
 
-<!-- ONBOARDING MODAL（�?次使?��?導�? -->
+<!-- ONBOARDING MODAL（首次使用引導） -->
 <div class="modal-overlay" id="onboardOverlay" style="z-index:10000">
   <div class="modal" style="max-width:380px;padding:0">
     <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:18px 18px 14px;border-radius:18px 18px 0 0">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div style="font-size:16px;font-weight:700">?? 歡�?使用?�財小幫?��?</div>
-        <button onclick="skipOnboard()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer">跳�?</button>
+        <div style="font-size:16px;font-weight:700">👋 歡迎使用理財小幫手！</div>
+        <button onclick="skipOnboard()" style="background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:14px;padding:4px 10px;font-size:11px;cursor:pointer">跳過</button>
       </div>
-      <div style="font-size:11px;opacity:0.9">??30 秒設定核心數字�?之�??��?&存款?�自?��?�?/div>
+      <div style="font-size:11px;opacity:0.9">花 30 秒設定核心數字，之後預算&存款都自動算好</div>
       <div id="onbProgress" style="display:flex;gap:4px;margin-top:10px"></div>
     </div>
     <div id="onbBody" style="padding:18px"></div>
     <div style="display:flex;gap:8px;padding:0 18px 18px">
-      <button id="onbBack" class="btn-sm" style="flex:1;padding:10px" onclick="onboardBack()">??上�?�?/button>
-      <button id="onbNext" class="btn-sm primary" style="flex:2;padding:10px" onclick="onboardNext()">下�?�???/button>
+      <button id="onbBack" class="btn-sm" style="flex:1;padding:10px" onclick="onboardBack()">← 上一步</button>
+      <button id="onbNext" class="btn-sm primary" style="flex:2;padding:10px" onclick="onboardNext()">下一步 →</button>
     </div>
   </div>
 </div>
 
-<!-- QUICK TOUR MODAL（�??�巡禮�?onboarding 完�?後�?從設定�??��? -->
+<!-- QUICK TOUR MODAL（功能巡禮，onboarding 完成後或從設定重啟） -->
 <div class="modal-overlay" id="tourOverlay" style="z-index:10001">
   <div class="modal" style="max-width:360px">
     <div class="modal-handle"></div>
     <div id="tourBody"></div>
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn-sm" style="flex:1;padding:10px" onclick="closeTour()">?��?</button>
-      <button id="tourNextBtn" class="btn-sm primary" style="flex:2;padding:10px" onclick="tourNext()">下�?????/button>
+      <button class="btn-sm" style="flex:1;padding:10px" onclick="closeTour()">略過</button>
+      <button id="tourNextBtn" class="btn-sm primary" style="flex:2;padding:10px" onclick="tourNext()">下一個 →</button>
     </div>
   </div>
 </div>
@@ -1965,13 +1986,13 @@
     <div class="modal-handle"></div>
     <div style="text-align:center;padding:10px 0 18px;font-size:14px;line-height:1.6" id="confirmMsg"></div>
     <div style="display:flex;gap:10px">
-      <button class="btn-mini" style="flex:1;padding:11px" onclick="document.getElementById('confirmOverlay').classList.remove('open')">?��?</button>
-      <button class="btn-mini confirm" style="flex:1;padding:11px" id="confirmOkBtn">確�?</button>
+      <button class="btn-mini" style="flex:1;padding:11px" onclick="document.getElementById('confirmOverlay').classList.remove('open')">取消</button>
+      <button class="btn-mini confirm" style="flex:1;padding:11px" id="confirmOkBtn">確認</button>
     </div>
   </div>
 </div>
 
-<!-- 三選?��?話�?（用?�相似�?決�?等�? -->
+<!-- 三選項對話框（用於相似品決策等） -->
 <div class="modal-overlay" id="choiceOverlay">
   <div class="modal" style="padding:18px 16px 22px">
     <div class="modal-handle"></div>
@@ -1985,11 +2006,17 @@
 <div class="modal-overlay" id="inventoryModalOverlay" onclick="closeModalOutside(event,'inventoryModalOverlay')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="invModalTitle">?�� 庫�?管�?</div>
+    <div class="modal-title" id="invModalTitle">📦 庫存管理</div>
     <div id="invModalContent"></div>
   </div>
 </div>
 
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW register failed:',err));
+  });
+}
+</script>
 </body>
 </html>
