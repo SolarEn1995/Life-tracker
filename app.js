@@ -505,6 +505,35 @@ function renderStats(now){
       fcCompare.style.display='none';
     }
   }
+  // 🐱 P3：喵咪心情卡
+  if(typeof renderCatMood==='function') renderCatMood({monthlyIncome,varTotal,lifeTotal,fixedTotal});
+}
+
+// ── 🐱 CAT MOOD CARD ──
+function renderCatMood(ctx){
+  const card=document.getElementById('catMoodCard');
+  if(!card) return;
+  const income=ctx.monthlyIncome||0;
+  const spend=(ctx.varTotal||0)+(ctx.lifeTotal||0)+(ctx.fixedTotal||0);
+  if(income<=0){ card.style.display='none'; return; }
+  card.style.display='block';
+  const balance=income-spend;
+  const rate=balance/income; // 可能負值
+  let tier;
+  if(rate>=0.5)      tier={emoji:'😸',name:'皇室喵',lv:99,quote:'優秀！這個月本喵賞你一條小魚乾 🐟',cls:'tier-rich'};
+  else if(rate>=0.2) tier={emoji:'😺',name:'小資喵',lv:50,quote:'還行啦，繼續努力本喵就考慮誇你 ✨',cls:'tier-mid'};
+  else if(rate>0)    tier={emoji:'😼',name:'貧民喵',lv:10,quote:'勉強及格，下個月再不努力本喵要罷工 💢',cls:'tier-low'};
+  else               tier={emoji:'🙀',name:'破產喵',lv:1, quote:'鏟屎官你完蛋了，本喵的罐罐錢都被你花光啦！',cls:'tier-broke'};
+  card.className='cat-mood-card '+tier.cls;
+  document.getElementById('cmcEmoji').textContent=tier.emoji;
+  document.getElementById('cmcName').textContent=tier.name;
+  document.getElementById('cmcLevel').textContent='Lv·'+tier.lv;
+  document.getElementById('cmcQuote').textContent=tier.quote;
+  const pct=Math.max(0,Math.min(100,rate*100));
+  document.getElementById('cmcBarFill').style.width=pct+'%';
+  const rateEl=document.getElementById('cmcRate');
+  rateEl.textContent=(rate*100).toFixed(0)+'%';
+  rateEl.style.color=rate<0?'var(--danger)':rate<0.2?'var(--warn)':'var(--accent3)';
 }
 
 // ── CAT TABS ──

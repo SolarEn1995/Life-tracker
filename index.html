@@ -84,6 +84,25 @@
     <button class="privacy-toggle" id="privacyToggle" onclick="togglePrivacy()" title="防偷窺：模糊金額" aria-label="切換隱私模式">👁</button>
   </div>
 
+  <!-- 🐱 喵咪心情卡（依存款率動態變化） -->
+  <div class="cat-mood-card" id="catMoodCard" style="display:none">
+    <div class="cmc-top">
+      <div class="cmc-emoji" id="cmcEmoji">😺</div>
+      <div class="cmc-info">
+        <div class="cmc-title">
+          <span class="cmc-name" id="cmcName">本月小喵心情</span>
+          <span class="cmc-level" id="cmcLevel">Lv·-</span>
+        </div>
+        <div class="cmc-quote" id="cmcQuote">記錄收入後本喵就現身～</div>
+      </div>
+    </div>
+    <div class="cmc-bar"><div class="cmc-bar-fill" id="cmcBarFill" style="width:0%"></div></div>
+    <div class="cmc-foot">
+      <span class="cmc-foot-label">存款率</span>
+      <span class="cmc-foot-value" id="cmcRate">—</span>
+    </div>
+  </div>
+
   <!-- � Quick Stats 4 小格 -->
   <div class="quick-stats" id="quickStats" style="display:none">
     <div class="qs-cell">

@@ -962,3 +962,83 @@ html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(240,138,107,0
   }
 }
 /* 不支援 backdrop-filter 的瀏覽器自動 fallback 到原本實心 surface */
+
+
+/* ========== 🐱 P3 Cat Mood Card ========== */
+.cat-mood-card{
+  margin:14px 0 4px;padding:14px 16px;border-radius:var(--r);
+  background:var(--surface);border:1.5px solid var(--border);
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+  transition:transform 0.15s, box-shadow 0.2s;
+}
+.cat-mood-card::before{
+  content:'';position:absolute;inset:0;z-index:0;opacity:0.18;pointer-events:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  transition:background 0.3s;
+}
+.cat-mood-card.tier-rich::before{background:linear-gradient(135deg,#3FA985,#7DD3B0);}
+.cat-mood-card.tier-mid::before{background:linear-gradient(135deg,#E5A234,#F5B97D);}
+.cat-mood-card.tier-low::before{background:linear-gradient(135deg,#F08A6B,#E5A234);}
+.cat-mood-card.tier-broke::before{background:linear-gradient(135deg,#E55A4D,#F08A6B);}
+.cat-mood-card:active{transform:scale(0.99);}
+.cat-mood-card>*{position:relative;z-index:1;}
+
+.cmc-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.cmc-emoji{
+  font-size:38px;line-height:1;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+  animation:catBob 2.4s ease-in-out infinite;
+}
+.cat-mood-card.tier-broke .cmc-emoji{animation:catShake 0.5s ease-in-out infinite;}
+@keyframes catBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+@keyframes catShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-2px);}75%{transform:translateX(2px);}}
+.cmc-info{flex:1;min-width:0;}
+.cmc-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.cmc-name{font-size:15px;font-weight:800;color:var(--text);}
+.cmc-level{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:999px;
+  background:var(--accent-light);color:var(--accent);
+  border:1px solid var(--accent);
+}
+.cat-mood-card.tier-rich .cmc-level{background:var(--accent3-light);color:var(--accent3);border-color:var(--accent3);}
+.cat-mood-card.tier-mid  .cmc-level{background:var(--accent2-light);color:var(--accent2);border-color:var(--accent2);}
+.cat-mood-card.tier-low  .cmc-level{background:var(--accent-light);color:var(--accent);border-color:var(--accent);}
+.cat-mood-card.tier-broke .cmc-level{background:var(--danger-light);color:var(--danger);border-color:var(--danger);}
+.cmc-quote{font-size:13px;color:var(--text2);line-height:1.45;}
+
+.cmc-bar{
+  height:8px;border-radius:999px;overflow:hidden;
+  background:rgba(0,0,0,0.06);margin-bottom:8px;
+}
+html[data-theme="dark"] .cmc-bar{background:rgba(255,255,255,0.08);}
+.cmc-bar-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  transition:width 0.5s ease-out;
+}
+.cat-mood-card.tier-rich  .cmc-bar-fill{background:linear-gradient(90deg,#3FA985,#7DD3B0);}
+.cat-mood-card.tier-mid   .cmc-bar-fill{background:linear-gradient(90deg,#E5A234,#F5B97D);}
+.cat-mood-card.tier-low   .cmc-bar-fill{background:linear-gradient(90deg,#F08A6B,#E5A234);}
+.cat-mood-card.tier-broke .cmc-bar-fill{background:linear-gradient(90deg,#E55A4D,#F08A6B);}
+
+.cmc-foot{display:flex;align-items:center;justify-content:space-between;font-size:12px;}
+.cmc-foot-label{color:var(--text3);}
+.cmc-foot-value{font-family:'DM Mono',monospace;font-weight:800;font-size:14px;}
+
+/* 玻璃模式下也半透明 */
+@supports ((backdrop-filter:blur(8px)) or (-webkit-backdrop-filter:blur(8px))){
+  .cat-mood-card{
+    background:rgba(255,255,255,0.42);
+    backdrop-filter:blur(20px) saturate(170%);
+    -webkit-backdrop-filter:blur(20px) saturate(170%);
+    border-color:rgba(255,255,255,0.55);
+    box-shadow:0 6px 22px rgba(178,138,98,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  html[data-theme="dark"] .cat-mood-card{
+    background:rgba(43,36,29,0.48);
+    border-color:rgba(255,238,210,0.10);
+    box-shadow:0 6px 22px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,238,210,0.06);
+  }
+}
