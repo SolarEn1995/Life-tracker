@@ -121,9 +121,10 @@ body{
   transition:color 0.2s;
   position:relative;
 }
-/* 🌈 P2 玻璃感色塊光暈 — 固定在 viewport，卡片模糊背景時透出色彩 */
+/* 🌈 P2 玻璃感色塊光暈 — 預設關閉，只在首頁啟用 */
 body::before{
   content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  opacity:0;transition:opacity 0.3s;
   background:
     radial-gradient(520px 420px at 12% 8%,  rgba(240,138,107,0.42), transparent 60%),
     radial-gradient(480px 400px at 92% 22%, rgba(229,162,52,0.32),  transparent 62%),
@@ -131,6 +132,7 @@ body::before{
     radial-gradient(620px 500px at 95% 92%, rgba(245,185,125,0.34), transparent 60%);
   filter:blur(8px);
 }
+body.home-active::before{opacity:1;}
 html[data-theme="dark"] body{
   background:linear-gradient(160deg, #1F1A15 0%, #241E18 55%, #1A1F1B 100%);
   background-attachment:fixed;
@@ -1194,3 +1196,26 @@ html[data-theme="dark"] #home > .free-card::before{
 }
 /* OFF 狀態（看得見）SVG 顏色按鈕風 */
 .privacy-toggle:hover svg.meow-cat{transform:scale(1.08);transition:transform 0.18s;}
+
+
+/* P2 fix: 列表頁卡片改高不透明，避免色暈穿透造成彩虹條紋 */
+@supports ((backdrop-filter:blur(8px)) or (-webkit-backdrop-filter:blur(8px))){
+  .product-card,
+  .fixed-card{
+    background:rgba(255,255,255,0.92) !important;
+    backdrop-filter:blur(10px) saturate(120%);
+    -webkit-backdrop-filter:blur(10px) saturate(120%);
+    border-color:var(--border) !important;
+  }
+  .product-card.urgent{
+    background:linear-gradient(135deg,rgba(232,124,32,0.12),rgba(255,255,255,0.92)) !important;
+  }
+  html[data-theme="dark"] .product-card,
+  html[data-theme="dark"] .fixed-card{
+    background:rgba(43,36,29,0.92) !important;
+    border-color:var(--border) !important;
+  }
+  html[data-theme="dark"] .product-card.urgent{
+    background:linear-gradient(135deg,rgba(232,124,32,0.20),rgba(43,36,29,0.92)) !important;
+  }
+}

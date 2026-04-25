@@ -1094,6 +1094,7 @@ function showPage(id,el){
   document.getElementById(id).style.display='block';
   document.getElementById(id).classList.add('active');
   el.classList.add('active');
+  document.body.classList.toggle('home-active', id==='home');
   closeFab();
   const now=getNow();
   updateMonthBadge(now);
