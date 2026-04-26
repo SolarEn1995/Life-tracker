@@ -2490,20 +2490,21 @@ function renderNetWorth(){
   // 動態調整 sub 標籤
   document.getElementById('netWorthSubLabel').textContent=
     debt>0 ? `總資產 $${totalAssets.toLocaleString()} − 負債 $${debt.toLocaleString()}` : `總資產 $${totalAssets.toLocaleString()}`;
-  // 明細
+  // 明細 (配合深哖背景：金色重點 + 亮色數字)
   const det=document.getElementById('netWorthDetail');
   if(det){
     const rows=[];
-    rows.push(`<div style="display:flex;justify-content:space-between"><span>💵 現金存款</span><span class="privacy-mask" style="color:var(--text);font-weight:600">$${cash.toLocaleString()}</span></div>`);
-    rows.push(`<div style="display:flex;justify-content:space-between"><span>📈 投資估值</span><span class="privacy-mask" style="color:var(--text);font-weight:600">$${inv.toLocaleString()}</span></div>`);
+    const valStyle='color:rgba(255,255,255,.92);font-weight:700';
+    rows.push(`<div style="display:flex;justify-content:space-between"><span>💵 現金存款</span><span class="privacy-mask" style="${valStyle}">$${cash.toLocaleString()}</span></div>`);
+    rows.push(`<div style="display:flex;justify-content:space-between"><span>📈 投資估值</span><span class="privacy-mask" style="${valStyle}">$${inv.toLocaleString()}</span></div>`);
     if(debt>0){
-      rows.push(`<div style="display:flex;justify-content:space-between;color:var(--danger)"><span>💸 負債總額</span><span class="privacy-mask" style="font-weight:600">−$${debt.toLocaleString()}</span></div>`);
+      rows.push(`<div style="display:flex;justify-content:space-between;color:#FFB6A0"><span>💸 負債總額</span><span class="privacy-mask" style="font-weight:700">−$${debt.toLocaleString()}</span></div>`);
       const activeDebts=debts.filter(d=>d.status!=='paid');
       activeDebts.forEach(d=>{
-        rows.push(`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);padding-left:14px"><span>${d.emoji||'·'} ${d.name}（剩 ${d.totalMonths-d.paidMonths} 期）</span><span class="privacy-mask">$${getDebtRemaining(d).toLocaleString()}</span></div>`);
+        rows.push(`<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.5);padding-left:14px"><span>${d.emoji||'·'} ${d.name}（剩 ${d.totalMonths-d.paidMonths} 期）</span><span class="privacy-mask">$${getDebtRemaining(d).toLocaleString()}</span></div>`);
       });
     }
-    rows.push(`<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:6px;padding-top:6px;font-weight:700;color:var(--text)"><span>淨值</span><span class="privacy-mask" style="color:#10b981">${netWorth<0?'-$':'$'}${Math.abs(netWorth).toLocaleString()}</span></div>`);
+    rows.push(`<div style="display:flex;justify-content:space-between;border-top:1px dashed rgba(255,216,107,.25);margin-top:6px;padding-top:8px;font-weight:800"><span style="color:#FFD86B">👑 淨值</span><span class="privacy-mask" style="color:#FFD86B">${netWorth<0?'-$':'$'}${Math.abs(netWorth).toLocaleString()}</span></div>`);
     det.innerHTML=rows.join('');
   }
 }
@@ -2513,7 +2514,7 @@ function toggleNetWorthDetail(){
   if(!det) return;
   const open=det.style.display!=='none';
   det.style.display=open?'none':'block';
-  if(hint) hint.textContent=open?'點擊展開明細 ▾':'點擊收合 ▴';
+  if(hint) hint.textContent=open?'展開明細 ▾':'收合 ▴';
 }
 function renderDebts(){
   const list=document.getElementById('debtList');

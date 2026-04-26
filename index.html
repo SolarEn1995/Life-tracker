@@ -187,18 +187,22 @@
     <div id="cardPendingDetail" class="privacy-mask" style="font-size:10px;color:var(--text3);margin-top:5px"></div>
   </div>
 
-  <!-- 💎 資產淨值總覽（移至此處：在「存款進度」之上） -->
-  <div id="netWorthCard" style="display:none;background:var(--surface);border:1px solid var(--border);border-left:3px solid #10b981;border-radius:14px;padding:14px 16px;margin-top:10px;cursor:pointer;box-shadow:var(--shadow)" onclick="toggleNetWorthDetail()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-size:18px">💎</div>
-        <div style="font-size:12px;font-weight:700;color:var(--text)">資產淨值</div>
+  <!-- 💎 資產淨值總覽 — 皇室金庫（深咖 + 金光暈） -->
+  <div id="netWorthCard" class="royal-vault" style="display:none" onclick="toggleNetWorthDetail()">
+    <div class="rv-glow"></div>
+    <div class="rv-glow rv-glow-2"></div>
+    <div class="rv-content">
+      <div class="rv-header">
+        <div class="rv-label">
+          <span class="rv-crown">👑</span>
+          <span>皇室總資產淨值</span>
+        </div>
+        <div class="rv-hint" id="netWorthToggleHint">展開明細 ▾</div>
       </div>
-      <div style="font-size:10px;color:var(--text3)" id="netWorthToggleHint">點擊展開明細 ▾</div>
+      <div class="privacy-mask rv-value" id="netWorthValue">$0</div>
+      <div class="privacy-mask rv-sub" id="netWorthSubLabel">總資產 − 負債</div>
+      <div id="netWorthDetail" class="rv-detail" style="display:none"></div>
     </div>
-    <div class="privacy-mask" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:0.3px;color:#10b981" id="netWorthValue">$0</div>
-    <div class="privacy-mask" style="font-size:11px;color:var(--text2);margin-top:2px" id="netWorthSubLabel">總資產 - 負債</div>
-    <div id="netWorthDetail" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);font-size:12px;line-height:1.9;color:var(--text2)"></div>
   </div>
 
   <!-- ▼ 章節：目標 -->
