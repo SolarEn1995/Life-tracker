@@ -1199,13 +1199,33 @@ function changeRecordMonth(d){
 }
 
 // ── PAGE NAV ──
+const REPORT_PAGES=['record','income','fixed'];
+function openReports(el){
+  const last=localStorage.getItem('btLastReport');
+  const target=REPORT_PAGES.includes(last)?last:'record';
+  showPage(target, el);
+}
+window.openReports=openReports;
 function showPage(id,el){
   navigator.vibrate?.(8);
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).style.display='block';
   document.getElementById(id).classList.add('active');
-  el.classList.add('active');
+  if(el && el.classList) el.classList.add('active');
+  // 同步底部導覽列高亮
+  const bn=document.getElementById('bottomNav');
+  if(bn){
+    bn.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+    let navKey=id;
+    if(REPORT_PAGES.includes(id)){ navKey='record'; localStorage.setItem('btLastReport',id); }
+    const target=bn.querySelector(`.bn-item[data-page="${navKey}"]`);
+    if(target) target.classList.add('active');
+  }
+  // 同步報表分頁列高亮
+  document.querySelectorAll('.report-tabs .rt-btn').forEach(b=>{
+    b.classList.toggle('active', b.getAttribute('data-rt')===id);
+  });
   document.body.classList.toggle('home-active', id==='home');
   closeFab();
   const now=getNow();

@@ -26,14 +26,6 @@
     <button class="theme-cycle-btn" id="themeCycleBtn" onclick="cycleTheme()" title="切換深淺色模式" aria-label="切換主題">🖥️</button>
     <div class="month-badge" id="currentMonthBadge"></div>
   </div>
-  <div class="tabs">
-    <button class="tab active" onclick="showPage('home',this)">🏠 總覽</button>
-    <button class="tab" onclick="showPage('reminder',this)">⏰ 補貨</button>
-    <button class="tab" onclick="showPage('fixed',this)">💳 固定</button>
-    <button class="tab" onclick="showPage('record',this)">📊 花費</button>
-    <button class="tab" onclick="showPage('income',this)">💵 收入</button>
-    <button class="tab" onclick="showPage('settings',this)">⚙️</button>
-  </div>
 </div>
 
 <!-- HOME -->
@@ -263,6 +255,11 @@
 
 <!-- FIXED -->
 <div class="content page" id="fixed" style="display:none">
+  <div class="report-tabs" role="tablist" aria-label="報表切換">
+    <button class="rt-btn" data-rt="record" onclick="showPage('record',this)">📊 花費</button>
+    <button class="rt-btn" data-rt="income" onclick="showPage('income',this)">💵 收入</button>
+    <button class="rt-btn active" data-rt="fixed" onclick="showPage('fixed',this)">💳 固定</button>
+  </div>
   <div class="page-section-title">💳 每月固定支出</div>
 
   <!-- 子分頁：訂閱 vs 負債 -->
@@ -591,12 +588,16 @@
 
 <!-- RECORD -->
 <div class="content page" id="record" style="display:none">
+  <div class="report-tabs" role="tablist" aria-label="報表切換">
+    <button class="rt-btn active" data-rt="record" onclick="showPage('record',this)">📊 花費</button>
+    <button class="rt-btn" data-rt="income" onclick="showPage('income',this)">💵 收入</button>
+    <button class="rt-btn" data-rt="fixed" onclick="showPage('fixed',this)">💳 固定</button>
+  </div>
   <div class="record-month-nav">
     <button onclick="changeRecordMonth(-1)">‹</button>
     <div class="month-label" id="recordMonthLabel"></div>
     <button onclick="changeRecordMonth(1)">›</button>
   </div>
-
   <!-- 焦點：本月總支出 hero -->
   <div class="page-hero hero-spend">
     <div class="ph-icon">💸</div>
@@ -717,6 +718,11 @@
 
 <!-- INCOME PAGE -->
 <div class="content page" id="income" style="display:none">
+  <div class="report-tabs" role="tablist" aria-label="報表切換">
+    <button class="rt-btn" data-rt="record" onclick="showPage('record',this)">📊 花費</button>
+    <button class="rt-btn active" data-rt="income" onclick="showPage('income',this)">💵 收入</button>
+    <button class="rt-btn" data-rt="fixed" onclick="showPage('fixed',this)">💳 固定</button>
+  </div>
   <!-- sub-tabs (settings-subtabs 共用樣式) -->
   <div class="settings-subtabs" id="incomeSubtabs">
     <button class="active" id="incTab-salary" onclick="switchIncTab('salary',this)">💵 主業</button>
@@ -2245,5 +2251,21 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
+<!-- 🐾 底部導覽列 (v36) -->
+<nav class="bottom-nav" id="bottomNav" role="tablist" aria-label="主導覽">
+  <button class="bn-item active" data-page="home" onclick="showPage('home',this)" role="tab" aria-label="總覽">
+    <span class="bn-icon">🏠</span><span class="bn-label">總覽</span>
+  </button>
+  <button class="bn-item" data-page="reminder" onclick="showPage('reminder',this)" role="tab" aria-label="補貨">
+    <span class="bn-icon">📦</span><span class="bn-label">補貨</span>
+  </button>
+  <button class="bn-item" data-page="record" onclick="openReports(this)" role="tab" aria-label="報表">
+    <span class="bn-icon">📊</span><span class="bn-label">報表</span>
+  </button>
+  <button class="bn-item" data-page="settings" onclick="showPage('settings',this)" role="tab" aria-label="設定">
+    <span class="bn-icon">⚙️</span><span class="bn-label">設定</span>
+  </button>
+</nav>
 </body>
 </html>

@@ -1901,3 +1901,66 @@ html[data-theme="dark"] .cat-skin-row::before{
 #home .cat-mood-card .cat-skin-row{
   flex-direction:row-reverse;
 }
+
+/* ─────────────────────────────────────────────────────
+   🐾 BOTTOM NAV (v36) — 取代頂部 .tabs，固定底部 4 格
+   ───────────────────────────────────────────────────── */
+.bottom-nav{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:0; width:100%; max-width:430px;
+  display:flex; justify-content:space-around; align-items:stretch;
+  background:var(--surface,#fff);
+  border-top:1px solid var(--border,#EFE6DA);
+  box-shadow:0 -8px 28px rgba(60,30,10,.07);
+  padding:6px 6px calc(6px + env(safe-area-inset-bottom,0));
+  z-index:90;
+  border-radius:22px 22px 0 0;
+}
+.bn-item{
+  flex:1; background:transparent; border:none; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; padding:8px 4px; border-radius:14px;
+  color:var(--text2,#7A5A40); font-weight:700;
+  transition:all .18s ease;
+}
+.bn-item .bn-icon{ font-size:22px; line-height:1; }
+.bn-item .bn-label{ font-size:11px; font-weight:700; letter-spacing:.5px; }
+.bn-item.active{
+  color:var(--accent,#F08A6B);
+  background:linear-gradient(135deg, rgba(240,138,107,.12), rgba(255,183,116,.08));
+}
+.bn-item.active .bn-icon{ transform:translateY(-1px) scale(1.06); }
+.bn-item:active{ transform:scale(.95); }
+
+/* 內容底部留空，避免被 nav 蓋住 */
+body{ padding-bottom:calc(76px + env(safe-area-inset-bottom,0)); }
+.content.page{ padding-bottom:20px; }
+
+/* FAB 抬高（不擋到 bottom-nav） */
+.fab-wrap{ bottom:calc(86px + env(safe-area-inset-bottom,0)) !important; }
+
+/* 報表內三分頁切換列 */
+.report-tabs{
+  display:flex; gap:6px; padding:10px 4px 6px;
+  position:sticky; top:0; z-index:5;
+  background:linear-gradient(180deg, var(--bg,#FFF5EC) 70%, transparent);
+}
+.rt-btn{
+  flex:1; padding:9px 6px; border:none; border-radius:14px;
+  background:var(--surface,#fff);
+  color:var(--text2,#7A5A40); font-size:13px; font-weight:800;
+  box-shadow:0 2px 8px rgba(60,30,10,.06);
+  cursor:pointer; transition:all .18s ease;
+}
+.rt-btn.active{
+  background:linear-gradient(135deg,#F08A6B,#E55A4D);
+  color:#fff;
+  box-shadow:0 4px 14px rgba(229,90,77,.32);
+}
+.rt-btn:active{ transform:scale(.96); }
+
+/* 暗色模式微調 */
+html[data-theme="dark"] .bottom-nav{ background:var(--surface); }
+html[data-theme="dark"] .bn-item.active{
+  background:linear-gradient(135deg, rgba(240,138,107,.18), rgba(255,183,116,.12));
+}
