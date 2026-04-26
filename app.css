@@ -1440,3 +1440,61 @@ html[data-theme="dark"] .product-card.urgent{
   box-shadow:0 0 0 2px rgba(240,138,107,0.30), 0 2px 8px rgba(240,138,107,0.40);
   transform:scale(1.06);
 }
+
+
+/* ========== 🐱 互動貓咪元件 ========== */
+
+/* 📦 紙箱貓 — 點擊探頭 */
+.box-cat{
+  display:inline-block;cursor:pointer;flex-shrink:0;
+  filter:drop-shadow(0 2px 4px rgba(120,80,50,0.18));
+  transition:transform 0.15s;
+}
+.box-cat:hover{transform:scale(1.08);}
+.box-cat .bc-svg{width:100%;height:100%;overflow:visible;}
+.box-cat .bc-head{
+  transform:translateY(20px);
+  transition:transform 0.45s cubic-bezier(0.18,0.9,0.32,1.275);
+}
+.box-cat.peek .bc-head{transform:translateY(0);}
+
+/* 🛌 睡覺雙貓 empty state */
+.empty-state.es-with-cat{padding:24px 16px;}
+.sleeping-cats{
+  position:relative;
+  width:160px;height:90px;margin:0 auto 12px;
+  cursor:pointer;
+  transition:transform 0.18s;
+}
+.sleeping-cats:hover{transform:scale(1.04);}
+.sleeping-cats .sc-svg{width:100%;height:100%;overflow:visible;
+  filter:drop-shadow(0 4px 8px rgba(120,80,50,0.16));}
+.sleeping-cats .sc-breathe{
+  animation:scBreathe 3s ease-in-out infinite;
+  transform-origin:50% 95%;
+}
+@keyframes scBreathe{
+  0%,100%{transform:scaleY(1);}
+  50%{transform:scaleY(1.04);}
+}
+.sleeping-cats.is-awake .sc-breathe{animation-duration:0.8s;}
+.sleeping-cats .sc-eye-awake{opacity:0;transition:opacity 0.18s;}
+.sleeping-cats.is-awake .sc-eye-sleep{opacity:0;transition:opacity 0.18s;}
+.sleeping-cats.is-awake .sc-eye-awake{opacity:1;}
+
+/* Zzz 飄浮 */
+.sleeping-cats .sc-zzz{
+  position:absolute;font-weight:900;color:#A5C5E5;pointer-events:none;
+  text-shadow:0 1px 2px rgba(255,255,255,0.8);
+  animation:scZzz 4s linear infinite;opacity:0;
+  z-index:2;
+}
+.sleeping-cats .sc-z1{top:-6px;right:24px;font-size:13px;color:#BCD3EB;}
+.sleeping-cats .sc-z2{top:-2px;right:8px;font-size:17px;animation-delay:1.3s;color:#A5C5E5;}
+.sleeping-cats .sc-z3{top:-18px;right:-4px;font-size:21px;animation-delay:2.6s;color:#7AA8D9;}
+@keyframes scZzz{
+  0%{opacity:0;transform:translate(0,0) scale(0.5) rotate(-10deg);}
+  50%{opacity:1;transform:translate(8px,-12px) scale(1) rotate(10deg);}
+  100%{opacity:0;transform:translate(18px,-28px) scale(1.4) rotate(-10deg);}
+}
+.sleeping-cats.is-awake .sc-zzz{opacity:0 !important;animation:none;}

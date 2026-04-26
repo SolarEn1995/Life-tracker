@@ -4955,7 +4955,7 @@ function renderRecords(){
   }
 
   recListEl.innerHTML=!allRecs.length
-    ?`<div style="text-align:center;padding:28px;color:var(--text3)">本月無消費記錄</div>`
+    ?emptyState({cat:'sleeping',title:'本月還沒有敗家紀錄',sub:'主子睡得很香，要不要記一筆喚醒牠？'})
     :allRecs.map(r=>{
       const fxBadge=r.fx?`<span class="fx-badge">${r.fx.origAmount} ${r.fx.currency}</span>`:'';
       const chipsHtml=(r.tags&&r.tags.length)?`<div style="margin-top:2px">${r.tags.map(t=>`<span class="record-chip">🏷 ${t}</span>`).join('')}</div>`:'';
@@ -6913,17 +6913,88 @@ function showToast(msg,type='warn'){
 }
 // ── EMPTY STATE 元件：emptyState({emoji, title, sub, ctaLabel, ctaOnClick, accent}) ──
 function emptyState(opts={}){
-  const {emoji='📭',title='還沒有資料',sub='',ctaLabel='',ctaOnClick='',accent=false}=opts;
+  const {emoji='📭',title='還沒有資料',sub='',ctaLabel='',ctaOnClick='',accent=false,cat=''}=opts;
   const cta=ctaLabel
     ? `<button class="es-cta${accent?' accent':''}" onclick="${escapeAttr(ctaOnClick)}">${escapeHTML(ctaLabel)}</button>`
     : '';
-  return `<div class="empty-state">
-    <div class="es-emoji">${emoji}</div>
+  // 🐱 互動貓咪 empty state
+  const catBlock=cat==='sleeping'?sleepingCatsSvg():(cat==='box'?boxCatSvg(true):'');
+  return `<div class="empty-state${cat?' es-with-cat':''}">
+    ${catBlock || `<div class="es-emoji">${emoji}</div>`}
     <div class="es-title">${escapeHTML(title)}</div>
     ${sub?`<div class="es-sub">${sub}</div>`:''}
     ${cta}
   </div>`;
 }
+
+// 🛌 兩隻睡覺的貓咪（empty state 裝飾）— 點擊驚醒
+function sleepingCatsSvg(){
+  return `<div class="sleeping-cats" onclick="wakeUpCats(this)" title="戳一下試試">
+    <div class="sc-zzz sc-z1">Z</div>
+    <div class="sc-zzz sc-z2">Z</div>
+    <div class="sc-zzz sc-z3">Z</div>
+    <svg viewBox="0 0 100 70" class="sc-svg" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="60" rx="45" ry="11" fill="rgba(255,255,255,0.85)"/>
+      <g class="sc-breathe">
+        <!-- 灰貓 -->
+        <polygon points="35,40 28,25 42,32" fill="#6B5F52"/>
+        <polygon points="50,38 60,22 62,35" fill="#6B5F52"/>
+        <circle cx="48" cy="45" r="14" fill="#A89D8E"/>
+        <path class="sc-eye-sleep" d="M40 45 Q43 48 46 45" stroke="#3A2A1F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path class="sc-eye-sleep" d="M50 45 Q53 48 56 45" stroke="#3A2A1F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <circle class="sc-eye-awake" cx="43" cy="44" r="2.5" fill="#E5A234"/>
+        <circle class="sc-eye-awake" cx="53" cy="44" r="2.5" fill="#E5A234"/>
+        <!-- 橘貓 -->
+        <ellipse cx="58" cy="55" rx="26" ry="13" fill="#FFB874"/>
+        <path d="M45 50 Q58 42 72 52" stroke="#D27A3C" stroke-width="2" fill="none" opacity="0.5"/>
+        <path d="M40 55 Q58 48 78 58" stroke="#D27A3C" stroke-width="2" fill="none" opacity="0.5"/>
+        <circle cx="38" cy="54" r="12" fill="#FFB874"/>
+        <polygon points="32,48 24,35 38,42" fill="#D27A3C"/>
+        <polygon points="45,45 50,32 50,44" fill="#D27A3C"/>
+        <path class="sc-eye-sleep" d="M32 54 Q35 57 38 54" stroke="#7A4F2F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path class="sc-eye-sleep" d="M40 54 Q43 57 46 54" stroke="#7A4F2F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <circle class="sc-eye-awake" cx="35" cy="53" r="2.5" fill="#3A2A1F"/>
+        <circle class="sc-eye-awake" cx="43" cy="53" r="2.5" fill="#3A2A1F"/>
+        <ellipse cx="39" cy="58" rx="1.4" ry="1" fill="#FF9F8A"/>
+      </g>
+    </svg>
+  </div>`;
+}
+function wakeUpCats(el){
+  if(!el || el.classList.contains('is-awake')) return;
+  el.classList.add('is-awake');
+  if(navigator.vibrate) navigator.vibrate([20,30,20]);
+  if(typeof playMeow==='function') playMeow();
+  setTimeout(()=>el.classList.remove('is-awake'),2400);
+}
+
+// 📦 紙箱貓（小尺寸裝飾）— 點擊探頭
+function boxCatSvg(big=false){
+  const sz=big?72:42;
+  return `<div class="box-cat" style="width:${sz}px;height:${sz}px" onclick="peekBoxCat(this)" title="戳一下">
+    <svg viewBox="0 0 100 100" class="bc-svg" xmlns="http://www.w3.org/2000/svg">
+      <g class="bc-head">
+        <polygon points="35,45 25,25 50,40" fill="#3A2A1F"/>
+        <polygon points="65,45 75,25 50,40" fill="#3A2A1F"/>
+        <circle cx="50" cy="55" r="22" fill="#3A2A1F"/>
+        <ellipse cx="40" cy="50" rx="3" ry="5" fill="#E5A234"/>
+        <ellipse cx="60" cy="50" rx="3" ry="5" fill="#E5A234"/>
+      </g>
+      <polygon points="20,60 80,60 70,95 30,95" fill="#D27A3C"/>
+      <polygon points="20,60 80,60 85,70 15,70" fill="#E5A234"/>
+      <path d="M45 80 Q50 85 55 80" stroke="#7A4F2F" stroke-width="2" fill="none" opacity="0.6"/>
+    </svg>
+  </div>`;
+}
+function peekBoxCat(el){
+  if(!el) return;
+  el.classList.add('peek');
+  if(navigator.vibrate) navigator.vibrate(40);
+  if(typeof playMeow==='function') playMeow();
+  setTimeout(()=>el.classList.remove('peek'),1500);
+}
+window.sleepingCatsSvg=sleepingCatsSvg; window.wakeUpCats=wakeUpCats;
+window.boxCatSvg=boxCatSvg; window.peekBoxCat=peekBoxCat;
 // ── SKELETON：skeletonList(count) 給載入中的清單佔位 ──
 function skeletonList(count=3){
   return Array.from({length:count},()=>`<div class="skeleton skel-card"></div>`).join('');
