@@ -2037,3 +2037,154 @@ html[data-theme="dark"] .bn-item.active{
 .fab-wrap.fab-dragging .fab{ box-shadow:0 0 0 6px rgba(255,123,84,.22), 0 12px 32px rgba(255,123,84,.55); }
 .fab-snap-hint{ position:fixed; padding:8px 14px; border-radius:14px; background:rgba(255,123,84,.92); color:#fff; font-size:11px; font-weight:700; pointer-events:none; z-index:9998; opacity:0; transition:opacity .15s; box-shadow:0 4px 14px rgba(255,123,84,.4); }
 .fab-snap-hint.show{ opacity:1; }
+
+/* ══════════════════════════════════════════════════
+   🌸  SAKURA FALLING PETALS
+   ══════════════════════════════════════════════════ */
+#sakura-layer{
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:1;
+  overflow:hidden;
+  opacity:0;
+  transition:opacity 0.8s ease;
+}
+body.home-active #sakura-layer{opacity:1;}
+
+.sakura-petal{
+  position:absolute;top:0;
+  border-radius:50% 0 50% 0;
+  pointer-events:none;
+  will-change:transform,opacity;
+  animation:sakuraFall linear infinite;
+}
+@keyframes sakuraFall{
+  0%  {transform:translateY(-24px) rotate(0deg) translateX(0);opacity:0;}
+  8%  {opacity:var(--op,0.72);}
+  84% {opacity:var(--op,0.60);}
+  100%{transform:translateY(108vh) rotate(var(--spin,520deg)) translateX(var(--drift,50px));opacity:0;}
+}
+
+/* ══════════════════════════════════════════════════
+   🐱  HOME CATS SCENE
+   ══════════════════════════════════════════════════ */
+.home-cats-scene{
+  position:relative;
+  height:92px;
+  margin-top:28px;
+  overflow:visible;
+  pointer-events:none;
+}
+/* Soft ground line */
+.home-cats-scene::after{
+  content:'';
+  position:absolute;
+  bottom:8px;left:3%;right:3%;
+  height:1.5px;
+  background:linear-gradient(90deg,transparent 0%,var(--border2) 20%,rgba(63,169,133,0.3) 50%,var(--border2) 80%,transparent 100%);
+  border-radius:1px;
+}
+.hc-cat{position:absolute;bottom:10px;}
+.hc-flip{display:inline-block;}
+
+/* ── 橘貓：左右來回走 ── */
+.hc-cat-orange{left:2%;}
+.hc-cat-orange{animation:hcWalkMove 7s ease-in-out infinite;}
+.hc-cat-orange .hc-flip{animation:hcWalkFlip 7s ease-in-out infinite;}
+.hc-cat-orange svg{animation:hcWalkBob 0.42s ease-in-out infinite;display:block;}
+.hc-cat-orange .hc-tail{transform-box:fill-box;transform-origin:85% 85%;animation:hcTailWag 0.85s ease-in-out infinite;}
+
+@keyframes hcWalkMove{
+  0%,100%{transform:translateX(0);}
+  44%    {transform:translateX(72px);}
+  56%    {transform:translateX(72px);}
+}
+@keyframes hcWalkFlip{
+  0%,43% {transform:scaleX(1);}
+  45%,100%{transform:scaleX(-1);}
+}
+@keyframes hcWalkBob{
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-3px);}
+}
+@keyframes hcTailWag{
+  0%,100%{transform:rotate(0deg);}
+  50%    {transform:rotate(22deg);}
+}
+
+/* ── 黑貓：正面坐著、眨眼、甩尾 ── */
+.hc-cat-black{left:50%;transform:translateX(-50%);}
+.hc-cat-black .hc-tail{
+  transform-box:fill-box;transform-origin:center bottom;
+  animation:hcSitTail 2.8s ease-in-out infinite;
+}
+.hc-cat-black .hc-eye-l{
+  transform-box:fill-box;transform-origin:center;
+  animation:hcBlink 4.2s ease-in-out infinite;
+}
+.hc-cat-black .hc-eye-r{
+  transform-box:fill-box;transform-origin:center;
+  animation:hcBlink 4.2s ease-in-out infinite 0.08s;
+}
+@keyframes hcSitTail{
+  0%,100%{transform:rotate(-13deg);}
+  50%    {transform:rotate(13deg);}
+}
+@keyframes hcBlink{
+  0%,88%,100%{transform:scaleY(1);}
+  93%         {transform:scaleY(0.06);}
+}
+
+/* ── 白貓：舉爪追花瓣 ── */
+.hc-cat-white{right:2%;}
+.hc-cat-white{animation:hcPlayBounce 2.1s ease-in-out infinite;}
+.hc-cat-white .hc-paw-up{
+  transform-box:fill-box;transform-origin:center bottom;
+  animation:hcPawSwipe 2.1s ease-in-out infinite;
+}
+@keyframes hcPlayBounce{
+  0%,55%,100%{transform:translateY(0);}
+  28%        {transform:translateY(-6px);}
+}
+@keyframes hcPawSwipe{
+  0%,65%,100%{transform:rotate(0deg) translateY(0);}
+  28%        {transform:rotate(-42deg) translateY(-10px);}
+}
+
+/* 追花瓣：從白貓上方落下 */
+.hc-chase-petal{
+  position:absolute;
+  width:9px;height:11px;
+  border-radius:50% 0 50% 0;
+  background:rgba(255,183,197,0.88);
+  right:calc(2% + 26px);
+  bottom:52px;
+  pointer-events:none;
+  animation:hcPetalChase 2.1s ease-in-out infinite;
+}
+@keyframes hcPetalChase{
+  0%  {transform:translateY(-52px) rotate(0deg);opacity:0;}
+  14% {opacity:0.92;}
+  62% {transform:translateY(10px) rotate(200deg);opacity:0.78;}
+  100%{transform:translateY(56px) rotate(390deg);opacity:0;}
+}
+
+/* 暗色模式調整 */
+html[data-theme="dark"] .home-cats-scene::after{
+  background:linear-gradient(90deg,transparent 0%,var(--border2) 20%,rgba(91,194,152,0.22) 50%,var(--border2) 80%,transparent 100%);
+}
+html[data-theme="dark"] .hc-chase-petal{background:rgba(255,183,197,0.45);}
+html[data-theme="dark"] .hc-cat-orange svg{filter:brightness(1.18);}
+html[data-theme="dark"] .hc-cat-black svg{filter:brightness(1.5);}
+html[data-theme="dark"] .hc-cat-white svg{filter:brightness(0.88) sepia(0.08);}
+
+/* 減少動態：尊重使用者設定 */
+@media (prefers-reduced-motion: reduce){
+  .sakura-petal,
+  .hc-cat-orange,.hc-cat-orange .hc-flip,.hc-cat-orange svg,
+  .hc-cat-orange .hc-tail,.hc-cat-black .hc-tail,
+  .hc-cat-black .hc-eye-l,.hc-cat-black .hc-eye-r,
+  .hc-cat-white,.hc-cat-white .hc-paw-up,.hc-chase-petal{
+    animation:none !important;
+  }
+}
