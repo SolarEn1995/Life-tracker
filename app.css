@@ -1884,3 +1884,20 @@ html[data-theme="dark"] .cat-skin-row::before{
   100% { box-shadow:0 0 0 0 rgba(86,128,194,0); }
 }
 .flash-once{ animation:flashOnce 1.2s ease-out; }
+
+/* ── 換毛色 🐾 移到卡片右上角（取代裝飾用的 ::after 腳印）── */
+#home .cat-mood-card::after{ display:none !important; }
+#home .cat-mood-card .cat-skin-row{
+  top:8px !important;
+  right:10px !important;
+  bottom:auto !important;
+}
+#home .cat-mood-card .cat-skin-row::before{
+  width:28px; height:28px;
+  font-size:13px;
+  background:rgba(255,255,255,.78);
+}
+/* 展開時往左展開（避免被卡片右邊切掉） */
+#home .cat-mood-card .cat-skin-row{
+  flex-direction:row-reverse;
+}
