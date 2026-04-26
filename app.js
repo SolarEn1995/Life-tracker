@@ -26,6 +26,7 @@ let recordMonth={y:NOW.getFullYear(),m:NOW.getMonth()};
 let recordDateMode='month'; // 'month'|'range3'|'range6'|'custom'
 let recordDateFrom=null, recordDateTo=null; // YYYY-MM for custom mode
 let recordSortBy='date'; // 'date'|'amount_desc'|'amount_asc'
+let recordDayFilter=null; // YYYY-MM-DD for single-day detail filter
 let incomeYear=NOW.getFullYear();
 let fabOpen=false;
 let currentPriceProductId=null;
@@ -1218,6 +1219,7 @@ function changeRecordMonth(d){
   recordMonth.m+=d;
   if(recordMonth.m>11){recordMonth.m=0;recordMonth.y++;}
   if(recordMonth.m<0){recordMonth.m=11;recordMonth.y--;}
+  clearRecordDayFilter();
   renderRecords();renderChart();
 }
 
@@ -4949,6 +4951,11 @@ function renderRecords(){
     allRecs=allRecs.filter(r=>r._travelBudget);
   }
 
+  // 單日篩選（在類別篩選之後再套用）
+  if(recordDayFilter){
+    allRecs=allRecs.filter(r=>r.date===recordDayFilter);
+  }
+
   const typeTag={var:'',life:`<span class="record-tag" style="background:#fde9f2;color:#e8488a">生活</span>`,voucher:`<span class="record-tag" style="background:var(--accent-light);color:var(--accent)">即享券</span>`,easycard:`<span class="record-tag" style="background:#dbeafe;color:#0891b2">🚇 悠遊卡</span>`,fixed:`<span class="record-tag fix">固定</span>`,installment:`<span class="record-tag" style="background:#ede9fe;color:#7c3aed">分期</span>`};
   const recListEl=document.getElementById('recordList'); if(!recListEl) return;
 
@@ -4964,7 +4971,10 @@ function renderRecords(){
   }
 
   recListEl.innerHTML=!allRecs.length
-    ?emptyState({cat:'sleeping',title:'本月還沒有敗家紀錄',sub:'主子睡得很香，要不要記一筆喚醒牠？'})
+    ?(recordDayFilter
+        ?emptyState({cat:'sleeping',title:'這天沒有消費記錄',sub:'換個日期，或點「✕ 清除」回到原本的區間'})
+        :emptyState({cat:'sleeping',title:'本月還沒有敗家紀錄',sub:'主子睡得很香，要不要記一筆喚醒牠？'})
+      )
     :allRecs.map(r=>{
       const fxBadge=r.fx?`<span class="fx-badge">${r.fx.origAmount} ${r.fx.currency}</span>`:'';
       const chipsHtml=(r.tags&&r.tags.length)?`<div style="margin-top:2px">${r.tags.map(t=>`<span class="record-chip">🏷 ${t}</span>`).join('')}</div>`:'';
@@ -5075,6 +5085,24 @@ function cycleRecordSort(){
   recordSortBy=next.key;
   const btn=document.getElementById('recordSortBtn');
   if(btn) btn.textContent=next.label;
+  renderRecords();
+}
+
+/* ── 單日篩選 ── */
+function setRecordDayFilter(date){
+  recordDayFilter=date||null;
+  const clearBtn=document.getElementById('recordDayClearBtn');
+  if(clearBtn) clearBtn.style.display=recordDayFilter?'':'none';
+  recordsVisible=RECORDS_PAGE_SIZE;
+  renderRecords();
+}
+function clearRecordDayFilter(){
+  recordDayFilter=null;
+  const input=document.getElementById('recordDayFilterInput');
+  if(input) input.value='';
+  const clearBtn=document.getElementById('recordDayClearBtn');
+  if(clearBtn) clearBtn.style.display='none';
+  recordsVisible=RECORDS_PAGE_SIZE;
   renderRecords();
 }
 
