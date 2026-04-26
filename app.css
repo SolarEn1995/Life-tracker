@@ -1294,3 +1294,74 @@ html[data-theme="dark"] .meow-bubble::after{border-right-color:#2A2520;}
 }
 
 .cat-mood-card{position:relative;}
+
+
+/* ========== 🐱 貓咪守門員（大額消費冷靜期） ========== */
+.cg-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(20,12,8,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.cg-overlay.show{opacity:1;pointer-events:auto;}
+.cg-sheet{
+  width:100%;max-width:430px;
+  background:#FFF8F1;
+  border-radius:32px 32px 0 0;
+  padding:18px 22px 28px;
+  transform:translateY(100%);
+  transition:transform 0.42s cubic-bezier(0.18,0.9,0.32,1);
+  box-shadow:0 -10px 40px rgba(120,70,40,0.18);
+  text-align:center;
+  position:relative;
+}
+.cg-overlay.show .cg-sheet{transform:translateY(0);}
+html[data-theme="dark"] .cg-sheet{background:#2A2520;}
+.cg-handle{width:42px;height:5px;border-radius:99px;background:#E5D6C7;margin:2px auto 14px;}
+.cg-cat{
+  font-size:64px;line-height:1;margin-bottom:8px;display:inline-block;
+  animation:cgShake 0.5s infinite;
+  filter:drop-shadow(0 4px 8px rgba(240,138,107,0.3));
+}
+.cg-cat.calm{animation:none;}
+@keyframes cgShake{
+  0%,100%{transform:translateX(0) rotate(0);}
+  25%{transform:translateX(-4px) rotate(-6deg);}
+  75%{transform:translateX(4px) rotate(6deg);}
+}
+.cg-title{font-size:17px;font-weight:900;color:var(--text);margin-bottom:10px;}
+.cg-msg{
+  font-size:13px;line-height:1.7;color:#A35A3F;
+  background:rgba(240,138,107,0.10);
+  padding:12px 14px;border-radius:14px;margin-bottom:18px;
+  border:1px dashed rgba(240,138,107,0.35);
+}
+.cg-amt{font-weight:900;color:var(--accent);font-size:16px;}
+.cg-remain{font-weight:900;color:#D4533C;font-size:15px;}
+.cg-sass{display:inline-block;margin-top:4px;font-style:italic;color:#8E6A52;font-size:12px;}
+
+.cg-hold-box{
+  position:relative;width:100%;height:54px;border-radius:99px;
+  background:#F0E2D2;overflow:hidden;cursor:pointer;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  margin-bottom:10px;
+  border:1.5px solid rgba(212,83,60,0.18);
+}
+.cg-hold-fill{
+  position:absolute;inset:0 auto 0 0;width:0%;
+  background:linear-gradient(90deg,#E5A234,#D4533C);
+  transition:width 0.08s linear;
+}
+.cg-hold-txt{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#7A4F36;font-size:14px;letter-spacing:0.5px;
+  z-index:2;transition:color 0.2s;
+}
+.cg-hold-box.holding .cg-hold-txt{color:#fff;}
+.cg-cancel{
+  width:100%;padding:12px;border:none;background:transparent;
+  color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;
+  border-radius:99px;
+}
+.cg-cancel:hover{background:rgba(0,0,0,0.04);color:var(--accent3);}

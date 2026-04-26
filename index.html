@@ -1461,6 +1461,25 @@
   </div>
 </div>
 
+<!-- 🐱 CAT GUARDIAN MODAL — 大額消費冷靜期 -->
+<div class="cg-overlay" id="catGuardOverlay" onclick="if(event.target===this)closeCatGuard()">
+  <div class="cg-sheet">
+    <div class="cg-handle"></div>
+    <div class="cg-cat" id="cgCat">🙀</div>
+    <div class="cg-title">等等！這筆要記下去嗎？</div>
+    <div class="cg-msg">
+      花這 <span id="cgAmt" class="cg-amt">$0</span> 之後，<br>
+      本月 <span id="cgScope">生活預算</span>會剩下 <span id="cgRemain" class="cg-remain">$0</span>。<br>
+      <span id="cgSass" class="cg-sass">本喵覺得你該再想想喔～</span>
+    </div>
+    <div class="cg-hold-box" id="cgHoldBox">
+      <div class="cg-hold-fill" id="cgHoldFill"></div>
+      <div class="cg-hold-txt" id="cgHoldTxt">長按 2 秒堅持記帳</div>
+    </div>
+    <button class="cg-cancel" onclick="closeCatGuard()">算了，本喵贏了 🐾</button>
+  </div>
+</div>
+
 <!-- 🏷 CATEGORY MANAGER MODAL -->
 <div class="modal-overlay" id="catManagerOverlay" onclick="closeModalOutside(event,'catManagerOverlay')">
   <div class="modal">

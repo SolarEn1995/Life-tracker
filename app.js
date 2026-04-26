@@ -4189,6 +4189,11 @@ function saveQuickExpense(){
   const amount=Math.round(rawAmount*rate);
   const fx=qeCur==='TWD'?null:{currency:qeCur,origAmount:rawAmount,rate};
 
+  // 🐱 貓咪守門員：預算快爆 / 大額時跳冷靜期 modal
+  if(!editingRecordId && !window._catGuardBypass){
+    if(catGuardCheck(amount,'life',()=>{ window._catGuardBypass=true; saveQuickExpense(); window._catGuardBypass=false; })) return;
+  }
+
   // ✏️ 編輯模式：更新既有 record
   if(editingRecordId){
     const r=records.find(x=>x.id===editingRecordId);
@@ -4302,6 +4307,10 @@ function saveHomeQuick(){
   const amount=parseInt(document.getElementById('hqAmount').value)||0;
   if(!name){showToast('請填花了什麼','error');return;}
   if(amount<=0){showToast('請填金額','error');return;}
+  // 🐱 貓咪守門員
+  if(!window._catGuardBypass){
+    if(catGuardCheck(amount,'life',()=>{ window._catGuardBypass=true; saveHomeQuick(); window._catGuardBypass=false; })) return;
+  }
   const cat=document.querySelector('#hqCats .hq-cat.active')?.dataset.val||'food';
   const today=todayStr();
   if(hqPay==='card'){
@@ -4352,6 +4361,94 @@ function applyPrivacyMode(){
     btn.title=privacyMode?'已開啟防偷窺，點擊顯示金額':'防偷窺：模糊金額';
   }
 }
+// 🐱 貓咪守門員 — 大額消費冷靜期
+const CG_SASS=[
+  '本喵覺得你該再想想喔～',
+  '罐罐基金又少了…😿',
+  '錢錢飛走的聲音太刺耳了',
+  '吃土不會比較浪漫喔',
+  '冷靜深呼吸，再決定一次',
+  '這個月的本喵已經要哭了',
+];
+function catGuardCheck(amount,scope,onConfirm){
+  if(typeof lifeBudget==='undefined' || lifeBudget<=0) return false;
+  const ym=(typeof getCurrentYM==='function')?getCurrentYM():new Date().toISOString().slice(0,7);
+  const spent=records.filter(r=>{
+    const m=(typeof getEffectiveMonth==='function')?getEffectiveMonth(r):(r.date||'').slice(0,7);
+    return m===ym && (r.type==='life'||r.type==='voucher'||r.type==='easycard') && !r._travelBudget;
+  }).reduce((s,r)=>s+(r.price||0),0);
+  const after=spent+amount;
+  const willOverflow=after>=lifeBudget*0.9;
+  const isHuge=amount>=Math.max(1500,lifeBudget*0.3);
+  if(!willOverflow && !isHuge) return false;
+  const remain=lifeBudget-after;
+  const overlay=document.getElementById('catGuardOverlay');
+  if(!overlay) return false;
+  document.getElementById('cgAmt').textContent='$'+amount.toLocaleString();
+  document.getElementById('cgScope').textContent=scope==='life'?'生活預算':'預算';
+  const remainEl=document.getElementById('cgRemain');
+  if(remain>=0){ remainEl.textContent='$'+remain.toLocaleString(); remainEl.style.color=''; }
+  else { remainEl.textContent='超支 $'+Math.abs(remain).toLocaleString(); remainEl.style.color='#D4533C'; }
+  document.getElementById('cgSass').textContent=CG_SASS[Math.floor(Math.random()*CG_SASS.length)];
+  const catEl=document.getElementById('cgCat');
+  catEl.textContent=remain<0?'😾':'🙀';
+  catEl.classList.remove('calm');
+  overlay.classList.add('show');
+  if(navigator.vibrate) navigator.vibrate([80,40,80]);
+  window._cgOnConfirm=onConfirm;
+  cgBindHold();
+  return true;
+}
+function closeCatGuard(){
+  const overlay=document.getElementById('catGuardOverlay');
+  if(overlay) overlay.classList.remove('show');
+  cgResetHold();
+  window._cgOnConfirm=null;
+}
+let _cgTimer=null,_cgProg=0;
+const _CG_HOLD_MS=2000,_CG_INT=24;
+function cgBindHold(){
+  const box=document.getElementById('cgHoldBox');
+  if(!box || box._bound) return;
+  box._bound=true;
+  const start=(e)=>{
+    e.preventDefault();
+    box.classList.add('holding');
+    document.getElementById('cgHoldTxt').textContent='正在硬掏錢包…';
+    const cat=document.getElementById('cgCat');
+    cat.textContent='😿'; cat.classList.add('calm');
+    if(navigator.vibrate) navigator.vibrate(40);
+    _cgTimer=setInterval(()=>{
+      _cgProg+=(_CG_INT/_CG_HOLD_MS)*100;
+      document.getElementById('cgHoldFill').style.width=Math.min(100,_cgProg)+'%';
+      if(_cgProg>=100) cgComplete();
+    },_CG_INT);
+  };
+  const end=()=>{ if(_cgProg<100) cgResetHold(); };
+  box.addEventListener('mousedown',start);
+  box.addEventListener('mouseup',end);
+  box.addEventListener('mouseleave',end);
+  box.addEventListener('touchstart',start,{passive:false});
+  box.addEventListener('touchend',end);
+  box.addEventListener('touchcancel',end);
+}
+function cgResetHold(){
+  clearInterval(_cgTimer);_cgTimer=null;_cgProg=0;
+  const fill=document.getElementById('cgHoldFill'); if(fill) fill.style.width='0%';
+  const box=document.getElementById('cgHoldBox'); if(box) box.classList.remove('holding');
+  const txt=document.getElementById('cgHoldTxt'); if(txt) txt.textContent='長按 2 秒堅持記帳';
+  const cat=document.getElementById('cgCat');
+  if(cat){ cat.textContent='🙀'; cat.classList.remove('calm'); }
+}
+function cgComplete(){
+  clearInterval(_cgTimer);_cgTimer=null;
+  document.getElementById('cgHoldTxt').textContent='記下去了 💸';
+  document.getElementById('cgCat').textContent='👻';
+  if(navigator.vibrate) navigator.vibrate(180);
+  const cb=window._cgOnConfirm;
+  setTimeout(()=>{ closeCatGuard(); if(typeof cb==='function') cb(); },420);
+}
+
 function togglePrivacy(){
   privacyMode=!privacyMode;
   localStorage.setItem('btPrivacy',privacyMode?'1':'0');
