@@ -1635,3 +1635,71 @@ html[data-theme="dark"] .product-card.urgent{
   color:rgba(255,255,255,.75);
 }
 .royal-vault .rv-detail strong{ color:#FFD86B; }
+
+/* ── P1 排版節奏升級 (Hero / 章節留白 / 月份徽章) ── */
+
+/* Hero 可用餘額卡：放大數字 + 加大留白 */
+.free-card{
+  padding:22px 22px 20px;
+  gap:16px;
+  border-radius:26px;
+  margin-bottom:14px;
+}
+.free-card .fc-icon{ font-size:36px; }
+.free-card .fc-label{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.4px;
+  color:var(--text3);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.free-card .fc-value{
+  font-size:42px;
+  line-height:1.05;
+  letter-spacing:-1px;
+  font-weight:900;
+}
+.free-card .fc-sub{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--text3);
+}
+.free-card .fc-compare{ margin-top:6px; font-size:11px; }
+
+/* 小螢幕降一級避免換行 */
+@media (max-width:360px){
+  .free-card .fc-value{ font-size:36px; }
+}
+
+/* 章節標題：加大上下呼吸感 */
+#home > .home-section-title,
+#home > .page-section-title{
+  margin-top:28px;
+  margin-bottom:14px;
+}
+#home > .home-section-title:first-child,
+.home-section-title:first-child{ margin-top:6px; }
+
+/* 月份徽章：tracking-widest 高級感 */
+.month-badge{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.8px;
+  padding:6px 12px;
+  border-radius:14px;
+  color:var(--text2);
+  background:var(--surface);
+  border:1px solid var(--border2);
+}
+
+/* App Logo 名稱：放大主標、副標縮小（更接近 reference 的層次） */
+.app-name .a, .app-name .b{ font-size:20px; font-weight:900; letter-spacing:-.5px; }
+.app-name .app-zh{ font-size:11px; font-weight:700; letter-spacing:1px; opacity:.7; }
+
+/* home-stat-card 與 quick-stats 間距 */
+#home .home-stat-card{ margin-top:0; margin-bottom:14px; border-radius:24px; padding:18px 18px 16px; }
+#home .quick-stats{ margin-bottom:14px; gap:10px; }
+
+/* cat-mood-card 留白同步 */
+#home .cat-mood-card{ border-radius:26px; padding:18px 20px; margin-bottom:14px; }
