@@ -513,8 +513,20 @@ function renderStats(now){
 // ── 🐱 CAT MOOD CARD ──
 // 喵咪 SVG 生成器 v2 — Q 版超萌（大頭、星星眼、白口吻、腮紅、清楚鬍鬚）
 function meowCatSvg(mood='mid',size=72){
-  const FACE='#FFB874', STRIPE='#D27A3C', EAR_IN='#FFC9D6', SNOUT='#FFF5E8',
-        LINE='#3A2A1F', WHISK='#5C544A', BLUSH='#FF9F8A', NOSE='#E55A4D';
+  // 🎨 造型表（橘貓 / 賓士 / 三花 / 純黑 / 灰虎）
+  const SKIN_PRESETS={
+    orange:{FACE:'#FFB874',STRIPE:'#D27A3C',EAR_IN:'#FFC9D6'},
+    tuxedo:{FACE:'#FFFFFF',STRIPE:'#1F1A15',EAR_IN:'#FFC9D6'},
+    calico:{FACE:'#FFF1DC',STRIPE:'#E5A234',EAR_IN:'#FFC9D6'},
+    black:{FACE:'#2D2620',STRIPE:'#1A1410',EAR_IN:'#9A6B6B'},
+    grey:{FACE:'#C9BDB0',STRIPE:'#6B5F52',EAR_IN:'#F5C2C9'},
+  };
+  const skinKey=(typeof catSkin!=='undefined'?catSkin:'orange')||'orange';
+  const sk=SKIN_PRESETS[skinKey]||SKIN_PRESETS.orange;
+  const FACE=sk.FACE, STRIPE=sk.STRIPE, EAR_IN=sk.EAR_IN, SNOUT='#FFF5E8',
+        LINE=skinKey==='black'?'#FFE9C9':'#3A2A1F',
+        WHISK=skinKey==='black'?'#E0CDB4':'#5C544A',
+        BLUSH='#FF9F8A', NOSE='#E55A4D';
   // 共用：白口吻（嘴部三角白塊）+ 腮紅 — 讓「貓味」立刻出來
   const snout=`<ellipse cx="50" cy="68" rx="20" ry="13" fill="${SNOUT}"/>`;
   const blush=`<ellipse cx="26" cy="64" rx="6" ry="3.5" fill="${BLUSH}" opacity="0.55"/><ellipse cx="74" cy="64" rx="6" ry="3.5" fill="${BLUSH}" opacity="0.55"/>`;
@@ -649,6 +661,18 @@ function renderCatMood(ctx){
   if(!card.querySelector('.meow-bubble')){
     const b=document.createElement('div'); b.className='meow-bubble'; b.id='cmcBubble'; card.appendChild(b);
   }
+  // 確保有換造型小盤
+  if(!card.querySelector('.cat-skin-row')){
+    const row=document.createElement('div');
+    row.className='cat-skin-row';
+    row.innerHTML=Object.keys(CAT_SKIN_LABELS).map(k=>{
+      const sw={orange:'#FFB874',tuxedo:'#1F1A15',calico:'#FFD27A',black:'#2D2620',grey:'#8A7A6B'}[k];
+      return `<button class="cat-skin-opt${catSkin===k?' active':''}" data-skin="${k}" title="${CAT_SKIN_LABELS[k]}" onclick="setCatSkin('${k}')"><span class="cs-dot" style="background:${sw}"></span></button>`;
+    }).join('');
+    card.appendChild(row);
+  }
+  // 記住最近的 net rate 供換造型重繪用
+  if(ctx&&'netRate' in ctx) window._lastNetRate=ctx.netRate;
   const emojiEl=document.getElementById('cmcEmoji');
   emojiEl.innerHTML=meowCatSvg(key,72);
   emojiEl.style.cursor='pointer';
@@ -667,6 +691,8 @@ function renderCatMood(ctx){
         bub._t=setTimeout(()=>bub.classList.remove('show'),2400);
       }
       emojiEl.classList.remove('meow-pop');void emojiEl.offsetWidth;emojiEl.classList.add('meow-pop');
+      // 🔊 喵叫
+      if(typeof playMeow==='function') playMeow();
       // 皇室喵點擊冒愛心
       if(k==='rich'){
         ['💖','✨','💛','🐟','💖'].forEach((h,i)=>{
@@ -4350,7 +4376,43 @@ function saveHomeQuick(){
   if(newRec) setTimeout(()=>askLargeExpense(newRec),350);
 }
 
-// 🛡 防偷窺模式
+// � 喵造型 + 喵叫聲
+const CAT_SKIN_LABELS={orange:'橘貓',tuxedo:'賓士',calico:'三花',black:'純黑',grey:'灰虎'};
+let catSkin=localStorage.getItem('btCatSkin')||'orange';
+function setCatSkin(s){
+  catSkin=s;
+  localStorage.setItem('btCatSkin',s);
+  if(typeof renderCatMood==='function'){
+    try{ renderCatMood({netRate:(window._lastNetRate??0.5)});}catch(e){}
+  }
+  if(typeof applyPrivacyMode==='function') applyPrivacyMode();
+  document.querySelectorAll('.cat-skin-opt').forEach(b=>b.classList.toggle('active',b.dataset.skin===s));
+  if(typeof showToast==='function') showToast('🐾 換造型：'+(CAT_SKIN_LABELS[s]||s),'ok');
+  playMeow();
+}
+let _audioCtx=null;
+function playMeow(){
+  try{
+    if(!_audioCtx) _audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const ctx=_audioCtx;
+    if(ctx.state==='suspended') ctx.resume();
+    const t0=ctx.currentTime;
+    [[0,0.18,520,820],[0.16,0.32,640,380]].forEach(([s,e,f1,f2])=>{
+      const osc=ctx.createOscillator(); osc.type='sawtooth';
+      const gain=ctx.createGain();
+      const filt=ctx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=2200;
+      osc.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(f1,t0+s);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(40,f2),t0+e);
+      gain.gain.setValueAtTime(0.0001,t0+s);
+      gain.gain.exponentialRampToValueAtTime(0.18,t0+s+0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001,t0+e);
+      osc.start(t0+s); osc.stop(t0+e+0.02);
+    });
+  }catch(e){}
+}
+
+// �🛡 防偷窺模式
 let privacyMode=localStorage.getItem('btPrivacy')==='1';
 function applyPrivacyMode(){
   document.body.classList.toggle('privacy-on',privacyMode);

@@ -1365,3 +1365,78 @@ html[data-theme="dark"] .cg-sheet{background:#2A2520;}
   border-radius:99px;
 }
 .cg-cancel:hover{background:rgba(0,0,0,0.04);color:var(--accent3);}
+
+
+/* ========== 🌟 P6 明亮化：modal 背景 + 卡片配色修正 ========== */
+/* 1. modal overlay 從冷藍轉暖淡，並降低不透明度（變亮） */
+.modal-overlay{
+  background:rgba(60,40,28,0.30) !important;
+  backdrop-filter:blur(4px) !important;
+  -webkit-backdrop-filter:blur(4px) !important;
+}
+
+/* 2. modal 本體強制走實色奶白底（蓋掉 glass 半透明，避免穿透變糊） */
+.modal,
+.bottom-sheet,
+.cg-sheet{
+  background:#FFFBF5 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border-color:rgba(232,217,194,0.85) !important;
+  box-shadow:0 -10px 40px rgba(120,80,50,0.18) !important;
+}
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .cg-sheet{
+  background:#2C241B !important;
+}
+
+/* 3. 補貨卡片強制更亮的奶白底（蓋掉 P2 glass 0.42 透明造成色暈） */
+.product-card,
+.fixed-card{
+  background:#FFFCF7 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border:1.2px solid #EFE3D0 !important;
+  box-shadow:0 4px 14px rgba(178,138,98,0.10) !important;
+}
+.product-card.urgent{
+  background:linear-gradient(135deg,#FFF4EC,#FFFCF7 60%) !important;
+  border-color:rgba(240,138,107,0.30) !important;
+}
+.fixed-card.confirmed{
+  background:linear-gradient(135deg,#E8F5EE,#FFFCF7 65%) !important;
+  border-color:rgba(63,169,133,0.32) !important;
+}
+html[data-theme="dark"] .product-card,
+html[data-theme="dark"] .fixed-card{
+  background:#2A231C !important;
+  border-color:#3F352A !important;
+}
+html[data-theme="dark"] .product-card.urgent{
+  background:linear-gradient(135deg,#3A2820,#2A231C 65%) !important;
+}
+
+
+/* ========== 🐾 喵造型小盤 ========== */
+.cat-skin-row{
+  display:flex;gap:6px;margin-top:10px;
+  padding:6px 8px;border-radius:99px;
+  background:rgba(255,251,245,0.7);
+  border:1px dashed rgba(232,217,194,0.7);
+  width:max-content;
+}
+.cat-skin-opt{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid #fff;
+  background:transparent;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.14s, box-shadow 0.18s;
+  box-shadow:0 1px 4px rgba(178,138,98,0.18);
+}
+.cat-skin-opt .cs-dot{display:block;width:18px;height:18px;border-radius:50%;}
+.cat-skin-opt:hover{transform:scale(1.08);}
+.cat-skin-opt.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(240,138,107,0.30), 0 2px 8px rgba(240,138,107,0.40);
+  transform:scale(1.06);
+}
