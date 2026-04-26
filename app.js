@@ -630,6 +630,9 @@ const CAT_QUOTES={
 function renderCatMood(ctx){
   const card=document.getElementById('catMoodCard');
   if(!card) return;
+  // 合併上次完整 ctx：換毛色重繪時只會帶 netRate，避免 income=0 把卡片藏起來
+  ctx=Object.assign({},window._lastCmcCtx||{},ctx||{});
+  window._lastCmcCtx=ctx;
   const income=ctx.monthlyIncome||0;
   const spend=(ctx.varTotal||0)+(ctx.lifeTotal||0)+(ctx.fixedTotal||0);
   if(income<=0){ card.style.display='none'; return; }
