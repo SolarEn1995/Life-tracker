@@ -3085,7 +3085,7 @@ function confirmImport(){
     if(shouldUpdate){
       // UPDATE existing duplicate
       const p=dup.product;
-      p.price=it.price||p.price;
+      p.price=it.price!=null ? it.price : p.price;
       p.boughtDate=today;
       // Apply scaled days if volumes match
       if(it.volume>0 && p.volume>0 && it.unit && p.unit && it.unit===p.unit){
