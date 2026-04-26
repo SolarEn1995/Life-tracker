@@ -375,6 +375,17 @@
         <div class="ph-sub" id="fixedPageCount">共 0 項</div>
       </div>
     </div>
+    <!-- 年度固定總覽 -->
+    <div class="kpi-mini-row" style="margin-bottom:12px">
+      <div class="kpi-mini">
+        <div class="kpi-mini-label">📅 估計年度固定支出</div>
+        <div class="kpi-mini-value privacy-mask" id="fixedYearTotal">$0</div>
+      </div>
+      <div class="kpi-mini">
+        <div class="kpi-mini-label">📊 年均每月</div>
+        <div class="kpi-mini-value privacy-mask" id="fixedMonthAvg">$0</div>
+      </div>
+    </div>
     <div id="fixedCalendar"></div>
     <div class="section-head">
       <div class="page-section-title">📋 訂閱清單</div>
@@ -695,11 +706,28 @@
     <div class="month-label" id="recordMonthLabel"></div>
     <button onclick="changeRecordMonth(1)">›</button>
   </div>
+  <!-- 日期範圍選擇 + 排序 -->
+  <div class="filter-toolbar" id="recordDateModeRow">
+    <div class="filter-chips" id="recordDateChips">
+      <button class="chip active" data-mode="month" onclick="setRecordDateMode('month',this)">本月</button>
+      <button class="chip" data-mode="range3" onclick="setRecordDateMode('range3',this)">近3月</button>
+      <button class="chip" data-mode="range6" onclick="setRecordDateMode('range6',this)">近半年</button>
+      <button class="chip" data-mode="custom" onclick="setRecordDateMode('custom',this)">自訂</button>
+    </div>
+    <button id="recordSortBtn" class="chip select-chip" onclick="cycleRecordSort()" title="切換排序">📅 日期</button>
+  </div>
+  <!-- 自訂日期範圍（預設隱藏） -->
+  <div id="recordCustomRange" style="display:none;align-items:center;gap:8px;margin-bottom:10px">
+    <span style="font-size:12px;color:var(--text2);flex-shrink:0">從</span>
+    <input type="month" id="recordRangeFrom" class="range-month-input" onchange="applyCustomRange()"/>
+    <span style="font-size:12px;color:var(--text2);flex-shrink:0">到</span>
+    <input type="month" id="recordRangeTo" class="range-month-input" onchange="applyCustomRange()"/>
+  </div>
   <!-- 焦點：本月總支出 hero -->
   <div class="page-hero hero-spend">
     <div class="ph-icon">💸</div>
     <div class="ph-info">
-      <div class="ph-label">本月總支出</div>
+      <div class="ph-label" id="recordPeriodLabel">本月總支出</div>
       <div class="ph-value privacy-mask" id="recordTotal">$0</div>
       <div class="ph-sub" id="recordTotalSub"></div>
     </div>
@@ -833,6 +861,12 @@
 
   <!-- SALARY SUB-PAGE -->
   <div id="incSub-salary">
+    <!-- 年份導覽 -->
+    <div class="record-month-nav">
+      <button onclick="changeIncomeYear(-1)">‹</button>
+      <div class="month-label" id="incomeYearLabel"></div>
+      <button onclick="changeIncomeYear(1)">›</button>
+    </div>
     <div class="page-hero hero-income">
       <div class="ph-icon">💵</div>
       <div class="ph-info">

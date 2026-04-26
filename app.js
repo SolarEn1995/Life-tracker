@@ -23,6 +23,10 @@
 function getNow(){ return new Date(); }
 const NOW=getNow(); // 保留給初始化預設資料用
 let recordMonth={y:NOW.getFullYear(),m:NOW.getMonth()};
+let recordDateMode='month'; // 'month'|'range3'|'range6'|'custom'
+let recordDateFrom=null, recordDateTo=null; // YYYY-MM for custom mode
+let recordSortBy='date'; // 'date'|'amount_desc'|'amount_asc'
+let incomeYear=NOW.getFullYear();
 let fabOpen=false;
 let currentPriceProductId=null;
 
@@ -885,6 +889,18 @@ function renderFixed(){
   const total=getMonthlyFixed();
   document.getElementById('fixedPageTotal').textContent=`$${total.toLocaleString()}`;
   document.getElementById('fixedPageCount').textContent=`共 ${fixedExpenses.length} 項`;
+  // 年度固定總覽
+  const yearlyTotal=fixedExpenses.reduce((s,f)=>{
+    if(f.cycle==='monthly') return s+f.amount*12;
+    if(f.cycle==='yearly') return s+f.amount;
+    if(f.cycle==='weekly') return s+Math.round(f.amount*52);
+    return s;
+  },0);
+  const monthAvg=Math.round(yearlyTotal/12);
+  const ytEl=document.getElementById('fixedYearTotal');
+  const maEl=document.getElementById('fixedMonthAvg');
+  if(ytEl) ytEl.textContent=`$${yearlyTotal.toLocaleString()}`;
+  if(maEl) maEl.textContent=`$${monthAvg.toLocaleString()}`;
 
   const list=document.getElementById('fixedList');
   if(!fixedExpenses.length){
@@ -3152,7 +3168,10 @@ function switchIncTab(tab, el){
 
 function renderIncome(){
   const now=getNow();
-  const yr=now.getFullYear(), mo=now.getMonth()+1;
+  const yr=incomeYear, mo=now.getMonth()+1;
+  // 更新年份導覽標籤
+  const ylEl=document.getElementById('incomeYearLabel');
+  if(ylEl) ylEl.textContent=`${yr}年`;
   // 結算月偏移 UI 同步
   const shiftDesc=document.getElementById('salaryShiftDesc');
   if(shiftDesc){
@@ -3187,10 +3206,11 @@ function renderIncome(){
 function renderIncomeSalary(){
   const now=getNow();
   const months=[];
-  for(let i=11;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+  for(let i=0;i<=11;i++){
+    const d=new Date(incomeYear,i,1); // 顯示選定年份 1-12 月
     const rec=salaryRecords.find(s=>salaryMatchesYM(s,d.getFullYear(),d.getMonth()+1));
-    months.push({label:`${d.getMonth()+1}月`,total:rec?rec.netPay:0,isCur:i===0});
+    const isCur=incomeYear===now.getFullYear()&&i===now.getMonth();
+    months.push({label:`${d.getMonth()+1}月`,total:rec?rec.netPay:0,isCur});
   }
   const maxInc=Math.max(...months.map(m=>m.total),1);
   const incBarChartEl=document.getElementById('incBarChart'); if(!incBarChartEl) return;
@@ -4786,19 +4806,42 @@ function renderYearlySavings(){
   `;
 }
 
-// ── UPDATED renderRecords (life expenses support) ──
+// ── UPDATED renderRecords (life expenses + date range + sort) ──
 function renderRecords(){
   const ym=`${recordMonth.y}-${String(recordMonth.m+1).padStart(2,'0')}`;
   const filter=document.getElementById('recordFilterCat')?.value||'all';
 
-  const varRecs=records.filter(r=>getEffectiveMonth(r)===ym&&r.type==='var');
-  const lifeRecs=records.filter(r=>getEffectiveMonth(r)===ym&&(r.type==='life'||r.type==='voucher'||r.type==='easycard'));
+  // Date range helper
+  function recInRange(r){
+    const rm=getEffectiveMonth(r);
+    if(recordDateMode==='month') return rm===ym;
+    let start=ym;
+    if(recordDateMode==='range3'){const d=new Date(recordMonth.y,recordMonth.m-2,1);start=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+    else if(recordDateMode==='range6'){const d=new Date(recordMonth.y,recordMonth.m-5,1);start=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+    else if(recordDateMode==='custom'){const s=recordDateFrom||ym,e=recordDateTo||ym;return rm>=s&&rm<=e;}
+    return rm>=start&&rm<=ym;
+  }
+  // Number of months in range (for scaling fixed total)
+  const monthCount=recordDateMode==='range3'?3:recordDateMode==='range6'?6:
+    recordDateMode==='custom'&&recordDateFrom&&recordDateTo?(()=>{
+      const[fy,fm]=recordDateFrom.split('-').map(Number);
+      const[ty,tm]=recordDateTo.split('-').map(Number);
+      return Math.max(1,(ty-fy)*12+(tm-fm)+1);
+    })():1;
+
+  const varRecs=records.filter(r=>recInRange(r)&&r.type==='var');
+  const lifeRecs=records.filter(r=>recInRange(r)&&(r.type==='life'||r.type==='voucher'||r.type==='easycard'));
   const varTotal=varRecs.filter(r=>!r._travelBudget).reduce((s,r)=>s+r.price,0);
   const lifeTotal=lifeRecs.filter(r=>r.type==='life'&&!r._travelBudget).reduce((s,r)=>s+r.price,0);
-  const fixedTotal=getMonthlyFixed();
+  const fixedTotal=getMonthlyFixed()*monthCount;
   const grandTotal=varTotal+lifeTotal+fixedTotal;
 
-  document.getElementById('recordMonthLabel').textContent=`${recordMonth.y}年${recordMonth.m+1}月`;
+  const periodLabel=recordDateMode==='month'?`${recordMonth.y}年${recordMonth.m+1}月`:
+    recordDateMode==='range3'?'近3個月':recordDateMode==='range6'?'近半年':
+    `${recordDateFrom||''}～${recordDateTo||''}`;
+  document.getElementById('recordMonthLabel').textContent=periodLabel;
+  const plEl=document.getElementById('recordPeriodLabel');
+  if(plEl) plEl.textContent=periodLabel+'總支出';
   document.getElementById('recordTotal').textContent=`$${grandTotal.toLocaleString()}`;
   document.getElementById('recordVarTotal').textContent=`$${varTotal.toLocaleString()}`;
   document.getElementById('recordFixTotal').textContent=`$${fixedTotal.toLocaleString()}`;
@@ -4861,7 +4904,10 @@ function renderRecords(){
     };
   });
 
-  let allRecs=[...varRecs,...lifeRecs,...fixedItems].sort((a,b)=>b.date.localeCompare(a.date));
+  let allRecs=[...varRecs,...lifeRecs,...fixedItems];
+  if(recordSortBy==='amount_desc') allRecs.sort((a,b)=>b.price-a.price);
+  else if(recordSortBy==='amount_asc') allRecs.sort((a,b)=>a.price-b.price);
+  else allRecs.sort((a,b)=>b.date.localeCompare(a.date));
   if(filter==='all'){
     // 全部都顯示
   } else if(filter==='var'){
@@ -4940,6 +4986,75 @@ function setRecordFilter(val, btn){
   recordsCatFilter=null;
   recordsVisible=RECORDS_PAGE_SIZE;
   renderRecords();
+}
+
+/* ── 日期範圍模式切換 ── */
+function setRecordDateMode(mode, btn){
+  recordDateMode=mode;
+  document.querySelectorAll('#recordDateChips .chip').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // 顯示/隱藏自訂輸入
+  const rangeRow=document.getElementById('recordCustomRange');
+  if(rangeRow){
+    rangeRow.style.display=mode==='custom'?'flex':'none';
+    if(mode==='custom'){
+      // 預填：從當月回推1個月到當月
+      const now=getNow();
+      const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const prev=new Date(now.getFullYear(),now.getMonth()-1,1);
+      const pm=`${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,'0')}`;
+      const fromEl=document.getElementById('recordRangeFrom');
+      const toEl=document.getElementById('recordRangeTo');
+      if(fromEl&&!fromEl.value) fromEl.value=pm;
+      if(toEl&&!toEl.value) toEl.value=ym;
+      if(fromEl&&toEl){
+        recordDateFrom=fromEl.value;
+        recordDateTo=toEl.value;
+      }
+    }
+  }
+  // 非本月模式時隱藏 ‹ › 月份導覽（改由範圍邏輯決定）
+  const nav=document.querySelector('.record-month-nav');
+  if(nav) nav.style.opacity=mode==='month'?'1':'0.35';
+  recordsCatFilter=null;
+  recordsVisible=RECORDS_PAGE_SIZE;
+  renderRecords();
+}
+
+function applyCustomRange(){
+  const fromEl=document.getElementById('recordRangeFrom');
+  const toEl=document.getElementById('recordRangeTo');
+  if(!fromEl||!toEl) return;
+  recordDateFrom=fromEl.value;
+  recordDateTo=toEl.value;
+  if(recordDateFrom&&recordDateTo&&recordDateFrom>recordDateTo){
+    // 自動修正順序
+    [recordDateFrom,recordDateTo]=[recordDateTo,recordDateFrom];
+    fromEl.value=recordDateFrom; toEl.value=recordDateTo;
+  }
+  recordsVisible=RECORDS_PAGE_SIZE;
+  renderRecords();
+}
+
+/* ── 金額 / 日期排序切換 ── */
+function cycleRecordSort(){
+  const MODES=[
+    {key:'date',    label:'📅 日期'},
+    {key:'amount_desc', label:'💰 金額↓'},
+    {key:'amount_asc',  label:'💰 金額↑'},
+  ];
+  const cur=MODES.findIndex(m=>m.key===recordSortBy);
+  const next=MODES[(cur+1)%MODES.length];
+  recordSortBy=next.key;
+  const btn=document.getElementById('recordSortBtn');
+  if(btn) btn.textContent=next.label;
+  renderRecords();
+}
+
+/* ── 收入頁年份切換 ── */
+function changeIncomeYear(d){
+  incomeYear+=d;
+  renderIncome();
 }
 let recordSelectedIds=new Set();
 function toggleRecordSelectMode(){

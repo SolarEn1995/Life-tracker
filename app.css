@@ -2178,6 +2178,29 @@ html[data-theme="dark"] .hc-cat-orange svg{filter:brightness(1.18);}
 html[data-theme="dark"] .hc-cat-black svg{filter:brightness(1.5);}
 html[data-theme="dark"] .hc-cat-white svg{filter:brightness(0.88) sepia(0.08);}
 
+/* ══════════════════════════════════════════════════
+   📅  DATE RANGE + SORT UI
+   ══════════════════════════════════════════════════ */
+/* 自訂月份輸入框 */
+.range-month-input{
+  flex:1;padding:6px 10px;
+  border:1.5px solid var(--border2);
+  border-radius:var(--r-sm);
+  font-size:13px;color:var(--text);
+  background:var(--surface);
+  font-family:inherit;
+  outline:none;
+  transition:border-color 0.18s;
+  min-width:0;
+}
+.range-month-input:focus{border-color:var(--accent);}
+html[data-theme="dark"] .range-month-input{
+  background:var(--surface2);
+  color-scheme:dark;
+}
+/* 月份導覽在非本月模式下變淡（已由 JS 設 opacity） */
+.record-month-nav{transition:opacity 0.2s;}
+
 /* 減少動態：尊重使用者設定 */
 @media (prefers-reduced-motion: reduce){
   .sakura-petal,
