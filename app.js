@@ -108,7 +108,8 @@ function dAgo(n){return new Date(NOW.getTime()-n*86400000).toISOString().split('
 // priceHistory: { [productId]: [{date, price}] }
 let priceHistory=JSON.parse(localStorage.getItem('btPriceHistory')||'{}');
 
-let products=JSON.parse(localStorage.getItem('btProducts')||'null')||[
+// 📦 示範資料定義（首次啟動詢問是否載入；不再寫死為預設）
+const DEMO_PRODUCTS=[
   {id:1,name:'EPA 1200 頂級魚油軟膠囊',brand:'大研生醫',price:1327,origPrice:2520,emoji:'🐟',cat:'health',totalDays:30,boughtDate:dAgo(15),shopeeUrl:'https://shopee.tw/search?keyword=大研生醫+EPA+1200'},
   {id:2,name:'超級1000薑黃錠60粒',brand:'大研生醫',price:1185,origPrice:2250,emoji:'🫚',cat:'health',totalDays:60,boughtDate:dAgo(45),shopeeUrl:'https://shopee.tw/search?keyword=大研生醫+薑黃錠'},
   {id:3,name:'好睡眠芝麻素膠囊90粒',brand:'大研生醫',price:1185,origPrice:2250,emoji:'😴',cat:'health',totalDays:90,boughtDate:dAgo(80),shopeeUrl:'https://shopee.tw/search?keyword=大研生醫+芝麻素'},
@@ -123,15 +124,18 @@ let products=JSON.parse(localStorage.getItem('btProducts')||'null')||[
   {id:12,name:'Vaseline 菸鹼醯胺煥亮乳',brand:'Vaseline',price:119,origPrice:119,emoji:'💎',cat:'daily',totalDays:30,boughtDate:dAgo(22),shopeeUrl:'https://shopee.tw/search?keyword=Vaseline+菸鹼醯胺'},
   {id:13,name:'Vaseline 煥亮潤色護唇',brand:'Vaseline',price:199,origPrice:199,emoji:'👄',cat:'daily',totalDays:30,boughtDate:dAgo(10),shopeeUrl:'https://shopee.tw/search?keyword=Vaseline+護唇'},
 ];
-
-// confirmedDeductions: { 'YYYY-MM-fxId': true }
-let confirmedDeductions=JSON.parse(localStorage.getItem('btConfirmed')||'{}');
-
-let fixedExpenses=JSON.parse(localStorage.getItem('btFixed')||'null')||[
+const DEMO_FIXED=[
   {id:1,name:'手機費',emoji:'📱',amount:699,day:1,cycle:'monthly',note:''},
   {id:2,name:'Netflix',emoji:'📺',amount:390,day:15,cycle:'monthly',note:'家庭方案'},
   {id:3,name:'Spotify',emoji:'🎵',amount:149,day:20,cycle:'monthly',note:''},
 ];
+
+let products=JSON.parse(localStorage.getItem('btProducts')||'null')||[];
+
+// confirmedDeductions: { 'YYYY-MM-fxId': true }
+let confirmedDeductions=JSON.parse(localStorage.getItem('btConfirmed')||'{}');
+
+let fixedExpenses=JSON.parse(localStorage.getItem('btFixed')||'null')||[];
 // debts schema: {id,name,emoji,totalAmount,monthlyPayment,totalMonths,paidMonths,startMonth(YYYY-MM),rate,day,note,linkedFixedId,status:'active'|'paid'}
 let debts=JSON.parse(localStorage.getItem('btDebts')||'[]');
 
@@ -141,15 +145,7 @@ let monthlyBudget=parseInt(localStorage.getItem('btBudget')||'0');
 let travelBudgetYearly=parseInt(localStorage.getItem('btTravelBudgetYearly')||'0');
 let travelFund=parseFloat(localStorage.getItem('btTravelFund')||'0')||0;
 let travelFundLog=JSON.parse(localStorage.getItem('btTravelFundLog')||'[]');
-let records=JSON.parse(localStorage.getItem('btRecords')||'null')||(()=>{
-  const _now=getNow();
-  const r=[];
-  for(let i=5;i>=0;i--){
-    const d=new Date(_now.getFullYear(),_now.getMonth()-i,15).toISOString().split('T')[0];
-    products.slice(0,3+(i%4)).forEach(p=>r.push({id:Date.now()+Math.floor(Math.random()*1000),productId:p.id,name:p.name,emoji:p.emoji,brand:p.brand,price:p.price,cat:p.cat,date:d,type:'var'}));
-  }
-  return r;
-})();
+let records=JSON.parse(localStorage.getItem('btRecords')||'[]');
 
 function save(){
   localStorage.setItem('btProducts',JSON.stringify(products));
@@ -7993,7 +7989,8 @@ if (document.readyState === 'loading') {
     if(typeof renderInvSeenHint==='function') renderInvSeenHint();
     setTimeout(applySwipeToProducts, 50);
     setTimeout(()=>{ if(typeof checkMonthSurplusPrompt==='function') checkMonthSurplusPrompt(); }, 800);
-    setTimeout(()=>{ if(typeof shouldShowOnboarding==='function' && shouldShowOnboarding()) startOnboarding(); }, 400);
+    setTimeout(()=>{ if(typeof maybePromptDemoData==='function') maybePromptDemoData(); }, 300);
+    setTimeout(()=>{ if(typeof shouldShowOnboarding==='function' && shouldShowOnboarding() && !document.getElementById('demoDataModal')) startOnboarding(); }, 600);
   });
 } else {
   if(typeof recomputeMonthlyIncome==='function') recomputeMonthlyIncome();
@@ -8003,7 +8000,8 @@ if (document.readyState === 'loading') {
   if(typeof renderInvSeenHint==='function') renderInvSeenHint();
   setTimeout(applySwipeToProducts, 50);
   setTimeout(()=>{ if(typeof checkMonthSurplusPrompt==='function') checkMonthSurplusPrompt(); }, 800);
-  setTimeout(()=>{ if(typeof shouldShowOnboarding==='function' && shouldShowOnboarding()) startOnboarding(); }, 400);
+  setTimeout(()=>{ if(typeof maybePromptDemoData==='function') maybePromptDemoData(); }, 300);
+  setTimeout(()=>{ if(typeof shouldShowOnboarding==='function' && shouldShowOnboarding() && !document.getElementById('demoDataModal')) startOnboarding(); }, 600);
 }
 
 // ─────────────────────────────────────────────────────
@@ -8264,3 +8262,63 @@ function scrollToCardPending(){
   el.classList.remove('flash-once'); void el.offsetWidth; el.classList.add('flash-once');
 }
 window.scrollToCardPending=scrollToCardPending;
+
+// ─────────────────────────────────────────────────────
+// 📦 DEMO DATA — 首次啟動詢問是否載入示範資料
+// ─────────────────────────────────────────────────────
+function loadDemoData(){
+  try{
+    if(typeof DEMO_PRODUCTS!=='undefined' && DEMO_PRODUCTS.length){
+      products=JSON.parse(JSON.stringify(DEMO_PRODUCTS));
+    }
+    if(typeof DEMO_FIXED!=='undefined' && DEMO_FIXED.length){
+      fixedExpenses=JSON.parse(JSON.stringify(DEMO_FIXED));
+    }
+    // 模擬最近 6 個月的補貨採購記錄
+    const _now=getNow();
+    records=[];
+    for(let i=5;i>=0;i--){
+      const d=new Date(_now.getFullYear(),_now.getMonth()-i,15).toISOString().split('T')[0];
+      products.slice(0,3+(i%4)).forEach(p=>records.push({
+        id:Date.now()+Math.floor(Math.random()*100000),
+        productId:p.id,name:p.name,emoji:p.emoji,brand:p.brand,
+        price:p.price,cat:p.cat,date:d,type:'var'
+      }));
+    }
+    if(typeof save==='function') save();
+    localStorage.setItem('btDemoChoice','loaded');
+    if(typeof showToast==='function') showToast('🎁 已載入示範資料，可隨時於設定→資料→清空','ok');
+    if(typeof renderAll==='function') renderAll();
+  }catch(e){ console.warn('loadDemoData failed:',e); }
+}
+function dismissDemoData(){
+  localStorage.setItem('btDemoChoice','skip');
+  const m=document.getElementById('demoDataModal');
+  if(m) m.remove();
+}
+function maybePromptDemoData(){
+  // 已選擇過 / 已有任何資料 / 已 onboarding 過 → 不問
+  if(localStorage.getItem('btDemoChoice')) return;
+  if(localStorage.getItem('btOnboarded')==='1') { localStorage.setItem('btDemoChoice','skip'); return; }
+  if(products.length||records.length||fixedExpenses.length) { localStorage.setItem('btDemoChoice','skip'); return; }
+  // 動態建立彈窗
+  const m=document.createElement('div');
+  m.id='demoDataModal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(60,40,20,.55);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;backdrop-filter:blur(6px)';
+  m.innerHTML=`
+    <div style="background:var(--surface,#fff);border-radius:24px;max-width:340px;width:100%;padding:26px 22px 20px;box-shadow:0 20px 50px rgba(60,30,10,.3);text-align:center">
+      <div style="font-size:48px;margin-bottom:8px">🎁</div>
+      <div style="font-size:18px;font-weight:900;color:var(--text,#3D2817);margin-bottom:6px">歡迎使用喵算</div>
+      <div style="font-size:13px;color:var(--text2,#7A5A40);line-height:1.6;margin-bottom:18px">
+        要不要載入一份<strong>示範資料</strong>（13 件補貨品、3 筆固定支出、半年消費紀錄）讓你體驗看看？<br>
+        <span style="font-size:11px;color:var(--text3,#A8927A)">隨時可在 設定 → 資料 → 清空全部資料</span>
+      </div>
+      <button onclick="loadDemoData();document.getElementById('demoDataModal').remove();" style="width:100%;padding:12px;background:linear-gradient(135deg,#F08A6B,#E55A4D);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;box-shadow:0 6px 16px rgba(229,90,77,.35)">🎁 載入示範資料</button>
+      <button onclick="dismissDemoData();" style="width:100%;padding:11px;background:transparent;color:var(--text2,#7A5A40);border:1.5px solid var(--border,#E8DDD0);border-radius:14px;font-size:13px;font-weight:700;cursor:pointer">從空白開始 →</button>
+    </div>
+  `;
+  document.body.appendChild(m);
+}
+window.loadDemoData=loadDemoData;
+window.dismissDemoData=dismissDemoData;
+window.maybePromptDemoData=maybePromptDemoData;

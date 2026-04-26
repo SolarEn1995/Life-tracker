@@ -132,7 +132,7 @@
     <div class="qs-cell">
       <div class="qs-icon">📊</div>
       <div class="qs-info">
-        <div class="qs-label">存糎達成</div>
+        <div class="qs-label">存糧達成</div>
         <div class="qs-value" id="qsSaveRate">—</div>
       </div>
     </div>
@@ -2189,29 +2189,56 @@
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('sw.js').then(reg=>{
-      // 主動檢查更新
       reg.update().catch(()=>{});
-      // 每次回到頁面也檢查（PWA 場景）
       document.addEventListener('visibilitychange',()=>{
         if(document.visibilityState==='visible') reg.update().catch(()=>{});
       });
-      // 偵測新版啟用後自動 reload
-      if(reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); }
+      // 偵測新版安裝完成 → 顯示 toast 讓使用者自行決定何時更新
+      const promptUpdate=(worker)=>{
+        if(window._swUpdatePrompted) return;
+        window._swUpdatePrompted=true;
+        const apply=()=>{
+          window._swApplying=true;
+          try{ worker.postMessage({type:'SKIP_WAITING'}); }catch(e){}
+        };
+        // 若 showToast 可用，用 toast；否則 fallback 用 confirm
+        const trigger=()=>{
+          if(typeof showToast==='function'){
+            const t=document.createElement('div');
+            t.className='sw-update-toast';
+            t.innerHTML='<span>✨ 有新版本可用</span><button id="swApplyBtn">點此更新</button><button id="swDismissBtn" aria-label="稍後">×</button>';
+            t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#3D2817;color:#FFD86B;padding:12px 16px;border-radius:14px;display:flex;gap:10px;align-items:center;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(60,30,10,.4);z-index:9999;border:1px solid rgba(255,216,107,.3)';
+            t.querySelector('#swApplyBtn').style.cssText='background:#FFD86B;color:#3D2817;border:none;padding:6px 12px;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px';
+            t.querySelector('#swDismissBtn').style.cssText='background:transparent;color:rgba(255,216,107,.7);border:none;font-size:18px;cursor:pointer;padding:0 4px';
+            document.body.appendChild(t);
+            t.querySelector('#swApplyBtn').onclick=()=>{ t.remove(); apply(); };
+            t.querySelector('#swDismissBtn').onclick=()=>{ t.remove(); window._swUpdatePrompted=false; };
+          } else {
+            if(confirm('✨ 有新版本可用，立即更新？')) apply();
+            else window._swUpdatePrompted=false;
+          }
+        };
+        // 等 100ms 確保 showToast 已載入
+        setTimeout(trigger,100);
+      };
+      if(reg.waiting && navigator.serviceWorker.controller){
+        promptUpdate(reg.waiting);
+      }
       reg.addEventListener('updatefound',()=>{
         const nw=reg.installing;
         if(nw) nw.addEventListener('statechange',()=>{
           if(nw.state==='installed' && navigator.serviceWorker.controller){
-            // 有新版本可用
-            console.log('[SW] new version installed, reloading…');
-            setTimeout(()=>location.reload(),200);
+            console.log('[SW] new version available');
+            promptUpdate(nw);
           }
         });
       });
     }).catch(err=>console.warn('SW register failed:',err));
-    // controllerchange = SW 換代了，refresh 取得新資源
+    // 只有使用者主動同意更新後（_swApplying=true）才 reload
     let _swRefreshed=false;
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(_swRefreshed) return;
+      if(!window._swApplying) return; // 使用者沒按更新就不刷
       _swRefreshed=true;
       location.reload();
     });
