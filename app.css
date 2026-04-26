@@ -16,7 +16,7 @@
   --shopee:#ee4d2d;--shopee-light:#fff2ef;
   --r:18px;--r-sm:11px;--r-md:14px;--r-lg:24px;
   --shadow:0 2px 12px rgba(178,138,98,0.08);--shadow-md:0 8px 28px rgba(178,138,98,0.16);
-  --header-bg:rgba(250,246,240,0.85);
+  --header-bg:rgba(250,246,240,0.97);
   --solid-light:#ffffff;
   /* 品牌漸層 — 暖珊瑚 */
   --grad-brand:linear-gradient(135deg,#F5B97D 0%,#F08A6B 55%,#E07B5C 100%);
@@ -33,7 +33,7 @@ html[data-theme="dark"]{
   --warn-light:#3A2E1A;--danger-light:#3A1F1B;--fixed-light:#1F2A38;--shopee-light:#3A1F1A;
   --text:#F2EBDF;--text2:#BFB29F;--text3:#857967;
   --shadow:0 2px 12px rgba(0,0,0,0.5);--shadow-md:0 8px 28px rgba(0,0,0,0.6);
-  --header-bg:rgba(31,26,21,0.88);
+  --header-bg:rgba(31,26,21,0.97);
   --solid-light:#2B241D;
   --grad-brand-soft:linear-gradient(135deg,rgba(245,160,133,0.16),rgba(232,181,102,0.14));
   color-scheme:dark;
@@ -1555,44 +1555,53 @@ html[data-theme="dark"] .product-card.urgent{
   60%{transform:translateY(2px);}
 }
 
-/* ── 皇室金庫 Royal Vault（總資產淨值卡片）── */
+/* ── 皇室金箔卡 Royal Vault（v41 奶油金箔配色，與整頁暖色和諧）── */
 .royal-vault{
   position:relative;
   margin-top:14px;
   padding:18px 20px 20px;
-  border-radius:24px;
-  background:linear-gradient(135deg,#3D2817 0%,#2A1B10 60%,#1F140A 100%);
-  box-shadow:0 16px 40px -12px rgba(60,30,10,.45),
-             0 2px 6px rgba(255,200,80,.06) inset,
-             0 0 0 1px rgba(255,200,80,.08) inset;
+  border-radius:24px 26px 22px 28px;
+  background:
+    radial-gradient(180px 120px at 88% 12%, rgba(255,216,107,.45), rgba(255,216,107,0) 70%),
+    radial-gradient(140px 100px at 8% 95%, rgba(255,180,120,.30), rgba(255,180,120,0) 70%),
+    linear-gradient(135deg,#FFF5E0 0%,#FFE6A8 55%,#FFD89B 100%);
+  border:1.5px solid rgba(212,160,72,.55);
+  box-shadow:
+    0 12px 28px -10px rgba(180,130,40,.30),
+    0 2px 4px rgba(255,216,107,.35) inset,
+    0 0 0 1px rgba(255,255,255,.45) inset;
   cursor:pointer;
   overflow:hidden;
   isolation:isolate;
   transition:transform .25s ease, box-shadow .25s ease;
+  transform:rotate(-0.4deg);
 }
-.royal-vault:active{ transform:scale(.985); }
-.royal-vault:hover{ box-shadow:0 18px 44px -12px rgba(60,30,10,.55), 0 0 0 1px rgba(255,200,80,.18) inset; }
+.royal-vault:active{ transform:rotate(-0.4deg) scale(.985); }
+.royal-vault:hover{
+  box-shadow:0 16px 32px -10px rgba(180,130,40,.40),
+             0 0 0 1px rgba(212,160,72,.65) inset;
+}
 
 .royal-vault .rv-glow{
   position:absolute;
-  width:220px; height:220px;
-  top:-90px; right:-70px;
-  background:radial-gradient(circle, rgba(255,200,80,.22) 0%, rgba(255,200,80,0) 65%);
-  filter:blur(8px);
+  width:200px; height:200px;
+  top:-80px; right:-60px;
+  background:radial-gradient(circle, rgba(255,216,107,.55) 0%, rgba(255,216,107,0) 65%);
+  filter:blur(6px);
   pointer-events:none;
   z-index:0;
   animation:rvGlowPulse 6s ease-in-out infinite;
 }
 .royal-vault .rv-glow-2{
-  width:160px; height:160px;
+  width:150px; height:150px;
   top:auto; right:auto;
-  bottom:-60px; left:-50px;
-  background:radial-gradient(circle, rgba(229,90,77,.16) 0%, rgba(229,90,77,0) 70%);
+  bottom:-50px; left:-40px;
+  background:radial-gradient(circle, rgba(255,180,120,.45) 0%, rgba(255,180,120,0) 70%);
   animation-delay:-3s;
 }
 @keyframes rvGlowPulse{
-  0%,100%{ opacity:.85; transform:scale(1); }
-  50%    { opacity:1;   transform:scale(1.08); }
+  0%,100%{ opacity:.7; transform:scale(1); }
+  50%    { opacity:1;  transform:scale(1.06); }
 }
 
 .royal-vault .rv-content{ position:relative; z-index:1; }
@@ -1602,44 +1611,61 @@ html[data-theme="dark"] .product-card.urgent{
 }
 .royal-vault .rv-label{
   display:flex; align-items:center; gap:8px;
-  font-size:11px; font-weight:700;
-  color:#FFD86B;
+  font-size:11px; font-weight:800;
+  color:#8A5A2B;
   letter-spacing:1.4px; text-transform:uppercase;
+  text-shadow:0 1px 0 rgba(255,255,255,.4);
 }
 .royal-vault .rv-crown{
   font-size:14px;
-  filter:drop-shadow(0 2px 4px rgba(255,200,80,.5));
+  filter:drop-shadow(0 2px 3px rgba(180,130,40,.45));
 }
 .royal-vault .rv-hint{
-  font-size:10px; color:rgba(255,216,107,.55);
-  background:rgba(255,216,107,.08);
-  padding:3px 8px; border-radius:8px;
-  border:1px solid rgba(255,216,107,.15);
+  font-size:10px; color:#8A5A2B;
+  background:rgba(255,255,255,.55);
+  padding:3px 9px; border-radius:10px;
+  border:1px solid rgba(212,160,72,.45);
+  font-weight:700;
 }
 .royal-vault .rv-value{
   font-size:32px; font-weight:900;
   font-family:'DM Mono','Inter',monospace;
   letter-spacing:-.5px;
-  background:linear-gradient(135deg,#FFE6A0 0%,#FFD86B 50%,#E5A04D 100%);
+  background:linear-gradient(135deg,#B8860B 0%,#D4A048 35%,#FFD86B 70%,#B8860B 100%);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
-  text-shadow:0 2px 12px rgba(255,216,107,.25);
+  text-shadow:0 1px 0 rgba(255,255,255,.5);
   line-height:1.1;
   margin-top:2px;
 }
 .royal-vault .rv-sub{
-  font-size:11px; color:rgba(255,255,255,.55);
-  margin-top:6px; font-weight:500;
+  font-size:11px; color:#8A5A2B;
+  margin-top:6px; font-weight:600;
+  opacity:.78;
 }
 .royal-vault .rv-detail{
   margin-top:14px;
   padding-top:12px;
-  border-top:1px dashed rgba(255,216,107,.18);
+  border-top:1px dashed rgba(180,130,40,.35);
   font-size:12px; line-height:1.9;
-  color:rgba(255,255,255,.75);
+  color:#5C3F1F;
 }
-.royal-vault .rv-detail strong{ color:#FFD86B; }
+.royal-vault .rv-detail strong{ color:#B8860B; }
+
+/* Dark theme: 維持金箔感但壓低亮度 */
+html[data-theme="dark"] .royal-vault{
+  background:
+    radial-gradient(180px 120px at 88% 12%, rgba(255,216,107,.30), rgba(255,216,107,0) 70%),
+    radial-gradient(140px 100px at 8% 95%, rgba(255,180,120,.18), rgba(255,180,120,0) 70%),
+    linear-gradient(135deg,#3D2817 0%,#5A3A1F 55%,#3D2817 100%);
+  border-color:rgba(255,216,107,.40);
+}
+html[data-theme="dark"] .royal-vault .rv-label,
+html[data-theme="dark"] .royal-vault .rv-sub{ color:#FFD86B; }
+html[data-theme="dark"] .royal-vault .rv-hint{ color:#FFD86B; background:rgba(255,216,107,.10); border-color:rgba(255,216,107,.30); }
+html[data-theme="dark"] .royal-vault .rv-detail{ color:rgba(255,235,200,.85); border-top-color:rgba(255,216,107,.25); }
+html[data-theme="dark"] .royal-vault .rv-detail strong{ color:#FFE6A0; }
 
 /* ── P1 排版節奏升級 (Hero / 章節留白 / 月份徽章) ── */
 
@@ -2000,3 +2026,14 @@ html[data-theme="dark"] .bn-item.active{
   from{ opacity:0; transform:translateY(-6px); }
   to{ opacity:1; transform:translateY(0); }
 }
+
+/* ── v41 FAB 4-corner drag anchors ── */
+.fab-wrap{ touch-action:none; transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
+.fab-wrap.fab-dragging{ transition:none; z-index:9999; }
+.fab-wrap.fa-br{ bottom:calc(86px + env(safe-area-inset-bottom,0)) !important; right:max(14px,calc(50% - 215px + 14px)) !important; left:auto !important; top:auto !important; align-items:flex-end !important; }
+.fab-wrap.fa-bl{ bottom:calc(86px + env(safe-area-inset-bottom,0)) !important; left:max(14px,calc(50% - 215px + 14px)) !important; right:auto !important; top:auto !important; align-items:flex-start !important; }
+.fab-wrap.fa-mr{ top:calc(50% - 28px) !important; bottom:auto !important; right:max(14px,calc(50% - 215px + 14px)) !important; left:auto !important; align-items:flex-end !important; }
+.fab-wrap.fa-ml{ top:calc(50% - 28px) !important; bottom:auto !important; left:max(14px,calc(50% - 215px + 14px)) !important; right:auto !important; align-items:flex-start !important; }
+.fab-wrap.fab-dragging .fab{ box-shadow:0 0 0 6px rgba(255,123,84,.22), 0 12px 32px rgba(255,123,84,.55); }
+.fab-snap-hint{ position:fixed; padding:8px 14px; border-radius:14px; background:rgba(255,123,84,.92); color:#fff; font-size:11px; font-weight:700; pointer-events:none; z-index:9998; opacity:0; transition:opacity .15s; box-shadow:0 4px 14px rgba(255,123,84,.4); }
+.fab-snap-hint.show{ opacity:1; }

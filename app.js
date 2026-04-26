@@ -2517,21 +2517,21 @@ function renderNetWorth(){
   // 動態調整 sub 標籤
   document.getElementById('netWorthSubLabel').textContent=
     debt>0 ? `總資產 $${totalAssets.toLocaleString()} − 負債 $${debt.toLocaleString()}` : `總資產 $${totalAssets.toLocaleString()}`;
-  // 明細 (配合深哖背景：金色重點 + 亮色數字)
+  // 明細 (配合奶油金箔背景：金棕重點 + 深咖數字)
   const det=document.getElementById('netWorthDetail');
   if(det){
     const rows=[];
-    const valStyle='color:rgba(255,255,255,.92);font-weight:700';
+    const valStyle='color:#5C3F1F;font-weight:700';
     rows.push(`<div style="display:flex;justify-content:space-between"><span>💵 現金存款</span><span class="privacy-mask" style="${valStyle}">$${cash.toLocaleString()}</span></div>`);
     rows.push(`<div style="display:flex;justify-content:space-between"><span>📈 投資估值</span><span class="privacy-mask" style="${valStyle}">$${inv.toLocaleString()}</span></div>`);
     if(debt>0){
-      rows.push(`<div style="display:flex;justify-content:space-between;color:#FFB6A0"><span>💸 負債總額</span><span class="privacy-mask" style="font-weight:700">−$${debt.toLocaleString()}</span></div>`);
+      rows.push(`<div style="display:flex;justify-content:space-between;color:#C2410C"><span>💸 負債總額</span><span class="privacy-mask" style="font-weight:700">−$${debt.toLocaleString()}</span></div>`);
       const activeDebts=debts.filter(d=>d.status!=='paid');
       activeDebts.forEach(d=>{
-        rows.push(`<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.5);padding-left:14px"><span>${d.emoji||'·'} ${d.name}（剩 ${d.totalMonths-d.paidMonths} 期）</span><span class="privacy-mask">$${getDebtRemaining(d).toLocaleString()}</span></div>`);
+        rows.push(`<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(92,63,31,.6);padding-left:14px"><span>${d.emoji||'·'} ${d.name}（剩 ${d.totalMonths-d.paidMonths} 期）</span><span class="privacy-mask">$${getDebtRemaining(d).toLocaleString()}</span></div>`);
       });
     }
-    rows.push(`<div style="display:flex;justify-content:space-between;border-top:1px dashed rgba(255,216,107,.25);margin-top:6px;padding-top:8px;font-weight:800"><span style="color:#FFD86B">👑 淨值</span><span class="privacy-mask" style="color:#FFD86B">${netWorth<0?'-$':'$'}${Math.abs(netWorth).toLocaleString()}</span></div>`);
+    rows.push(`<div style="display:flex;justify-content:space-between;border-top:1px dashed rgba(180,130,40,.35);margin-top:6px;padding-top:8px;font-weight:800"><span style="color:#B8860B">👑 淨值</span><span class="privacy-mask" style="color:#B8860B">${netWorth<0?'-$':'$'}${Math.abs(netWorth).toLocaleString()}</span></div>`);
     det.innerHTML=rows.join('');
   }
 }
@@ -8209,4 +8209,87 @@ window.toggleFabMore=toggleFabMore;
   if(typeof orig==='function'){
     window.openFab=function(){ orig.apply(this,arguments); toggleFabMore(false); };
   }
+})();
+
+// ── v41 FAB 4-corner drag (long-press → drag → snap) ──
+(function(){
+  const ANCHORS=['fa-br','fa-bl','fa-mr','fa-ml'];
+  const LABELS={'fa-br':'右下','fa-bl':'左下','fa-mr':'右中','fa-ml':'左中'};
+  function applyAnchor(a){
+    const w=document.getElementById('fabWrap'); if(!w) return;
+    ANCHORS.forEach(c=>w.classList.remove(c));
+    w.classList.add(a||'fa-br');
+    w.style.transform='';
+  }
+  function nearestAnchor(cx,cy){
+    const W=window.innerWidth, H=window.innerHeight;
+    const pts={'fa-br':[W-40,H-110],'fa-bl':[40,H-110],'fa-mr':[W-40,H/2],'fa-ml':[40,H/2]};
+    let best='fa-br',bd=Infinity;
+    for(const k in pts){
+      const dx=pts[k][0]-cx, dy=pts[k][1]-cy, d=dx*dx+dy*dy;
+      if(d<bd){bd=d;best=k;}
+    }
+    return best;
+  }
+  let hintEl=null;
+  function showHint(text,x,y){
+    if(!hintEl){ hintEl=document.createElement('div'); hintEl.className='fab-snap-hint'; document.body.appendChild(hintEl); }
+    hintEl.textContent='放開後 → '+text;
+    hintEl.style.left=(x+30)+'px';
+    hintEl.style.top=(y-10)+'px';
+    hintEl.classList.add('show');
+  }
+  function hideHint(){ if(hintEl) hintEl.classList.remove('show'); }
+  function initFabDrag(){
+    const fab=document.getElementById('mainFab');
+    const wrap=document.getElementById('fabWrap');
+    if(!fab||!wrap) return;
+    const saved=localStorage.getItem('fabAnchor');
+    if(saved && ANCHORS.includes(saved)) applyAnchor(saved);
+    else applyAnchor('fa-br');
+    let startX=0,startY=0,active=false,moved=false,suppressClick=false;
+    const TH=8;
+    fab.addEventListener('pointerdown',e=>{
+      startX=e.clientX; startY=e.clientY; active=true; moved=false;
+      try{ fab.setPointerCapture(e.pointerId); }catch(_){}
+    });
+    fab.addEventListener('pointermove',e=>{
+      if(!active) return;
+      const dx=e.clientX-startX, dy=e.clientY-startY;
+      if(!moved && (Math.abs(dx)>TH||Math.abs(dy)>TH)){
+        moved=true;
+        wrap.classList.add('fab-dragging');
+        if(navigator.vibrate) try{ navigator.vibrate(15); }catch(_){}
+      }
+      if(moved){
+        wrap.style.transform='translate('+dx+'px,'+dy+'px) scale(1.06)';
+        const r=fab.getBoundingClientRect();
+        const a=nearestAnchor(r.left+r.width/2, r.top+r.height/2);
+        showHint(LABELS[a], e.clientX, e.clientY);
+      }
+    });
+    function endDrag(e){
+      if(!active) return; active=false;
+      hideHint();
+      if(moved){
+        suppressClick=true;
+        const r=fab.getBoundingClientRect();
+        const a=nearestAnchor(r.left+r.width/2, r.top+r.height/2);
+        wrap.classList.remove('fab-dragging');
+        applyAnchor(a);
+        localStorage.setItem('fabAnchor',a);
+        if(window.showToast) try{ showToast('已移到 '+LABELS[a],'ok'); }catch(_){}
+        setTimeout(()=>{ suppressClick=false; }, 300);
+      } else {
+        wrap.classList.remove('fab-dragging');
+      }
+    }
+    fab.addEventListener('pointerup',endDrag);
+    fab.addEventListener('pointercancel',endDrag);
+    fab.addEventListener('click',e=>{
+      if(suppressClick){ e.stopImmediatePropagation(); e.preventDefault(); }
+    },true);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initFabDrag);
+  else initFabDrag();
 })();
