@@ -739,7 +739,10 @@ function renderProducts(){
   const q=(document.getElementById('productSearchInput')?.value||'').trim().toLowerCase();
   let filtered=currentCat==='all'?products:products.filter(p=>p.cat===currentCat);
   if(q) filtered=filtered.filter(p=>(p.name+p.brand).toLowerCase().includes(q));
-  if(!filtered.length){list.innerHTML=`<div style="text-align:center;padding:32px;color:var(--text3)">${q?'找不到符合的商品':'此分類還沒有品項'}</div>`;return;}
+  if(!filtered.length){list.innerHTML=q
+    ?`<div style="text-align:center;padding:32px;color:var(--text3)">找不到符合的商品</div>`
+    :emptyState({cat:'sleeping',title:currentCat==='all'?'本喵的補貨清單空空如也':'此分類還沒有品項',sub:'按右下角 ➕ 新增第一個品項，本喵會幫你顧著'});
+    return;}
   list.innerHTML=filtered.map(p=>{
     const d=getDaysLeft(p),pct=getStockPct(p);
     const isEmpty=d<=0;
@@ -3185,7 +3188,7 @@ function renderIncomeSalary(){
     ?`<div style="text-align:center;margin-top:8px"><button class="btn-sm primary" style="padding:7px 14px;font-size:12px" onclick="loadMoreSalary()">▼ 載入更多（剩 ${salTotal-_salaryShown} 筆）</button></div>`
     :(salTotal>12?`<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3)"><a href="javascript:void(0)" onclick="resetSalaryPage()" style="color:var(--accent)">收合</a></div>`:'');
   salaryListEl.innerHTML=!sl.length
-    ?emptyState({emoji:'💵',title:'還沒有薪資記錄',sub:'手動輸入或 AI 辨識薪資單，自動計算可用餘額',ctaLabel:'＋ 輸入薪資',ctaOnClick:'openManualSalaryModal()'})
+    ?emptyState({cat:'pawcoin',title:'還沒有薪資記錄',sub:'手動輸入或 AI 辨識薪資單，自動計算可用餘額',ctaLabel:'＋ 輸入薪資',ctaOnClick:'openManualSalaryModal()',accent:true})
     :salItems+salMore;
 }
 let _salaryShown=12;
@@ -6918,7 +6921,7 @@ function emptyState(opts={}){
     ? `<button class="es-cta${accent?' accent':''}" onclick="${escapeAttr(ctaOnClick)}">${escapeHTML(ctaLabel)}</button>`
     : '';
   // 🐱 互動貓咪 empty state
-  const catBlock=cat==='sleeping'?sleepingCatsSvg():(cat==='box'?boxCatSvg(true):'');
+  const catBlock=cat==='sleeping'?sleepingCatsSvg():(cat==='box'?boxCatSvg(true):(cat==='pawcoin'?pawCoinSvg():''));
   return `<div class="empty-state${cat?' es-with-cat':''}">
     ${catBlock || `<div class="es-emoji">${emoji}</div>`}
     <div class="es-title">${escapeHTML(title)}</div>
@@ -6995,6 +6998,44 @@ function peekBoxCat(el){
 }
 window.sleepingCatsSvg=sleepingCatsSvg; window.wakeUpCats=wakeUpCats;
 window.boxCatSvg=boxCatSvg; window.peekBoxCat=peekBoxCat;
+
+// 🪙 招財金幣肉球（收入頁無記錄空狀態）
+function pawCoinSvg(){
+  return `<div class="paw-coin" onclick="bumpPawCoin(this)" title="戳一下">
+    <span class="pc-plus">+1</span>
+    <svg viewBox="0 0 110 110" class="pc-svg" xmlns="http://www.w3.org/2000/svg">
+      <g class="pc-coin">
+        <circle cx="55" cy="32" r="24" fill="#FFD86B" stroke="#C28B1E" stroke-width="2"/>
+        <circle cx="55" cy="32" r="18" fill="none" stroke="#C28B1E" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <text x="55" y="40" font-size="20" font-weight="900" fill="#C28B1E" text-anchor="middle">$</text>
+      </g>
+      <path d="M28 110 L34 64 Q34 44 55 44 Q76 44 76 64 L82 110 Z" fill="#FFFEF8" stroke="#E5DCC9" stroke-width="2"/>
+      <ellipse cx="55" cy="74" rx="14" ry="9" fill="#FF9F8A"/>
+      <ellipse cx="42" cy="58" rx="5" ry="6" fill="#FF9F8A"/>
+      <ellipse cx="55" cy="52" rx="5" ry="6" fill="#FF9F8A"/>
+      <ellipse cx="68" cy="58" rx="5" ry="6" fill="#FF9F8A"/>
+    </svg>
+  </div>`;
+}
+function bumpPawCoin(el){
+  if(!el) return;
+  const coin=el.querySelector('.pc-coin'); const plus=el.querySelector('.pc-plus');
+  if(coin){ coin.classList.remove('pc-spin'); void coin.getBBox?.(); coin.classList.add('pc-spin'); }
+  if(plus){ plus.classList.remove('pc-float'); void plus.offsetWidth; plus.classList.add('pc-float'); }
+  if(navigator.vibrate) navigator.vibrate([30,50,30]);
+  if(typeof playMeow==='function') playMeow();
+}
+window.pawCoinSvg=pawCoinSvg; window.bumpPawCoin=bumpPawCoin;
+
+// 💰 揮手招財貓（設定頁角落）
+function bumpLuckyCat(el){
+  if(!el) return;
+  el.classList.add('lc-bump');
+  if(navigator.vibrate) navigator.vibrate(40);
+  if(typeof playMeow==='function') playMeow();
+  setTimeout(()=>el.classList.remove('lc-bump'),900);
+}
+window.bumpLuckyCat=bumpLuckyCat;
 // ── SKELETON：skeletonList(count) 給載入中的清單佔位 ──
 function skeletonList(count=3){
   return Array.from({length:count},()=>`<div class="skeleton skel-card"></div>`).join('');

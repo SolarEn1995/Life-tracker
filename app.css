@@ -1498,3 +1498,54 @@ html[data-theme="dark"] .product-card.urgent{
   100%{opacity:0;transform:translate(18px,-28px) scale(1.4) rotate(-10deg);}
 }
 .sleeping-cats.is-awake .sc-zzz{opacity:0 !important;animation:none;}
+
+
+/* ========== 🪙 招財金幣肉球（empty state） ========== */
+.paw-coin{
+  position:relative;width:120px;height:120px;margin:0 auto 12px;
+  cursor:pointer;
+  filter:drop-shadow(0 6px 14px rgba(194,139,30,0.30));
+  transition:transform 0.18s;
+}
+.paw-coin:hover{transform:scale(1.06);}
+.paw-coin .pc-svg{width:100%;height:100%;}
+.paw-coin .pc-coin{transform-box:fill-box;transform-origin:center;}
+.pc-spin{animation:pcSpin 0.85s ease-in-out;}
+@keyframes pcSpin{
+  0%{transform:scale(1) rotateY(0);filter:brightness(1);}
+  50%{transform:scale(1.18) rotateY(180deg);filter:brightness(1.4) drop-shadow(0 0 8px gold);}
+  100%{transform:scale(1) rotateY(360deg);filter:brightness(1);}
+}
+.paw-coin .pc-plus{
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  font-size:20px;font-weight:900;color:#3FA985;
+  text-shadow:0 1px 4px rgba(255,255,255,0.9);
+  pointer-events:none;opacity:0;z-index:2;
+}
+.pc-float{animation:pcFloat 1s ease-out forwards;}
+@keyframes pcFloat{
+  0%{opacity:1;transform:translate(-50%,0) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-32px) scale(1.3);}
+}
+
+/* ========== 💰 揮手招財貓（設定頁右上角） ========== */
+.lucky-cat{
+  display:inline-block;width:54px;height:60px;cursor:pointer;flex-shrink:0;
+  filter:drop-shadow(0 3px 6px rgba(120,80,50,0.18));
+}
+.lucky-cat .lc-svg{width:100%;height:100%;overflow:visible;}
+.lucky-cat .lc-paw{
+  transform-box:fill-box;transform-origin:22px 70px;
+  animation:lcWave 1.6s ease-in-out infinite;
+}
+@keyframes lcWave{
+  0%,100%{transform:rotate(-8deg);}
+  50%{transform:rotate(20deg);}
+}
+.lucky-cat.lc-bump .lc-paw{animation:lcWave 0.4s ease-in-out 3;}
+.lucky-cat.lc-bump{animation:lcShake 0.5s ease-in-out;}
+@keyframes lcShake{
+  0%,100%{transform:translateY(0);}
+  30%{transform:translateY(-4px) scale(1.05);}
+  60%{transform:translateY(2px);}
+}
