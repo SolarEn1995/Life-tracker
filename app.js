@@ -670,8 +670,21 @@ function renderCatMood(ctx){
     row.className='cat-skin-row';
     row.innerHTML=Object.keys(CAT_SKIN_LABELS).map(k=>{
       const sw={orange:'#FFB874',tuxedo:'#1F1A15',calico:'#FFD27A',black:'#2D2620',grey:'#8A7A6B'}[k];
-      return `<button class="cat-skin-opt${catSkin===k?' active':''}" data-skin="${k}" title="${CAT_SKIN_LABELS[k]}" onclick="setCatSkin('${k}')"><span class="cs-dot" style="background:${sw}"></span></button>`;
+      return `<button class="cat-skin-opt${catSkin===k?' active':''}" data-skin="${k}" title="${CAT_SKIN_LABELS[k]}" onclick="event.stopPropagation();setCatSkin('${k}')"><span class="cs-dot" style="background:${sw}"></span></button>`;
     }).join('');
+    // 行動裝置點擊 🐾 切換展開
+    row.addEventListener('click',(e)=>{
+      if(e.target===row || e.target.classList.contains('cat-skin-row')){
+        row.classList.toggle('is-open');
+        // 點外面收合
+        if(row.classList.contains('is-open')){
+          setTimeout(()=>{
+            const closer=(ev)=>{ if(!row.contains(ev.target)){ row.classList.remove('is-open'); document.removeEventListener('click',closer); } };
+            document.addEventListener('click',closer);
+          },50);
+        }
+      }
+    });
     card.appendChild(row);
   }
   // 記住最近的 net rate 供換造型重繪用

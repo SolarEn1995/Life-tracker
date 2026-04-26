@@ -1780,3 +1780,98 @@ html[data-theme="dark"] .product-card.urgent{
 html[data-theme="dark"] .quick-stats .qs-cell{
   box-shadow:0 4px 14px -8px rgba(0,0,0,.4) !important;
 }
+
+/* ── #3a 本月概況標題置中 + 紙箱貓貼齊 ── */
+#home > .home-section-title.section-with-action{
+  display:inline-flex !important;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  padding-right:10px;
+}
+#home > .home-section-title.section-with-action > span:first-child{
+  white-space:nowrap;
+}
+#home > .home-section-title.section-with-action .box-cat{
+  margin-left:0 !important;
+  flex-shrink:0;
+  transform:translateY(-2px) rotate(2deg);
+}
+
+/* ── #3b 喵主子心情卡瘦身 + 換色盤摺疊 ── */
+#home .cat-mood-card{
+  padding:14px 16px !important;
+  border-radius:22px !important;
+  margin-bottom:14px;
+}
+#home .cat-mood-card .cmc-emoji{
+  width:60px !important; height:60px !important;
+}
+#home .cat-mood-card .cmc-emoji svg{ width:60px !important; height:60px !important; }
+#home .cat-mood-card .cmc-name{ font-size:16px !important; }
+#home .cat-mood-card .cmc-quote{ font-size:12px !important; line-height:1.5; }
+#home .cat-mood-card .cmc-bar{ height:7px !important; margin-top:10px; }
+#home .cat-mood-card .cmc-foot{ margin-top:6px; font-size:11px; }
+
+/* 換色盤 — 預設只顯示一顆🐾按鈕，點擊展開 */
+.cat-skin-row{
+  position:absolute;
+  bottom:10px; right:10px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:0 !important;
+  background:transparent !important;
+  border:none !important;
+  z-index:5;
+}
+.cat-skin-row::before{
+  content:'🐾';
+  display:flex; align-items:center; justify-content:center;
+  width:30px; height:30px;
+  border-radius:50%;
+  background:rgba(255,255,255,.85);
+  border:1.5px solid rgba(240,138,107,0.35);
+  box-shadow:0 2px 6px rgba(178,138,98,.18);
+  font-size:14px;
+  cursor:pointer;
+  transition:transform .2s ease;
+}
+.cat-skin-row:hover::before{ transform:rotate(20deg) scale(1.05); }
+
+/* 預設藏所有按鈕 */
+.cat-skin-row .cat-skin-opt{
+  width:0; height:0;
+  padding:0; margin:0;
+  border:none !important;
+  opacity:0;
+  overflow:hidden;
+  transition:all .25s cubic-bezier(.34,1.4,.56,1);
+  pointer-events:none;
+}
+
+/* hover/focus 時展開 */
+.cat-skin-row:hover .cat-skin-opt,
+.cat-skin-row.is-open .cat-skin-opt{
+  width:22px; height:22px;
+  margin:0 1px;
+  opacity:1;
+  pointer-events:auto;
+  border:2px solid #fff !important;
+  border-radius:50% !important;
+  box-shadow:0 2px 4px rgba(0,0,0,.15);
+}
+.cat-skin-row:hover .cat-skin-opt.active,
+.cat-skin-row.is-open .cat-skin-opt.active{
+  border-color:#F08A6B !important;
+  transform:scale(1.15);
+}
+.cat-skin-row .cat-skin-opt .cs-dot{ width:100%; height:100%; border-radius:50%; display:block; }
+
+html[data-theme="dark"] .cat-skin-row::before{
+  background:rgba(43,36,29,.85);
+  border-color:rgba(245,160,133,.4);
+}
+
+/* 心情卡需要 relative 讓換色盤定位 */
+#home .cat-mood-card{ position:relative; }
