@@ -755,10 +755,10 @@
   </div>
   <!-- 單日篩選 + 排序按鈕 -->
   <div class="filter-toolbar" id="recordDetailBar">
-    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-      <span style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0">📆 單日</span>
-      <input type="date" id="recordDayFilterInput" class="range-month-input" style="max-width:140px" onchange="setRecordDayFilter(this.value)"/>
-      <button id="recordDayClearBtn" class="chip select-chip" style="display:none;flex-shrink:0" onclick="clearRecordDayFilter()">✕ 清除</button>
+    <div class="day-filter-row">
+      <span class="day-filter-label">📆 單日</span>
+      <input type="date" id="recordDayFilterInput" class="range-month-input day-filter-input" onchange="setRecordDayFilter(this.value)"/>
+      <button id="recordDayClearBtn" class="chip select-chip day-filter-clear" style="display:none" onclick="clearRecordDayFilter()">✕ 清除</button>
     </div>
     <button id="recordSortBtn" class="chip select-chip" onclick="cycleRecordSort()" title="切換排序">📅 日期</button>
   </div>

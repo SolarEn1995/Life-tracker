@@ -381,6 +381,12 @@ html[data-theme="dark"] .alert-chip{background:linear-gradient(135deg,rgba(251,1
 .record-batch-bar .rbb-actions{display:flex;gap:6px;flex-wrap:wrap;}
 .record-batch-bar .rbb-actions .btn-sm{padding:6px 12px;font-size:12px;}
 
+/* 單日篩選列 */
+.day-filter-row{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.day-filter-label{font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0;}
+.day-filter-input{max-width:140px;}
+.day-filter-clear{flex-shrink:0;}
+
 /* ENTRANCE animation 套用至所有 page */
 .page.active > .page-section-title,
 .page.active > .page-stats-row,

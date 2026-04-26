@@ -5092,7 +5092,7 @@ function cycleRecordSort(){
 function setRecordDayFilter(date){
   recordDayFilter=date||null;
   const clearBtn=document.getElementById('recordDayClearBtn');
-  if(clearBtn) clearBtn.style.display=recordDayFilter?'':'none';
+  if(clearBtn) clearBtn.style.display=recordDayFilter?'inline-block':'none';
   recordsVisible=RECORDS_PAGE_SIZE;
   renderRecords();
 }
