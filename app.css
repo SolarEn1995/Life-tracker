@@ -1875,3 +1875,12 @@ html[data-theme="dark"] .cat-skin-row::before{
 
 /* 心情卡需要 relative 讓換色盤定位 */
 #home .cat-mood-card{ position:relative; }
+
+/* ── #2 待扣款格 cursor + flash 動畫 ── */
+.quick-stats .qs-cell[onclick]{ cursor:pointer; }
+@keyframes flashOnce{
+  0%   { box-shadow:0 0 0 0 rgba(86,128,194,.45); }
+  60%  { box-shadow:0 0 0 14px rgba(86,128,194,0); }
+  100% { box-shadow:0 0 0 0 rgba(86,128,194,0); }
+}
+.flash-once{ animation:flashOnce 1.2s ease-out; }

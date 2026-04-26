@@ -461,7 +461,14 @@ function renderStats(now){
     if(monthlyIncome>0||totalSpend>0){
       qs.style.display='grid';
       setQ('qsIncome','$'+monthlyIncome.toLocaleString(),'income');
-      setQ('qsSpend','$'+totalSpend.toLocaleString(),'spend');
+      // 待扣款：所有信用卡未來月份合計（含 records + fixed 推估）
+      let pendingTotal=0;
+      try{
+        const now2=getNow();
+        const curYM2=`${now2.getFullYear()}-${String(now2.getMonth()+1).padStart(2,'0')}`;
+        records.filter(r=>r.pay==='card'&&r.billingMonth&&r.billingMonth>curYM2&&r.type!=='fixed').forEach(r=>{ pendingTotal+=(r.price||0); });
+      }catch(e){}
+      setQ('qsPending','$'+pendingTotal.toLocaleString(),'spend');
       setQ('qsBalance','$'+balance.toLocaleString(),'balance'+(balance<0?' neg':''));
       if(saveRate===null){
         setQ('qsSaveRate','—','rate');
@@ -8245,3 +8252,15 @@ function parseLotteryRSS(xml){
   return {period, special, grand, first, sixth};
 }
 window.autoFetchLotteryNumbers=autoFetchLotteryNumbers;
+
+// ── scroll helper：4 格儀表板「待扣款」點擊時跳到下方信用卡待扣卡 ──
+function scrollToCardPending(){
+  const el=document.getElementById('cardPendingCard');
+  if(!el || el.style.display==='none'){
+    if(typeof showToast==='function') showToast('💳 目前沒有信用卡待扣款','ok');
+    return;
+  }
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.remove('flash-once'); void el.offsetWidth; el.classList.add('flash-once');
+}
+window.scrollToCardPending=scrollToCardPending;
