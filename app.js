@@ -1279,6 +1279,7 @@ function toggleFab(){
     btn.textContent='✕';
     btn.classList.add('open');
     if(typeof renderFabRecent==='function') renderFabRecent();
+    if(typeof toggleFabMore==='function') toggleFabMore(false);
   } else closeFab();
 }
 function closeFab(){
@@ -1309,6 +1310,8 @@ function renderFabRecent(){
   if(!sheet) return;
   // 先清掉舊的常用區
   sheet.querySelector('#fabRecentSection')?.remove();
+  // v36：已有靜態「⭐ 最常用」區塊，跳過動態插入避免重複
+  if(sheet.querySelector('.fab-card-hot')) return;
   const top=Object.entries(_fabUsage).filter(([_,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k);
   if(!top.length) return;
   // 從現有卡找出對應 node 複製過來
@@ -2609,14 +2612,14 @@ let importSelectedIds=new Set();
 // ── CLAUDE API KEY MANAGEMENT ──
 let claudeApiKey=localStorage.getItem('btClaudeKey')||'';
 let geminiApiKey=localStorage.getItem('btGeminiKey')||'';
-let aiProvider=localStorage.getItem('btAiProvider')||'claude'; // 'claude' | 'gemini'
+let aiProvider=localStorage.getItem('btAiProvider')||'gemini'; // 'gemini' | 'claude'
 
 function getActiveAiProvider(){
   // 優先使用設定的 provider，若沒 key 則 fallback
   if(aiProvider==='gemini' && geminiApiKey) return 'gemini';
   if(aiProvider==='claude' && claudeApiKey) return 'claude';
-  if(claudeApiKey) return 'claude';
   if(geminiApiKey) return 'gemini';
+  if(claudeApiKey) return 'claude';
   return null;
 }
 
@@ -8342,3 +8345,21 @@ function maybePromptDemoData(){
 window.loadDemoData=loadDemoData;
 window.dismissDemoData=dismissDemoData;
 window.maybePromptDemoData=maybePromptDemoData;
+
+// 🪄 FAB 「更多動作」折疊（v36）
+function toggleFabMore(force){
+  const body=document.getElementById('fabMoreBody');
+  const btn=document.getElementById('fabMoreToggle');
+  if(!body||!btn) return;
+  const open = (typeof force==='boolean') ? force : body.hasAttribute('hidden');
+  if(open){ body.removeAttribute('hidden'); btn.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+  else { body.setAttribute('hidden',''); btn.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+}
+window.toggleFabMore=toggleFabMore;
+// 每次打開 FAB sheet 預設收合「更多動作」
+(function(){
+  const orig=window.openFab;
+  if(typeof orig==='function'){
+    window.openFab=function(){ orig.apply(this,arguments); toggleFabMore(false); };
+  }
+})();

@@ -1700,13 +1700,35 @@
     <div class="fab-sheet-handle"></div>
     <div class="fab-sheet-title">＋ 新增</div>
 
-    <div class="fab-section-label">💸 支出與補貨</div>
+    <!-- 🔥 常用快捷（永遠顯示在最上） -->
+    <div class="fab-section-label">⭐ 最常用</div>
     <div class="fab-sheet-grid fab-grid-compact">
-      <button class="fab-card" onclick="closeFab();openQuickExpense()">
+      <button class="fab-card fab-card-hot" onclick="closeFab();openQuickExpense()">
         <div class="fab-card-emoji">📝</div>
         <div class="fab-card-title">記消費</div>
         <div class="fab-card-sub">日常花費</div>
       </button>
+      <button class="fab-card fab-card-hot" onclick="closeFab();openAIChooser()">
+        <div class="fab-card-emoji">🤖</div>
+        <div class="fab-card-title">AI 辨識</div>
+        <div class="fab-card-sub">薪資/訂單/截圖</div>
+      </button>
+      <button class="fab-card fab-card-hot" onclick="closeFab();openInvoiceScanner()">
+        <div class="fab-card-emoji">📷</div>
+        <div class="fab-card-title">掃發票 QR</div>
+        <div class="fab-card-sub">電子發票條碼</div>
+      </button>
+    </div>
+
+    <!-- 📂 更多動作（折疊） -->
+    <button class="fab-more-toggle" type="button" onclick="toggleFabMore()" aria-expanded="false" id="fabMoreToggle">
+      <span>更多動作</span>
+      <span class="fab-more-chev">▾</span>
+    </button>
+    <div class="fab-more-body" id="fabMoreBody" hidden>
+
+    <div class="fab-section-label">💸 支出與補貨</div>
+    <div class="fab-sheet-grid fab-grid-compact">
       <button class="fab-card" onclick="closeFab();openProductModal()">
         <div class="fab-card-emoji">📦</div>
         <div class="fab-card-title">補貨品項</div>
@@ -1780,22 +1802,13 @@
         <div class="fab-card-title">悠遊卡儲值</div>
         <div class="fab-card-sub">儲值加值</div>
       </button>
-      <button class="fab-card" onclick="closeFab();openAIChooser()">
-        <div class="fab-card-emoji">🤖</div>
-        <div class="fab-card-title">AI 辨識</div>
-        <div class="fab-card-sub">薪資/訂單</div>
-      </button>
-      <button class="fab-card" onclick="closeFab();openInvoiceScanner()">
-        <div class="fab-card-emoji">📷</div>
-        <div class="fab-card-title">掃發票 QR</div>
-        <div class="fab-card-sub">電子發票條碼</div>
-      </button>
       <label class="fab-card" for="fabCsvInput" style="cursor:pointer">
         <div class="fab-card-emoji">📥</div>
         <div class="fab-card-title">發票 CSV</div>
         <div class="fab-card-sub">財政部檔</div>
       </label>
     </div>
+    </div><!-- /fab-more-body -->
   </div>
 </div>
 

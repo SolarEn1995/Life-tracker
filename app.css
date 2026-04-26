@@ -1964,3 +1964,34 @@ html[data-theme="dark"] .bottom-nav{ background:var(--surface); }
 html[data-theme="dark"] .bn-item.active{
   background:linear-gradient(135deg, rgba(240,138,107,.18), rgba(255,183,116,.12));
 }
+
+/* 🔥 FAB 常用卡片強調 + 更多動作折疊 (v36) */
+.fab-card-hot{
+  background:linear-gradient(135deg, rgba(240,138,107,.08), rgba(255,183,116,.06)) !important;
+  border:1.5px solid rgba(240,138,107,.35) !important;
+  position:relative;
+}
+.fab-card-hot::before{
+  content:"⭐";
+  position:absolute; top:6px; right:8px;
+  font-size:11px; opacity:.55;
+}
+.fab-card-hot .fab-card-emoji{ filter:drop-shadow(0 2px 6px rgba(240,138,107,.3)); }
+.fab-more-toggle{
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  width:100%; margin:14px 0 6px;
+  padding:11px 14px; background:var(--bg2,#FAF1E4);
+  border:1px dashed var(--border,#E8DDD0); border-radius:14px;
+  color:var(--text2,#7A5A40); font-size:13px; font-weight:800;
+  cursor:pointer; transition:all .18s ease;
+}
+.fab-more-toggle:hover{ background:var(--surface,#fff); }
+.fab-more-toggle:active{ transform:scale(.97); }
+.fab-more-toggle .fab-more-chev{ transition:transform .25s ease; display:inline-block; }
+.fab-more-toggle.open .fab-more-chev{ transform:rotate(180deg); }
+.fab-more-body[hidden]{ display:none; }
+.fab-more-body{ animation:fabMoreSlide .25s ease-out; }
+@keyframes fabMoreSlide{
+  from{ opacity:0; transform:translateY(-6px); }
+  to{ opacity:1; transform:translateY(0); }
+}
