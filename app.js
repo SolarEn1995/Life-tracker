@@ -537,17 +537,18 @@ function meowCatSvg(mood='mid',size=72){
   const lips =`<path d="M50 65 L50 68" stroke="${LINE}" stroke-width="1.2" stroke-linecap="round"/>`;
 
   const parts={
-    rich:{ // 皇室喵：閉眼大笑 + 吐舌 + 皇冠
-      eyes:`<path d="M28 50 Q35 42 42 50" stroke="${LINE}" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M58 50 Q65 42 72 50" stroke="${LINE}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-            <circle cx="80" cy="34" r="3" fill="#FFD54F" stroke="#C8961D" stroke-width="0.8"/>
-            <text x="78" y="37" font-size="4" fill="#C8961D">★</text>`,
-      mouth:`<path d="M50 70 Q47 76 50 80 Q53 84 50 86" stroke="${LINE}" stroke-width="2" fill="none" stroke-linecap="round"/>
-             <ellipse cx="50" cy="80" rx="5" ry="4" fill="#FF7A8A"/>
-             <path d="M50 78 L50 84" stroke="#D14E60" stroke-width="0.8"/>`,
+    rich:{ // 皇室喵：優雅瞇眼笑 + 自然微笑 + 皇冠
+      eyes:`<path d="M28 52 Q35 47 42 52" stroke="${LINE}" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M58 52 Q65 47 72 52" stroke="${LINE}" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="32" cy="49" r="1.2" fill="#FFD86B" opacity="0.85"/>
+            <circle cx="68" cy="49" r="1.2" fill="#FFD86B" opacity="0.85"/>`,
+      mouth:`<path d="M44 70 Q50 75 56 70" stroke="${LINE}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+             <path d="M48 72 Q50 74 52 72" stroke="${LINE}" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6"/>`,
       extra:`<g><path d="M30 24 L36 12 L44 22 L50 8 L56 22 L64 12 L70 24 Z" fill="#FFD54F" stroke="#C8961D" stroke-width="1.4" stroke-linejoin="round"/>
              <circle cx="36" cy="14" r="1.8" fill="#FF6B6B"/>
              <circle cx="50" cy="10" r="2" fill="#5BC2DC"/>
-             <circle cx="64" cy="14" r="1.8" fill="#FF6B6B"/></g>`
+             <circle cx="64" cy="14" r="1.8" fill="#FF6B6B"/>
+             <ellipse cx="50" cy="22" rx="22" ry="2" fill="#FFE6A8" opacity="0.55"/></g>`
     },
     mid:{ // 小資喵：圓亮眼 + 微笑（最 Q 版，大眼睛）
       eyes:`<circle cx="36" cy="52" r="7" fill="${LINE}"/><circle cx="64" cy="52" r="7" fill="${LINE}"/>

@@ -979,10 +979,15 @@ html[data-theme="dark"] .pill-add:hover{box-shadow:0 4px 14px rgba(240,138,107,0
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   transition:background 0.3s;
 }
-.cat-mood-card.tier-rich::before{background:linear-gradient(135deg,#3FA985,#7DD3B0);}
+.cat-mood-card.tier-rich::before{background:linear-gradient(135deg,#FFC75F,#FFE6A8 60%,#FFD86B);opacity:0.22;}
 .cat-mood-card.tier-mid::before{background:linear-gradient(135deg,#E5A234,#F5B97D);}
 .cat-mood-card.tier-low::before{background:linear-gradient(135deg,#F08A6B,#E5A234);}
 .cat-mood-card.tier-broke::before{background:linear-gradient(135deg,#E55A4D,#F08A6B);}
+/* 皇室喵：金框加微光暈，與整體橘暖調和諰 */
+.cat-mood-card.tier-rich{
+  border-color:rgba(212,160,72,.45);
+  box-shadow:0 8px 22px -8px rgba(212,160,72,.35), inset 0 1px 0 rgba(255,236,180,.6);
+}
 .cat-mood-card:active{transform:scale(0.99);}
 .cat-mood-card>*{position:relative;z-index:1;}
 
@@ -1020,7 +1025,7 @@ html[data-theme="dark"] .cmc-bar{background:rgba(255,255,255,0.08);}
   background:linear-gradient(90deg,var(--accent),var(--accent2));
   transition:width 0.5s ease-out;
 }
-.cat-mood-card.tier-rich  .cmc-bar-fill{background:linear-gradient(90deg,#3FA985,#7DD3B0);}
+.cat-mood-card.tier-rich  .cmc-bar-fill{background:linear-gradient(90deg,#D4A048,#FFD86B 55%,#FFEFB8);}
 .cat-mood-card.tier-mid   .cmc-bar-fill{background:linear-gradient(90deg,#E5A234,#F5B97D);}
 .cat-mood-card.tier-low   .cmc-bar-fill{background:linear-gradient(90deg,#F08A6B,#E5A234);}
 .cat-mood-card.tier-broke .cmc-bar-fill{background:linear-gradient(90deg,#E55A4D,#F08A6B);}
