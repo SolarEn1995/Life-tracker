@@ -103,14 +103,14 @@ const DEFAULT_CATS=[
   {id:'skin',label:'保養品',emoji:'🧴',color:'#e8488a'},
   {id:'daily',label:'日用品',emoji:'🛒',color:'#e87c20'},
 ];
-let categories=JSON.parse(localStorage.getItem('btCats')||'null')||DEFAULT_CATS;
+let categories=LS.getJSON('btCats',null)||DEFAULT_CATS;
 function catById(id){return categories.find(c=>c.id===id)||{label:id,emoji:'📦',color:'#aaa'};}
 function saveCats(){ localStorage.setItem('btCats',JSON.stringify(categories)); }
 
 function dAgo(n){return new Date(NOW.getTime()-n*86400000).toISOString().split('T')[0];}
 
 // priceHistory: { [productId]: [{date, price}] }
-let priceHistory=JSON.parse(localStorage.getItem('btPriceHistory')||'{}');
+let priceHistory=LS.getJSON('btPriceHistory',{});
 
 // 📦 示範資料定義（首次啟動詢問是否載入；不再寫死為預設）
 const DEMO_PRODUCTS=[
@@ -134,22 +134,22 @@ const DEMO_FIXED=[
   {id:3,name:'Spotify',emoji:'🎵',amount:149,day:20,cycle:'monthly',note:''},
 ];
 
-let products=JSON.parse(localStorage.getItem('btProducts')||'null')||[];
+let products=LS.getJSON('btProducts',null)||[];
 
 // confirmedDeductions: { 'YYYY-MM-fxId': true }
-let confirmedDeductions=JSON.parse(localStorage.getItem('btConfirmed')||'{}');
+let confirmedDeductions=LS.getJSON('btConfirmed',{});
 
-let fixedExpenses=JSON.parse(localStorage.getItem('btFixed')||'null')||[];
+let fixedExpenses=LS.getJSON('btFixed',null)||[];
 // debts schema: {id,name,emoji,totalAmount,monthlyPayment,totalMonths,paidMonths,startMonth(YYYY-MM),rate,day,note,linkedFixedId,status:'active'|'paid'}
-let debts=JSON.parse(localStorage.getItem('btDebts')||'[]');
+let debts=LS.getJSON('btDebts',[]);
 
 let monthlyIncome=parseInt(localStorage.getItem('btIncome')||'0');
 let monthlyBudget=parseInt(localStorage.getItem('btBudget')||'0');
 // 🛫 年度旅遊預算（目標金額）+ 旅遊資金（已撥入的累積金額）
 let travelBudgetYearly=parseInt(localStorage.getItem('btTravelBudgetYearly')||'0');
 let travelFund=parseFloat(localStorage.getItem('btTravelFund')||'0')||0;
-let travelFundLog=JSON.parse(localStorage.getItem('btTravelFundLog')||'[]');
-let records=JSON.parse(localStorage.getItem('btRecords')||'[]');
+let travelFundLog=LS.getJSON('btTravelFundLog',[]);
+let records=LS.getJSON('btRecords',[]);
 
 function save(){
   localStorage.setItem('btProducts',JSON.stringify(products));
@@ -289,7 +289,8 @@ function toggleAlertStack(){
 function updateMonthBadge(now){
   now=now||getNow();
   const mn=['一','二','三','四','五','六','七','八','九','十','十一','十二'];
-  document.getElementById('currentMonthBadge').textContent=`${now.getFullYear()}年${mn[now.getMonth()]}月`;
+  const el=document.getElementById('currentMonthBadge');
+  if(el) el.textContent=`${now.getFullYear()}年${mn[now.getMonth()]}月`;
 }
 
 // ── STATS + BUDGET ALERTS ──
@@ -301,9 +302,12 @@ function renderStats(now){
   const fixedTotal=getMonthlyFixed();
   const urgent=products.filter(p=>getDaysLeft(p)<=7).length;
 
-  document.getElementById('totalSpend').textContent=`$${varTotal.toLocaleString()}`;
-  document.getElementById('totalFixed').textContent=`$${fixedTotal.toLocaleString()}`;
-  document.getElementById('alertCount').textContent=urgent;
+  const totalSpendEl=document.getElementById('totalSpend');
+  if(totalSpendEl) totalSpendEl.textContent=`$${varTotal.toLocaleString()}`;
+  const totalFixedEl=document.getElementById('totalFixed');
+  if(totalFixedEl) totalFixedEl.textContent=`$${fixedTotal.toLocaleString()}`;
+  const alertCountEl=document.getElementById('alertCount');
+  if(alertCountEl) alertCountEl.textContent=urgent;
   const homeLifeEl=document.getElementById('homeLifeTotal');
   if(homeLifeEl) homeLifeEl.textContent=`$${lifeTotal.toLocaleString()}`;
   const homeTotalEl=document.getElementById('homeTotalAll');
@@ -319,8 +323,9 @@ function renderStats(now){
   setBudgetLabel('totalSpendBudget',varTotal,monthlyBudget);
   setBudgetLabel('homeLifeBudget',lifeTotal,lifeBudget);
   setBudgetLabel('totalFixedBudget',fixedTotal,(typeof fixedBudget!=='undefined'?fixedBudget:0));
-  document.getElementById('alertBar').style.display=urgent>0?'block':'none';
-  if(urgent>0)document.getElementById('alertCountBadge').textContent=urgent;
+  const alertBarEl=document.getElementById('alertBar');
+  if(alertBarEl) alertBarEl.style.display=urgent>0?'block':'none';
+  if(urgent>0){ const acb=document.getElementById('alertCountBadge'); if(acb) acb.textContent=urgent; }
 
   // Budget alert（採購 + 生活費 + 固定，合併為一張柔和卡片）
   const budgetAlertEl=document.getElementById('budgetAlert');
@@ -350,10 +355,14 @@ function renderStats(now){
         const pct=varTotal/monthlyBudget;
         const fill=document.getElementById('budgetBarFill');
         const w=Math.min(100,pct*100);
-        fill.style.width=w+'%';
-        fill.className='budget-bar-fill '+(pct>=1?'over':pct>=0.8?'warn':'ok');
-        document.getElementById('budgetSpentLabel').textContent=`已花 $${varTotal.toLocaleString()}`;
-        document.getElementById('budgetLimitLabel').textContent=`上限 $${monthlyBudget.toLocaleString()}`;
+        if(fill){
+          fill.style.width=w+'%';
+          fill.className='budget-bar-fill '+(pct>=1?'over':pct>=0.8?'warn':'ok');
+        }
+        const bsl=document.getElementById('budgetSpentLabel');
+        const bll=document.getElementById('budgetLimitLabel');
+        if(bsl) bsl.textContent=`已花 $${varTotal.toLocaleString()}`;
+        if(bll) bll.textContent=`上限 $${monthlyBudget.toLocaleString()}`;
       }
     } else {
       const bp=document.getElementById('budgetProgress'); if(bp) bp.style.display='none';
@@ -374,10 +383,14 @@ function renderStats(now){
       lbp.style.display='block';
       const pct=lifeTotal/lifeBudget;
       const fill=document.getElementById('lifeBudgetBarFill');
-      fill.style.width=Math.min(100,pct*100)+'%';
-      fill.className='budget-bar-fill '+(pct>=1?'over':pct>=0.8?'warn':'ok');
-      document.getElementById('lifeBudgetSpentLabel').textContent=`已花 $${lifeTotal.toLocaleString()}`;
-      document.getElementById('lifeBudgetLimitLabel').textContent=`上限 $${lifeBudget.toLocaleString()}`;
+      if(fill){
+        fill.style.width=Math.min(100,pct*100)+'%';
+        fill.className='budget-bar-fill '+(pct>=1?'over':pct>=0.8?'warn':'ok');
+      }
+      const lbsl=document.getElementById('lifeBudgetSpentLabel');
+      const lbll=document.getElementById('lifeBudgetLimitLabel');
+      if(lbsl) lbsl.textContent=`已花 $${lifeTotal.toLocaleString()}`;
+      if(lbll) lbll.textContent=`上限 $${lifeBudget.toLocaleString()}`;
     } else { lbp.style.display='none'; }
   }
   // Fixed budget progress (settings page)
@@ -387,10 +400,14 @@ function renderStats(now){
       fbp.style.display='block';
       const pct=fixedTotal/fixedBudget;
       const fill=document.getElementById('fixedBudgetBarFill');
-      fill.style.width=Math.min(100,pct*100)+'%';
-      fill.className='budget-bar-fill '+(pct>=1?'over':pct>=0.8?'warn':'ok');
-      document.getElementById('fixedBudgetSpentLabel').textContent=`已花 $${fixedTotal.toLocaleString()}`;
-      document.getElementById('fixedBudgetLimitLabel').textContent=`上限 $${fixedBudget.toLocaleString()}`;
+      if(fill){
+        fill.style.width=Math.min(100,pct*100)+'%';
+        fill.className='budget-bar-fill '+(pct>=1?'over':pct>=0.8?'warn':'ok');
+      }
+      const fbsl=document.getElementById('fixedBudgetSpentLabel');
+      const fbll=document.getElementById('fixedBudgetLimitLabel');
+      if(fbsl) fbsl.textContent=`已花 $${fixedTotal.toLocaleString()}`;
+      if(fbll) fbll.textContent=`上限 $${fixedBudget.toLocaleString()}`;
     } else { fbp.style.display='none'; }
   }
 
@@ -1554,7 +1571,7 @@ function guessInvoiceCategory(parsed){
   ];
   for(const r of rules){
     if(r.kw.some(k=>text.includes(k))){
-      if(categories.some(c=>c.id===r.cat)) return r.cat;
+      if(expCats.some(c=>c.id===r.cat)) return r.cat;
     }
   }
   return null;
@@ -1758,7 +1775,7 @@ function confirmCSVImport(){
         hasNums
           ?`本期新增 ${importedCount} 張發票，要立即對獎嗎？`
           :`本期新增 ${importedCount} 張發票，尚未設定獎號，要去設定嗎？`,
-        ()=>{ hasNums?openLotteryModal():openLotteryModal(); }
+        ()=>{ hasNums?openLotteryModal():openLotteryEditModal(); }
       );
     },600);
   }
@@ -3062,10 +3079,20 @@ function confirmImport(){
   toAdd.forEach(it=>{
     const today=todayStr();
     const effectiveDays=it._days||30;
-    const p=products.find(x=>x.name===it.name && (x.brand||'')===(it.brand||''));
-    if(p){
-      // UPDATE existing
+    // Respect the user's explicit action choice; fall back to exact-name match only when no action set
+    const dup=findDuplicate(it);
+    const shouldUpdate=dup && it._action!=='new';
+    if(shouldUpdate){
+      // UPDATE existing duplicate
+      const p=dup.product;
       p.price=it.price||p.price;
+      p.boughtDate=today;
+      // Apply scaled days if volumes match
+      if(it.volume>0 && p.volume>0 && it.unit && p.unit && it.unit===p.unit){
+        p.totalDays=Math.max(1,Math.round(p.totalDays*(it.volume/p.volume)));
+      } else {
+        p.totalDays=effectiveDays;
+      }
       if(it.volume>0) p.volume=it.volume;
       if(it.unit) p.unit=it.unit;
       updateCount++;
@@ -3102,7 +3129,7 @@ function confirmImport(){
 }
 
 // ── INCOME PAGE ──
-let salaryRecords=JSON.parse(localStorage.getItem('btSalary')||'[]');
+let salaryRecords=LS.getJSON('btSalary',[]);
 // 薪資結算月偏移：0=領薪當月、1=下一月（3/25 入帳算 4 月）
 function getSalaryShift(){ return parseInt(localStorage.getItem('btSalaryShift')||'0')||0; }
 function setSalaryShift(v){ localStorage.setItem('btSalaryShift',String(v|0)); }
@@ -3130,21 +3157,21 @@ function toggleSalaryShift(){
   else { renderIncome(); renderIncomeSalary&&renderIncomeSalary(); }
 }
 window.toggleSalaryShift=toggleSalaryShift;
-let bonusExpected=JSON.parse(localStorage.getItem('btBonus')||'[]');
-let vouchers=JSON.parse(localStorage.getItem('btVouchers')||'[]');
-let extraIncome=JSON.parse(localStorage.getItem('btExtraIncome')||'[]'); // 副業/投資等额外收入 [{id,name,source,amount,date(YYYY-MM-DD)}]
-let creditCards=JSON.parse(localStorage.getItem('btCreditCards')||'[]'); // [{id,name,bank,last4,statementDay,dueDay,color}]
-let cashSavings=JSON.parse(localStorage.getItem('btCashSavings')||'null')||{amount:0,history:[],lastSurplusPromptYM:''};
+let bonusExpected=LS.getJSON('btBonus',[]);
+let vouchers=LS.getJSON('btVouchers',[]);
+let extraIncome=LS.getJSON('btExtraIncome',[]); // 副業/投資等额外收入 [{id,name,source,amount,date(YYYY-MM-DD)}]
+let creditCards=LS.getJSON('btCreditCards',[]); // [{id,name,bank,last4,statementDay,dueDay,color}]
+let cashSavings=LS.getJSON('btCashSavings',null)||{amount:0,history:[],lastSurplusPromptYM:''};
 // 🚇 悠遊卡/儲值帳戶（iCash、街口等通用）— balance:目前餘額；history:[{date,delta,note,type:'topup'|'spend'}]
-let easyCard=JSON.parse(localStorage.getItem('btEasyCard')||'null')||{balance:0,history:[]};
-let investments=JSON.parse(localStorage.getItem('btInvestments')||'null')||{entries:[],valueHistory:[]};
+let easyCard=LS.getJSON('btEasyCard',null)||{balance:0,history:[]};
+let investments=LS.getJSON('btInvestments',null)||{entries:[],valueHistory:[]};
 // entries: [{id,name,amount,date,note}]
 // valueHistory: [{id,date,value,note}] —  最後一筆即「目前市值」
-let invoiceSeen=JSON.parse(localStorage.getItem('btInvoiceSeen')||'{}');
+let invoiceSeen=LS.getJSON('btInvoiceSeen',{});
 // invoice: {date,total,seller,savedAt}
-let lotteryNumbers=JSON.parse(localStorage.getItem('btLotteryNumbers')||'null')||{period:'',special:'',grand:'',first:[],sixth:[],updatedAt:''};
+let lotteryNumbers=LS.getJSON('btLotteryNumbers',null)||{period:'',special:'',grand:'',first:[],sixth:[],updatedAt:''};
 // period '113-03-04'（113年3-4月期） first:['AB12345678',...]（8碼尾號）
-let savingGoal=JSON.parse(localStorage.getItem('btSavingGoal')||'null')||{mode:'percent',value:0}; // mode:'percent'|'amount'
+let savingGoal=LS.getJSON('btSavingGoal',null)||{mode:'percent',value:0}; // mode:'percent'|'amount'
 let psFields=[];
 let summaryMonth={y:getNow().getFullYear(),m:getNow().getMonth()};// 0-indexed month (prev month default)
 let currentIncTab='salary';
@@ -3618,7 +3645,7 @@ function renderNetWorthTimelineCard(){
   for(let i=0;i<12;i++){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
     const ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    const salRec=(typeof salaryRecords!=='undefined')?salaryRecords.find(s=>`${s.year}-${String(s.month+1).padStart(2,'0')}`===ym):null;
+    const salRec=(typeof salaryRecords!=='undefined')?salaryRecords.find(s=>`${s.year}-${String(s.month).padStart(2,'0')}`===ym):null;
     const sal=salRec?salRec.netPay:0;
     const sp=records.filter(r=>getEffectiveMonth(r)===ym&&!r._travelBudget&&(r.type==='var'||r.type==='life'||r.type==='fixed'||r.type==='voucher'||r.type==='easycard')).reduce((s,r)=>s+r.price,0);
     points.unshift({ym,val});
@@ -4020,7 +4047,7 @@ let qeCat='food', qePay='cash', qeCur='TWD';
 let lifeBudget=parseInt(localStorage.getItem('btLifeBudget')||'0');
 
 // 💱 外幣匯率與 metadata（避免未定義錯誤導致 modal 無法開啟）
-let fxRates=JSON.parse(localStorage.getItem('btFxRates')||'{}');
+let fxRates=LS.getJSON('btFxRates',{});
 const FX_META={
   TWD:{symbol:'NT$',name:'新台幣'},
   USD:{symbol:'$',name:'美元'},
@@ -4053,7 +4080,7 @@ const DEFAULT_EXP_CATS=[
   {id:'medical',emoji:'🏥',label:'醫藥保健'},
   {id:'other',emoji:'📦',label:'其他'}
 ];
-let expCats=JSON.parse(localStorage.getItem('btExpCats')||'null')||DEFAULT_EXP_CATS;
+let expCats=LS.getJSON('btExpCats',null)||DEFAULT_EXP_CATS;
 function saveExpCats(){ localStorage.setItem('btExpCats',JSON.stringify(expCats)); }
 function renderQeCatOptions(){
   const wrap=document.getElementById('qeCatSelect'); if(!wrap) return;
@@ -5878,7 +5905,7 @@ function tryAutoFillSalary(){
   const now=getNow();
   const cy=now.getFullYear(), cm=now.getMonth()+1, today=now.getDate();
   const curYM=`${cy}-${String(cm).padStart(2,'0')}`;
-  const skipMap=JSON.parse(localStorage.getItem('btSalaryAutoSkip')||'{}');
+  const skipMap=LS.getJSON('btSalaryAutoSkip',{});
   if(skipMap[curYM]) return;
   const hasCurr=salaryRecords.some(s=>{
     const eff=getEffectiveYM(s.year,s.month,s.payDay);
@@ -5929,7 +5956,7 @@ function confirmAutoSalary(){
 function skipAutoSalary(){
   const now=getNow();
   const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const skipMap=JSON.parse(localStorage.getItem('btSalaryAutoSkip')||'{}');
+  const skipMap=LS.getJSON('btSalaryAutoSkip',{});
   skipMap[ym]=true;
   localStorage.setItem('btSalaryAutoSkip',JSON.stringify(skipMap));
   closeModal('salaryAutoOverlay');
@@ -6623,8 +6650,8 @@ let _confirmCb=null;
 // ── INVENTORY SYSTEM ──
 // inventory: { [productId]: [{unitId, openedDate, usedDays}] }
 // stock: { [productId]: count }  — how many sealed units
-let inventory=JSON.parse(localStorage.getItem('btInventory')||'{}');
-let stockCount=JSON.parse(localStorage.getItem('btStock')||'{}');
+let inventory=LS.getJSON('btInventory',{});
+let stockCount=LS.getJSON('btStock',{});
 
 function getStock(pid){ return stockCount[pid]||0; }
 function getOpenUnit(pid){ return (inventory[pid]||[]).find(u=>!u.finished); }
@@ -7426,7 +7453,7 @@ function renderBackupReminder(){
   if(freq===0){ el.style.display='none'; return; }
   const days=daysSinceBackup();
   // 從未備份且已用一段時間
-  const hasData=(JSON.parse(localStorage.getItem('btRecords')||'[]')).length>5;
+  const hasData=(LS.getJSON('btRecords',[])).length>5;
   if(days===null && !hasData){ el.style.display='none'; return; }
   const shouldShow=(days===null && hasData) || (days!==null && days>=freq);
   if(!shouldShow){ el.style.display='none'; return; }
