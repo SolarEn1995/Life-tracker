@@ -706,7 +706,7 @@
     <div class="month-label" id="recordMonthLabel"></div>
     <button onclick="changeRecordMonth(1)">›</button>
   </div>
-  <!-- 日期範圍選擇 + 排序 -->
+  <!-- 日期範圍選擇 -->
   <div class="filter-toolbar" id="recordDateModeRow">
     <div class="filter-chips" id="recordDateChips">
       <button class="chip active" data-mode="month" onclick="setRecordDateMode('month',this)">本月</button>
@@ -714,7 +714,6 @@
       <button class="chip" data-mode="range6" onclick="setRecordDateMode('range6',this)">近半年</button>
       <button class="chip" data-mode="custom" onclick="setRecordDateMode('custom',this)">自訂</button>
     </div>
-    <button id="recordSortBtn" class="chip select-chip" onclick="cycleRecordSort()" title="切換排序">📅 日期</button>
   </div>
   <!-- 自訂日期範圍（預設隱藏） -->
   <div id="recordCustomRange" style="display:none;align-items:center;gap:8px;margin-bottom:10px">
@@ -753,6 +752,15 @@
   <div class="page-section-title section-with-action">
     <span>📋 消費明細</span>
     <button class="pill-add-btn" onclick="openQuickExpense()">➕ 新增記錄</button>
+  </div>
+  <!-- 單日篩選 + 排序按鈕 -->
+  <div class="filter-toolbar" id="recordDetailBar">
+    <div class="day-filter-row">
+      <span class="day-filter-label">📆 單日</span>
+      <input type="date" id="recordDayFilterInput" class="range-month-input day-filter-input" onchange="setRecordDayFilter(this.value)"/>
+      <button id="recordDayClearBtn" class="chip select-chip day-filter-clear" style="display:none" onclick="clearRecordDayFilter()">✕ 清除</button>
+    </div>
+    <button id="recordSortBtn" class="chip select-chip" onclick="cycleRecordSort()" title="切換排序">📅 日期</button>
   </div>
   <!-- 篩選列：chip + 選取按鈕 -->
   <input type="hidden" id="recordFilterCat" value="all"/>
