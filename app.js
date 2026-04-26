@@ -428,7 +428,7 @@ function renderStats(now){
       freeSub.textContent=`財務健康！可自由支配 ${Math.round(pct*100)}%${goalNote}`;
     }
     document.getElementById('cashflowBar').style.display='block';
-    document.getElementById('cfIncomeLabel').textContent=`月收入 $${monthlyIncome.toLocaleString()}`;
+    document.getElementById('cfIncomeLabel').textContent=`進貢 $${monthlyIncome.toLocaleString()}`;
     const vp=Math.min(100,(varTotal/monthlyIncome)*100);
     const lp=Math.min(100-vp,(lifeTotal/monthlyIncome)*100);
     const fp=Math.min(100-vp-lp,(fixedTotal/monthlyIncome)*100);

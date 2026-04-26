@@ -101,7 +101,7 @@
     </div>
     <div class="cmc-bar"><div class="cmc-bar-fill" id="cmcBarFill" style="width:0%"></div></div>
     <div class="cmc-foot">
-      <span class="cmc-foot-label">存款率</span>
+      <span class="cmc-foot-label">存糧達成</span>
       <span class="cmc-foot-value" id="cmcRate">—</span>
     </div>
   </div>
@@ -140,30 +140,30 @@
 
   <!-- �📊 本月支出（合併卡：3 格 + 進度條） -->
   <div class="home-stat-card" style="margin-top:10px">
-    <div class="hsc-title">📊 本月支出明細</div>
+    <div class="hsc-title">� 敗家排行榜</div>
     <div class="hsc-grid">
       <div class="hsc-cell">
         <div class="hsc-icon">🛍</div>
-        <div class="hsc-label">採購</div>
+        <div class="hsc-label">瞎拚採購</div>
         <div class="hsc-value privacy-mask" id="totalSpend" style="color:var(--accent2)">$0</div>
         <div class="hsc-budget" id="totalSpendBudget"></div>
       </div>
       <div class="hsc-cell">
-        <div class="hsc-icon">💸</div>
-        <div class="hsc-label">生活</div>
+        <div class="hsc-icon">🍲</div>
+        <div class="hsc-label">生存所需</div>
         <div class="hsc-value privacy-mask" id="homeLifeTotal" style="color:var(--accent2)">$0</div>
         <div class="hsc-budget" id="homeLifeBudget"></div>
       </div>
       <div class="hsc-cell">
         <div class="hsc-icon">💳</div>
-        <div class="hsc-label">固定</div>
+        <div class="hsc-label">固定貢金</div>
         <div class="hsc-value privacy-mask" id="totalFixed" style="color:var(--fixed)">$0</div>
         <div class="hsc-budget" id="totalFixedBudget"></div>
       </div>
     </div>
     <div class="cashflow-bar cashflow-inline" id="cashflowBar" style="display:none">
       <div class="cf-header">
-        <div class="cf-title">支出佔比 <span id="homeTotalAll" class="privacy-mask" style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:700;margin-left:6px">$0</span></div>
+        <div class="cf-title">已燒掉 / 進貢 <span id="homeTotalAll" class="privacy-mask" style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:700;margin-left:6px">$0</span></div>
         <div class="cf-income privacy-mask" id="cfIncomeLabel"></div>
       </div>
       <div class="cf-track">
@@ -172,9 +172,9 @@
         <div class="cf-seg seg-fixed" id="cfSegFixed" style="width:0%"></div>
       </div>
       <div class="cf-legend">
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2)"></div>採購</div>
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2);opacity:0.5"></div>生活</div>
-        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--fixed)"></div>固定</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2)"></div>瞎拚採購</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--accent2);opacity:0.5"></div>生存所需</div>
+        <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--fixed)"></div>固定貢金</div>
         <div class="cf-legend-item"><div class="cf-legend-dot" style="background:var(--bg2)"></div>剩餘</div>
       </div>
     </div>
