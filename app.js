@@ -52,10 +52,10 @@ function escapeJS(str){
   if(str==null) return '';
   return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,'\\n');
 }
-// 3) 統一導航：依 page id 找對應 tab，避免依賴 .tab[idx]
+// 3) 統一導航：v36 後改用底部 nav；保留 navTab 供舊呼叫
 function navTab(pageId){
-  const tab=document.querySelector(`.tab[onclick*="'${pageId}'"]`);
-  showPage(pageId,tab);
+  const btn=document.querySelector(`#bottomNav .bn-item[data-page="${pageId}"]`);
+  showPage(pageId, btn);
 }
 // 4) 跨日／回到前景時重新渲染當月卡片
 document.addEventListener('visibilitychange',()=>{
@@ -959,14 +959,6 @@ function renderChart(){
 }
 
 // ── PRICE HISTORY ──
-function openPriceHistory(id){
-  currentPriceProductId=id;
-  const p=products.find(x=>x.id===id);
-  document.getElementById('priceModalTitle').textContent=`📈 ${p.name}`;
-  document.getElementById('ph-price').value='';
-  renderPriceHistoryList();
-  document.getElementById('priceModalOverlay').classList.add('open');
-}
 
 function renderPriceHistoryList(){
   const id=currentPriceProductId;
@@ -1073,13 +1065,6 @@ function markRestocked(id){
   records.push({id:Date.now(),productId:p.id,name:p.name,emoji:p.emoji,brand:p.brand,price:p.price,cat:p.cat,date:today,type:'var'});
   save();renderAll();
 }
-function recordBuy(id){
-  const p=products.find(x=>x.id===id);if(!p)return;
-  showConfirm(`記錄購買「${p.name}」？<br><span style="color:var(--accent2);font-family:'DM Mono',monospace;font-size:18px;font-weight:700">NT$ ${p.price.toLocaleString()}</span>`,()=>{
-    records.push({id:Date.now(),productId:p.id,name:p.name,emoji:p.emoji,brand:p.brand,price:p.price,cat:p.cat,date:todayStr(),type:'var'});
-    save();renderAll();
-  });
-}
 function deleteProduct(id){
   const idx=products.findIndex(x=>x.id===id); if(idx<0) return;
   const p=products[idx];
@@ -1107,14 +1092,6 @@ function deleteFixed(id){
     save();renderAll();
     showToast('✓ 已復原','ok');
   });
-}
-function saveIncome(){
-  // incomeInput removed from settings; income is now set via payslip/manual salary
-  renderAll();
-}
-function saveBudget(){
-  const v=parseInt(document.getElementById('budgetInput').value)||0;
-  monthlyBudget=v;save();renderAll();
 }
 
 // ── BUDGET EDIT TOGGLE (lock/unlock with sanity check) ──
@@ -1209,7 +1186,7 @@ window.openReports=openReports;
 function showPage(id,el){
   navigator.vibrate?.(8);
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  // ⚠️ 不再清掉所有 .tab — 那會誤砍儲蓄目標 / 預算通知的子分頁高亮
   document.getElementById(id).style.display='block';
   document.getElementById(id).classList.add('active');
   if(el && el.classList) el.classList.add('active');
@@ -1291,7 +1268,6 @@ function closeFab(){
 }
 function openFab(){ if(!fabOpen) toggleFab(); }
 // 兼容舊呼叫（已不再使用，但保險）
-function toggleFabCat(){ /* deprecated, kept as no-op */ }
 
 // ── PHASE G: FAB 使用次數追蹤 + ⭐ 常用置頂 ──
 const _fabUsage=LS.getJSON('btFabUsage',{}) || {};
@@ -2207,7 +2183,6 @@ function selectFxPay(el){
     picker.style.display='none';
   }
 }
-function addFixed(){ saveFixed(); }
 function saveFixed(){
   const name=document.getElementById('fx-name').value.trim();
   const amount=parseInt(document.getElementById('fx-amount').value)||0;
@@ -3239,53 +3214,6 @@ function loadMoreSalary(){ _salaryShown+=12; renderIncomeSalary(); }
 function resetSalaryPage(){ _salaryShown=12; renderIncomeSalary(); }
 
 // ── BONUS TAB (compact timeline) ──
-function renderIncomeBonus(){
-  const now=getNow(); const mo=now.getMonth()+1;
-  const sorted=[...bonusExpected].sort((a,b)=>a.month-b.month);
-  const total=sorted.reduce((s,b)=>s+b.amount,0);
-  const tlEl=document.getElementById('bonusTotalLabel');
-  if(tlEl) tlEl.textContent=`$${total.toLocaleString()}`;
-
-  // Compact timeline: 12 month dots
-  const tl=document.getElementById('bonusTimeline');
-  if(tl){
-    const monthNames=['1','2','3','4','5','6','7','8','9','10','11','12'];
-    tl.innerHTML=`<div style="display:flex;align-items:flex-end;gap:4px;padding:8px 0 4px">
-      ${monthNames.map((_,i)=>{
-        const mNo=i+1;
-        const bonuses=sorted.filter(b=>b.month===mNo);
-        const isCur=mNo===mo;
-        const hasBon=bonuses.length>0;
-        return `<div style="flex:1;text-align:center;cursor:${hasBon?'pointer':'default'}" onclick="${hasBon?`toggleBonusMonth(${mNo})`:''}">
-          <div style="height:${hasBon?28:8}px;background:${isCur&&hasBon?'var(--accent3)':hasBon?'var(--accent)':'var(--bg2)'};border-radius:4px;margin-bottom:3px;display:flex;align-items:center;justify-content:center;font-size:${hasBon?'10px':'0'};color:white;font-weight:700">
-            ${hasBon?bonuses[0].emoji:''}
-          </div>
-          <div style="font-size:9px;color:${isCur?'var(--accent)':'var(--text3)'};font-weight:${isCur?'700':'400'}">${mNo}月</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  }
-
-  // List
-  const bc=document.getElementById('bonusCalendar'); if(!bc) return;
-  bc.innerHTML=!sorted.length
-    ?emptyState({emoji:'🎁',title:'還沒有獎金預期',sub:'預計年終、年中、三節獎金可事先設定',ctaLabel:'＋ 新增獎金預期',ctaOnClick:'openBonusModal()'})
-    :sorted.map(b=>{
-      const diff=b.month-mo;
-      const isCur=diff===0;
-      const isPast=diff<0;
-      const label=isCur?'🎉 本月發放':(isPast?`${Math.abs(diff)}個月前`:`還有 ${diff} 個月`);
-      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:${isCur?'var(--accent3-light)':'var(--surface)'};border:1.5px solid ${isCur?'rgba(24,184,124,0.3)':'var(--border)'};border-radius:var(--r-sm);margin-bottom:7px;box-shadow:var(--shadow)">
-        <div style="font-size:18px">${b.emoji}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600">${b.name}</div>
-          <div style="font-size:10px;color:var(--text2)">${b.month}月 · ${label}${b.note?' · '+b.note:''}</div>
-        </div>
-        <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${isCur?'var(--accent3)':'var(--accent)'};flex-shrink:0">$${b.amount.toLocaleString()}</div>
-        <button onclick="deleteBonus(${b.id})" style="color:var(--text3);background:none;border:none;cursor:pointer;font-size:16px;padding:0;flex-shrink:0">✕</button>
-      </div>`;
-    }).join('');
-}
 
 // ── MONTHLY SUMMARY TAB ──
 let summaryView='month'; // 'month' | 'year'
@@ -3311,7 +3239,6 @@ function changeSummaryPeriod(d){
   renderSummaryTab();
 }
 // 舊 API 相容
-function changeSummaryMonth(d){ changeSummaryPeriod(d); }
 function renderSummaryTab(){
   if(summaryView==='year'){ renderYearSummary(); renderYearlySavings(); }
   else { renderSummary(); }
@@ -4054,11 +3981,6 @@ function showVoucherHistory(id){
   const lines=hist.length?hist.map(h=>`• ${h.date} ${h.item} $${h.amount}`).join('\n'):'尚無使用記錄';
   showToast(`${v.name} 使用明細\n${lines}`, 'info');
 }
-function openVoucherUseFromRecord(){
-  const avail=vouchers.filter(v=>(v.faceValue-(v.usedAmt||0))>0);
-  if(!avail.length){showToast('目前沒有可用的即享券','error');return;}
-  openUseVoucher(avail[0].id);
-}
 
 // ── QUICK EXPENSE ──
 let qeCat='food', qePay='cash', qeCur='TWD';
@@ -4328,41 +4250,6 @@ function setHqCat(el){
   el.classList.add('active');
 }
 let hqPay='cash';
-function setHqPay(el,mode){
-  document.querySelectorAll('#hqPayRow .hq-pay').forEach(o=>o.classList.remove('active'));
-  el.classList.add('active');
-  hqPay=mode;
-  const ec=document.getElementById('hqEasyCardHint');
-  if(mode==='card'){
-    const sel=document.getElementById('hqCardSel');
-    if(!creditCards.length){
-      sel.innerHTML='<option value="">尚無信用卡，請先到 ⚙️ 設定新增</option>';
-    } else {
-      sel.innerHTML=creditCards.map(c=>`<option value="${c.id}">💳 ${c.name}${c.last4?' ····'+c.last4:''}</option>`).join('');
-      sel.onchange=updateHqCardHint;
-    }
-    cp.style.display='block'; vp.style.display='none'; if(ec)ec.style.display='none';
-    updateHqCardHint();
-  } else if(mode==='voucher'){
-    const avail=vouchers.filter(v=>(v.faceValue-(v.usedAmt||0))>0);
-    const sel=document.getElementById('hqVoucherSel');
-    sel.innerHTML=avail.length
-      ? avail.map(v=>`<option value="${v.id}">${v.emoji||'🎫'} ${v.name} (剩$${(v.faceValue-(v.usedAmt||0)).toLocaleString()})</option>`).join('')
-      : '<option value="">沒有可用的即享券</option>';
-    vp.style.display='block'; cp.style.display='none'; if(ec)ec.style.display='none';
-  } else if(mode==='easycard'){
-    const bal=(easyCard&&easyCard.balance)||0;
-    if(ec){
-      ec.innerHTML=bal>0
-        ?`🚇 悠遊卡餘額 <strong style="color:var(--accent)">$${bal.toLocaleString()}</strong>　<a href="javascript:void(0)" onclick="openEasyCardTopup()" style="color:var(--accent);font-size:11px">＋ 儲值</a>`
-        :`🚇 悠遊卡尚無餘額，<a href="javascript:void(0)" onclick="openEasyCardTopup()" style="color:var(--accent);font-weight:700">點此先儲值</a>`;
-      ec.style.display='block';
-    }
-    cp.style.display='none'; vp.style.display='none';
-  } else {
-    cp.style.display='none'; vp.style.display='none'; if(ec)ec.style.display='none';
-  }
-}
 function updateHqCardHint(){
   const sel=document.getElementById('hqCardSel');
   const hint=document.getElementById('hqCardHint');
@@ -4742,17 +4629,7 @@ function deleteRestockCat(id){
   saveCats();
   renderCatManagerList(); renderCatTabs(); renderProducts();
 }
-function saveLifeBudget(){
-  const v=parseInt(document.getElementById('lifeBudgetInput').value)||0;
-  lifeBudget=v; localStorage.setItem('btLifeBudget',v.toString()); renderAll();
-  showToast('生活費預算已儲存','ok');
-}
 let fixedBudget=parseInt(localStorage.getItem('btFixedBudget')||'0');
-function saveFixedBudget(){
-  const v=parseInt(document.getElementById('fixedBudgetInput').value)||0;
-  fixedBudget=v; localStorage.setItem('btFixedBudget',v.toString());
-  renderAll(); showToast('固定支出預算已儲存','ok');
-}
 
 // ── RECORD + PRICE COMBINED ──
 function openRecordAndPrice(pid){
@@ -5492,7 +5369,6 @@ function setBonusMode(m){
   }
 }
 // 舊函式相容
-function setBonusInclude(v){ setBonusMode(v?'budget':'savings'); }
 function saveBonus(){
   const name=document.getElementById('bn-name').value.trim();
   const month=parseInt(document.getElementById('bn-month').value);
@@ -5564,7 +5440,6 @@ function saveBonus(){
   if(typeof renderAll==='function') renderAll();
 }
 // 舊函式相容
-function addBonus(){ saveBonus(); }
 function deleteBonus(id){
   const b=bonusExpected.find(x=>x.id===id);
   if(b && b._committed){
@@ -5740,10 +5615,6 @@ function getEffectiveMonth(r){
   if(r&&r.pay==='card'&&r.billingMonth) return r.billingMonth;
   return (r&&r.date)?r.date.substring(0,7):'';
 }
-function getCardPendingByMonth(ym){
-  // 該月的「信用卡待扣款」總額
-  return records.filter(r=>r.pay==='card'&&getEffectiveMonth(r)===ym&&r.type!=='fixed').reduce((s,r)=>s+(r.price||0),0);
-}
 function renderCreditCardList(){
   const el=document.getElementById('creditCardList'); if(!el) return;
   if(!creditCards.length){
@@ -5824,18 +5695,6 @@ function deleteCardConfirm(){
 }
 
 // ── 💰 現金存款 ──
-function saveCashSavings(){
-  const v=parseInt(document.getElementById('cashSavingsInput').value);
-  if(isNaN(v)||v<0){showToast('請輸入有效金額','error');return;}
-  const old=cashSavings.amount||0;
-  cashSavings.amount=v;
-  if(!cashSavings.history) cashSavings.history=[];
-  cashSavings.history.push({date:todayStr(),delta:v-old,amount:v,note:'手動更新'});
-  save();
-  document.getElementById('cashSavingsHint').textContent=`✓ 已儲存：$${v.toLocaleString()}`;
-  showToast('✓ 現金存款已更新','ok');
-  renderAll();
-}
 function renderCashSavingsUI(){
   const inp=document.getElementById('cashSavingsInput'); if(!inp) return;
   if(inp.value==='') inp.value=cashSavings.amount||'';
@@ -6836,31 +6695,6 @@ function openCompareModal(pid){
 // ── RECOMMEND BANNER（已合併進 renderHomeRestockSummary）──
 
 // ── CARD ACTION MENU (••• button) ──
-function openCardMenu(pid, e){
-  e.stopPropagation();
-  closeCardMenu();
-  const p=products.find(x=>x.id===pid); if(!p) return;
-  const histCount=getPriceHistory(pid).length;
-  const rect=e.currentTarget.getBoundingClientRect();
-  const overlay=document.createElement('div');
-  overlay.className='card-menu-overlay';
-  overlay.onclick=closeCardMenu;
-  const menu=document.createElement('div');
-  menu.className='card-menu'; menu.id='_cardMenu';
-  menu.innerHTML=`
-    <button class="card-menu-item" onclick="closeCardMenu();openRecordAndPrice(${pid})">📝 記錄購買${histCount>0?` (${histCount}筆價格記錄)`:''}</button>
-    ${p.shopeeUrl?`<button class="card-menu-item" onclick="closeCardMenu();openShopee(${pid})">${p.shopeeUrl.includes('shopee')?'🛍 前往蝦皮':p.shopeeUrl.includes('momo')?'🔴 前往 momo':'🔗 前往補貨連結'}</button>`:''}
-    <div style="height:1px;background:var(--border);margin:2px 0"></div>
-    <button class="card-menu-item danger" onclick="closeCardMenu();deleteProduct(${pid})">🗑️ 刪除品項</button>
-  `;
-  const menuH=160, menuW=200;
-  let top=rect.bottom+6, left=rect.right-menuW;
-  if(top+menuH>window.innerHeight) top=rect.top-menuH-6;
-  if(left<8) left=8;
-  menu.style.top=top+'px'; menu.style.left=left+'px';
-  document.body.appendChild(overlay);
-  document.body.appendChild(menu);
-}
 function closeCardMenu(){
   document.getElementById('_cardMenu')?.remove();
   document.querySelector('.card-menu-overlay')?.remove();
