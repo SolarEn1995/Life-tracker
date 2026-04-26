@@ -8293,3 +8293,58 @@ window.toggleFabMore=toggleFabMore;
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initFabDrag);
   else initFabDrag();
 })();
+
+/* 🌸 Sakura petals — dynamically spawned, GPU-animated */
+(function(){
+  var LIGHT_COLS=[
+    'rgba(255,183,197,.72)','rgba(255,210,220,.62)',
+    'rgba(255,235,240,.68)','rgba(255,160,180,.58)','rgba(250,200,215,.65)'
+  ];
+  var DARK_COLS=[
+    'rgba(255,183,197,.32)','rgba(255,210,220,.24)',
+    'rgba(255,235,240,.28)','rgba(255,160,180,.26)'
+  ];
+  var COUNT=20;
+
+  function makePetal(){
+    var dark=document.documentElement.getAttribute('data-theme')==='dark';
+    var cols=dark?DARK_COLS:LIGHT_COLS;
+    var p=document.createElement('div');
+    p.className='sakura-petal';
+    var sz=(7+Math.random()*9).toFixed(1);
+    var dur=(5+Math.random()*7).toFixed(1);
+    var del=(-Math.random()*parseFloat(dur)).toFixed(1);
+    var drift=((Math.random()-.5)*140).toFixed(0);
+    var spin=(360+Math.random()*360).toFixed(0);
+    var col=cols[Math.floor(Math.random()*cols.length)];
+    var op=(0.55+Math.random()*.3).toFixed(2);
+    p.style.cssText=
+      'left:'+((Math.random()*105-2).toFixed(1))+'%;'+
+      'width:'+sz+'px;'+
+      'height:'+(parseFloat(sz)*1.3).toFixed(1)+'px;'+
+      'background:'+col+';'+
+      'animation-duration:'+dur+'s;'+
+      'animation-delay:'+del+'s;'+
+      '--drift:'+drift+'px;'+
+      '--spin:'+spin+'deg;'+
+      '--op:'+op;
+    return p;
+  }
+
+  function populate(){
+    var layer=document.getElementById('sakura-layer');
+    if(!layer) return;
+    layer.innerHTML='';
+    for(var i=0;i<COUNT;i++) layer.appendChild(makePetal());
+  }
+
+  function init(){
+    populate();
+    /* Refresh petal colors when theme changes */
+    new MutationObserver(populate)
+      .observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
