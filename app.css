@@ -2081,16 +2081,18 @@ body.home-active #sakura-layer{opacity:1;}
   overflow:visible;
   pointer-events:none;
 }
-/* Soft ground line */
+/* Soft ground line（v45：更乾淨的地平線） */
 .home-cats-scene::after{
   content:'';
   position:absolute;
-  bottom:8px;left:3%;right:3%;
-  height:1.5px;
-  background:linear-gradient(90deg,transparent 0%,var(--border2) 20%,rgba(63,169,133,0.3) 50%,var(--border2) 80%,transparent 100%);
-  border-radius:1px;
+  bottom:6px;left:6%;right:6%;
+  height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(63,169,133,0.15) 8%,rgba(63,169,133,0.45) 50%,rgba(63,169,133,0.15) 92%,transparent 100%);
+  border-radius:2px;
+  box-shadow:0 1px 2px rgba(63,169,133,0.18);
 }
-.hc-cat{position:absolute;bottom:10px;}
+/* v45：所有貓腳掌貼齊地面線（bottom:6px+腳掌厚度抵銷） */
+.hc-cat{position:absolute;bottom:4px;}
 .hc-flip{display:inline-block;}
 
 /* ── 橘貓：左右來回走 ── */
@@ -2125,20 +2127,20 @@ body.home-active #sakura-layer{opacity:1;}
   animation:hcSitTail 2.8s ease-in-out infinite;
 }
 .hc-cat-black .hc-eye-l{
-  transform-box:fill-box;transform-origin:center;
-  animation:hcBlink 4.2s ease-in-out infinite;
+  transform-origin:22px 28px;
+  animation:hcBlink 5.4s ease-in-out infinite;
 }
 .hc-cat-black .hc-eye-r{
-  transform-box:fill-box;transform-origin:center;
-  animation:hcBlink 4.2s ease-in-out infinite 0.08s;
+  transform-origin:42px 28px;
+  animation:hcBlink 5.4s ease-in-out infinite 0.06s;
 }
 @keyframes hcSitTail{
   0%,100%{transform:rotate(-13deg);}
   50%    {transform:rotate(13deg);}
 }
 @keyframes hcBlink{
-  0%,88%,100%{transform:scaleY(1);}
-  93%         {transform:scaleY(0.06);}
+  0%,90%,100%{transform:scaleY(1);}
+  94%,96%    {transform:scaleY(0.18);}
 }
 
 /* ── 白貓：舉爪追花瓣 ── */
