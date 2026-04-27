@@ -2315,3 +2315,9 @@ html[data-theme="dark"] .cmc-privacy-mini:hover{ background:rgba(255,255,255,.14
 }
 /* 餘額卡隱藏時，cashflow bar 上的 margin 補回去避免黏到 cat card */
 .free-card.fc-merged{ display:none !important; }
+
+/* v46 record items details */
+.rec-items-details summary{ list-style:none; }
+.rec-items-details summary::-webkit-details-marker{ display:none; }
+.rec-items-details[open] summary{ color:var(--text2); }
+.rec-items-details[open] summary::after{ content:''; }

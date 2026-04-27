@@ -1396,14 +1396,16 @@ function openAIChooser(){
 }
 
 // ── 📷 INVOICE QR SCANNER (台灣電子發票) ──
-window._invScanState={stream:null,running:false,detector:null,pending:null,raf:0};
+// v46: 同時掃左碼（基本）+ 右碼（細項），合併後存入記錄
+window._invScanState={stream:null,running:false,detector:null,pending:null,raf:0,leftRaw:null,rightRaw:null,startAt:0};
 
 async function openInvoiceScanner(){
   closeFab();
   const errEl=document.getElementById('invScanError');
   errEl.style.display='none'; errEl.textContent='';
-  document.getElementById('invScanHint').textContent='對準發票左下角 QR Code';
+  document.getElementById('invScanHint').textContent='對準發票左下角 QR Code（自動讀左+右碼）';
   document.getElementById('invoiceScanOverlay').classList.add('open');
+  _invScanState.leftRaw=null; _invScanState.rightRaw=null; _invScanState.startAt=Date.now();
   // 偵測能力
   if(!('BarcodeDetector' in window)){
     errEl.innerHTML='⚠️ 此瀏覽器不支援相機即時掃描<br>請改用 <strong>📁 選擇照片</strong>（iOS Safari 17+ / Chrome 支援）';
@@ -1445,9 +1447,25 @@ async function scanLoop(){
     try{
       const codes=await det.detect(vid);
       if(codes && codes.length){
-        const raw=codes[0].rawValue||'';
-        onInvoiceQRDecoded(raw);
-        return;
+        for(const c of codes){
+          const raw=c.rawValue||'';
+          if(raw.startsWith('**')){
+            _invScanState.rightRaw=raw;
+          } else if(/^[A-Z]{2}\d{8}/.test(raw)){
+            _invScanState.leftRaw=raw;
+          }
+        }
+        const elapsed=Date.now()-_invScanState.startAt;
+        // 同時抓到 → 直接送
+        if(_invScanState.leftRaw && _invScanState.rightRaw){
+          onInvoiceQRDecoded(_invScanState.leftRaw,_invScanState.rightRaw);
+          return;
+        }
+        // 掃到左碼後給 1.5 秒等右碼，逾時就單獨送
+        if(_invScanState.leftRaw && elapsed>1500){
+          onInvoiceQRDecoded(_invScanState.leftRaw,_invScanState.rightRaw||null);
+          return;
+        }
       }
     }catch(e){/* ignore frame errors */}
   }
@@ -1465,20 +1483,48 @@ async function scanInvoiceFiles(files){
     errEl.style.display='block';
     return;
   }
-  let found=null, failed=0;
+  let leftRaw=null, rightRaw=null, failed=0;
   for(const file of files){
     try{
       const bmp=await createImageBitmap(file);
       const codes=await detector.detect(bmp);
-      if(codes && codes.length){ found=codes[0].rawValue||''; break; }
-      else failed++;
+      if(codes && codes.length){
+        for(const c of codes){
+          const raw=c.rawValue||'';
+          if(raw.startsWith('**')) rightRaw=rightRaw||raw;
+          else if(/^[A-Z]{2}\d{8}/.test(raw)) leftRaw=leftRaw||raw;
+        }
+      } else failed++;
     }catch(e){ failed++; }
   }
-  if(found){ onInvoiceQRDecoded(found); }
+  if(leftRaw){ onInvoiceQRDecoded(leftRaw,rightRaw); }
   else{
-    errEl.innerHTML=`❌ ${files.length} 張圖片都未偵測到 QR Code<br>請確認對準發票左下角、光線充足`;
+    errEl.innerHTML=`❌ ${files.length} 張圖片都未偵測到發票左碼<br>請確認對準發票左下角、光線充足`;
     errEl.style.display='block';
   }
+}
+
+// ── 解析財政部電子發票 QR 右碼（細項清單） ──
+// 右碼格式：** + 品項數(2位) + : + 名稱1 : 數量1 : 單價1 : 名稱2 : 數量2 : 單價2 : ...
+function parseTaiwanInvoiceQRRight(raw){
+  try{
+    if(!raw||!raw.startsWith('**')) return null;
+    const body=raw.substring(2);
+    const parts=body.split(':');
+    if(parts.length<4) return null;
+    // 第一段是品項數量（可能是 hex 或十進位），跳過
+    const items=[];
+    for(let i=1;i+2<parts.length;i+=3){
+      const name=(parts[i]||'').trim();
+      const qty=parseFloat(parts[i+1])||1;
+      const sub=parseFloat(parts[i+2])||0;
+      if(!name) continue;
+      // 過濾掉純數字 / 純亂碼（沒有可見字元）
+      if(!/[\u4e00-\u9fff\w]/.test(name)) continue;
+      items.push({name,qty,sub});
+    }
+    return items.length?{items}:null;
+  }catch(e){ return null; }
 }
 
 // 解析財政部電子發票 QR 左碼
@@ -1492,22 +1538,17 @@ function parseTaiwanInvoiceQR(raw){
     const rocY=parseInt(rocDate.substring(0,3),10);
     const mm=rocDate.substring(3,5), dd=rocDate.substring(5,7);
     const date=`${rocY+1911}-${mm}-${dd}`;
-    // 隨機碼 17-21
-    // 銷售額 21-29（稅前）
-    // 總計金額 29-37（含稅，hex）
     const totalHex=raw.substring(29,37);
     const total=parseInt(totalHex,16);
     if(isNaN(total)||total<=0||total>1000000) return null;
     const buyerId=raw.substring(37,45);
     const sellerId=raw.substring(45,53);
-    // 54+ 是驗證碼 ** items
     let items=[];
     const idx=raw.indexOf('**');
     if(idx>0 && idx+2<raw.length){
       const tail=raw.substring(idx+2);
-      // tail 格式：:AES加密:BASE64品項  → 只擷取可見中文品項
       const parts=tail.split(':').filter(s=>s && /[\u4e00-\u9fff]/.test(s));
-      items=parts.slice(0,20);
+      items=parts.slice(0,20).map(name=>({name,qty:null,sub:null}));
     }
     return {
       invoice:inv, date, total,
@@ -1519,8 +1560,8 @@ function parseTaiwanInvoiceQR(raw){
 }
 
 window._invPending=null;
-function onInvoiceQRDecoded(raw){
-  const parsed=parseTaiwanInvoiceQR(raw);
+function onInvoiceQRDecoded(rawLeft, rawRight){
+  const parsed=parseTaiwanInvoiceQR(rawLeft);
   if(!parsed){
     const errEl=document.getElementById('invScanError');
     errEl.innerHTML=`⚠️ 不是台灣電子發票格式<br><div style="font-size:10px;color:#999;word-break:break-all;margin-top:4px">原始內容：${raw.substring(0,60)}...</div>`;
@@ -1537,8 +1578,23 @@ function onInvoiceQRDecoded(raw){
     showToast(`⚠️ 發票 ${parsed.invoice} 已記過\n${prev.date} · $${(prev.total||0).toLocaleString()}`,'error');
     return;
   }
+  // v46: 合併右碼細項（含數量/單價）
+  if(rawRight){
+    const rightParsed=parseTaiwanInvoiceQRRight(rawRight);
+    if(rightParsed && rightParsed.items.length){
+      // 右碼有完整明細 → 完全覆蓋（更詳細）
+      parsed.items=rightParsed.items;
+    }
+  }
   _invPending=parsed;
   // 填結果
+  const itemsHtml=parsed.items.length?parsed.items.slice(0,10).map(it=>{
+    if(typeof it==='string') return `• ${it}`;
+    const sub=it.sub?` <span style="color:var(--accent);font-family:'DM Mono',monospace;font-weight:600">$${it.sub.toLocaleString()}</span>`:'';
+    const qty=it.qty&&it.qty>1?` <span style="color:var(--text3);font-size:10px">×${it.qty}</span>`:'';
+    return `• ${it.name}${qty}${sub}`;
+  }).join('<br>'):'';
+  const firstName=parsed.items[0]?(typeof parsed.items[0]==='string'?parsed.items[0]:parsed.items[0].name):('發票'+parsed.invoice.slice(-4));
   const body=document.getElementById('invoiceResultBody');
   body.innerHTML=`
     <div style="background:linear-gradient(135deg,rgba(0,188,212,0.12),rgba(240,138,107,0.08));border:1.5px solid rgba(0,188,212,0.3);border-radius:var(--r-sm);padding:14px;margin-bottom:12px">
@@ -1551,11 +1607,11 @@ function onInvoiceQRDecoded(raw){
       ${parsed.sellerId?`<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2)"><span>🏪 賣方</span><span style="color:var(--text);font-family:'DM Mono',monospace">${parsed.sellerId}</span></div>`:''}
     </div>
     ${parsed.items.length?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px">
-      <div style="font-size:10px;color:var(--text2);margin-bottom:6px">📋 品項（${parsed.items.length}）</div>
-      <div style="font-size:12px;line-height:1.7">${parsed.items.slice(0,8).map(i=>`• ${i}`).join('<br>')}${parsed.items.length>8?'<br>...':''}</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:6px">📋 品項（${parsed.items.length}）${rawRight?' <span style="color:var(--accent3);font-weight:700">✓ 含明細</span>':''}</div>
+      <div style="font-size:12px;line-height:1.7">${itemsHtml}${parsed.items.length>10?'<br>...':''}</div>
     </div>`:''}
     <div class="form-group"><label class="form-label">品名（可修改）</label>
-      <input class="form-input" id="ir-name" value="${parsed.items[0]||'發票'+parsed.invoice.slice(-4)}"/>
+      <input class="form-input" id="ir-name" value="${firstName}"/>
     </div>
   `;
   // 分類下拉（使用生活花費類別 expCats，而非補貨品項類別）
@@ -1601,7 +1657,7 @@ window.selectInvoiceType=selectInvoiceType;
 window._setInvCatList=applyInvoiceTypeUI; // legacy
 
 function guessInvoiceCategory(parsed){
-  const text=(parsed.items.join(' ')||'').toLowerCase();
+  const text=(parsed.items.map(i=>typeof i==='string'?i:i.name).join(' ')||'').toLowerCase();
   const rules=[
     {kw:['餐','便當','飲','咖啡','茶','pizza','mcd','麥當勞','星巴克','麵','飯','鍋'],cat:'food'},
     {kw:['油','停車','uber','計程','客運','高鐵','台鐵','捷運'],cat:'transport'},
@@ -1634,7 +1690,9 @@ function confirmInvoiceRecord(){
     type:isRestock?'var':'life',
     pay,
     invoice:p.invoice,
-    note:`發票 ${p.invoice}${p.sellerId?' · '+p.sellerId:''}`
+    note:`發票 ${p.invoice}${p.sellerId?' · '+p.sellerId:''}`,
+    // v46: 存入細項清單，供詳情展開 + 全域搜尋
+    items:(p.items||[]).map(it=>typeof it==='string'?{name:it}:{name:it.name,qty:it.qty||null,sub:it.sub||null})
   };
   if(pay==='card' && creditCards.length){
     rec.cardId=creditCards[0].id;
@@ -1686,6 +1744,8 @@ function parseInvoiceCSV(text){
   const colSeller=findCol('賣方名稱','店家','商家','賣方');
   const colSellerId=findCol('賣方統編','統編');
   const colAmount=findCol('金額','總計','總金額');
+  // v46: 品項細項欄位（兌獎 App 進階匯出 / 自製 CSV 才有）
+  const colItems=findCol('品項','明細','購物明細','商品明細','商品');
   if(colInv<0 || colDate<0 || colAmount<0) return [];
   const rows=[];
   for(let i=1;i<lines.length;i++){
@@ -1702,10 +1762,17 @@ function parseInvoiceCSV(text){
     }
     const total=parseInt((f[colAmount]||'0').replace(/[^\d]/g,''))||0;
     if(total<=0) continue;
+    // 解析品項（多種分隔符：;/、|/逗號/換行）
+    let items=[];
+    if(colItems>=0 && f[colItems]){
+      const raw=f[colItems];
+      items=raw.split(/[;、|/\n]+/).map(s=>s.trim()).filter(s=>s && /[\u4e00-\u9fff\w]/.test(s)).slice(0,30).map(name=>({name}));
+    }
     rows.push({
       invoice:inv, date, total,
       seller:(colSeller>=0?f[colSeller]:'')||'',
-      sellerId:(colSellerId>=0?(f[colSellerId]||'').replace(/\s/g,''):'')||''
+      sellerId:(colSellerId>=0?(f[colSellerId]||'').replace(/\s/g,''):'')||'',
+      items
     });
   }
   return rows;
@@ -1758,7 +1825,7 @@ async function importInvoiceCSV(ev){
     </div>
     ${news.length?`<div style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;margin-bottom:10px">
       ${news.slice(0,12).map(r=>`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 6px;border-bottom:1px solid var(--border)">
-        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.date} · ${r.seller||r.invoice}</span>
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.date} · ${r.seller||r.invoice}${r.items&&r.items.length?` <span style="color:var(--accent3);font-weight:700">📋${r.items.length}</span>`:''}</span>
         <span style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:600">$${r.total.toLocaleString()}</span>
       </div>`).join('')}
       ${news.length>12?`<div style="text-align:center;font-size:10px;color:var(--text3);padding:6px">... 還有 ${news.length-12} 筆</div>`:''}
@@ -1789,7 +1856,8 @@ function confirmCSVImport(){
       cat, date:r.date,
       type:'var', pay,
       invoice:r.invoice,
-      note:`CSV 匯入 · ${r.invoice}${r.sellerId?' · '+r.sellerId:''}`
+      note:`CSV 匯入 · ${r.invoice}${r.sellerId?' · '+r.sellerId:''}`,
+      items:r.items||[]
     };
     if(pay==='card' && firstCard){
       rec.cardId=firstCard.id;
@@ -4993,7 +5061,7 @@ function renderRecords(){
     allRecs=allRecs.filter(r=>r.date===recordDayFilter);
   }
 
-  // v45 搜尋（商家名 / 備註 / 標籤 / 類別 label）
+  // v45 搜尋（商家名 / 備註 / 標籤 / 類別 label / v46: 發票字軌+細項品名）
   if(recordSearchQuery){
     const q=recordSearchQuery;
     const catLabel=(id)=>{
@@ -5003,8 +5071,15 @@ function renderRecords(){
     allRecs=allRecs.filter(r=>{
       if((r.name||'').toLowerCase().includes(q)) return true;
       if((r.memo||'').toLowerCase().includes(q)) return true;
+      if((r.note||'').toLowerCase().includes(q)) return true;
+      if((r.invoice||'').toLowerCase().includes(q)) return true;
       if((r.tags||[]).some(t=>String(t).toLowerCase().includes(q))) return true;
       if(catLabel(r.cat).includes(q)) return true;
+      // v46: 搜發票細項品名
+      if((r.items||[]).some(it=>{
+        const n=typeof it==='string'?it:(it&&it.name||'');
+        return n.toLowerCase().includes(q);
+      })) return true;
       return false;
     });
   }
@@ -5034,6 +5109,18 @@ function renderRecords(){
       const fxBadge=r.fx?`<span class="fx-badge">${r.fx.origAmount} ${r.fx.currency}</span>`:'';
       const chipsHtml=(r.tags&&r.tags.length)?`<div style="margin-top:2px">${r.tags.map(t=>`<span class="record-chip">🏷 ${t}</span>`).join('')}</div>`:'';
       const memoHtml=r.memo?`<div class="record-memo">📝 ${r.memo}</div>`:'';
+      // v46: 發票細項展開（清單存在 r.items）
+      const itemsHtml=(r.items&&r.items.length)?(()=>{
+        const lis=r.items.slice(0,8).map(it=>{
+          const n=typeof it==='string'?it:(it&&it.name||'');
+          if(!n) return '';
+          const sub=(it&&it.sub)?`<span style="color:var(--accent);font-family:'DM Mono',monospace;float:right">$${Number(it.sub).toLocaleString()}</span>`:'';
+          const qty=(it&&it.qty&&it.qty>1)?`<span style="color:var(--text3);font-size:10px"> ×${it.qty}</span>`:'';
+          return `<div style="font-size:11px;line-height:1.55;padding:1px 0">• ${n}${qty}${sub}</div>`;
+        }).join('');
+        const more=r.items.length>8?`<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:2px">⋯ 還有 ${r.items.length-8} 項</div>`:'';
+        return `<details class="rec-items-details" style="margin-top:4px"><summary style="cursor:pointer;font-size:10px;color:var(--accent);user-select:none;padding:2px 0">📋 發票明細（${r.items.length} 項）▾</summary><div style="background:var(--bg2);border-radius:6px;padding:6px 10px;margin-top:4px">${lis}${more}</div></details>`;
+      })():'';
       const payInfo=(r.type==='var'||r.type==='life'||r.type==='easycard'||r.type==='voucher')?(function(){
         if(r.pay==='cash') return '💵 現金';
         if(r.pay==='easycard') return '🚇 悠遊卡';
@@ -5059,7 +5146,7 @@ function renderRecords(){
         <div class="ri-info">
           <div class="ri-name">${r.name}${typeTag[r.type]||''}${r._travelBudget?'<span class="record-tag" style="background:#dbeafe;color:#2563eb">✈️ 旅遊預算</span>':''}${fxBadge}</div>
           <div class="ri-date">${r.brand} · ${fmtDate(r.date)}</div>
-          ${payHtml}${chipsHtml}${memoHtml}
+          ${payHtml}${chipsHtml}${memoHtml}${itemsHtml}
         </div>
         <div class="ri-amt ${r.type==='fixed'||r.type==='installment'?'fix':'var'}">$${r.price.toLocaleString()}</div>
         ${actionBtns}
