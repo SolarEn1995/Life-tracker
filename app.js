@@ -1399,6 +1399,128 @@ function openAIChooser(){
 // v46: 同時掃左碼（基本）+ 右碼（細項），合併後存入記錄
 window._invScanState={stream:null,running:false,detector:null,pending:null,raf:0,leftRaw:null,rightRaw:null,startAt:0};
 
+// ── v48: 補貨白名單比對（Dice 雙字頻 + 軟性日期+金額查重）──
+function _bigrams(s){
+  s=String(s||'').toLowerCase().replace(/\s+/g,'');
+  const out=new Set();
+  for(let i=0;i<s.length-1;i++) out.add(s.substr(i,2));
+  if(s.length===1) out.add(s); // 單字也納
+  return out;
+}
+function _similarity(a,b){
+  const A=_bigrams(a), B=_bigrams(b);
+  if(!A.size||!B.size) return 0;
+  let inter=0; A.forEach(x=>{ if(B.has(x)) inter++; });
+  return (2*inter)/(A.size+B.size); // Dice coefficient (0~1)
+}
+function _fuzzyFindProduct(itemName, threshold=0.42){
+  if(!itemName||!products||!products.length) return null;
+  let best=null, bestScore=0;
+  for(const p of products){
+    const s=_similarity(itemName, p.name);
+    if(s>bestScore){ bestScore=s; best=p; }
+  }
+  return bestScore>=threshold?{product:best,score:bestScore}:null;
+}
+function _daysDiff(d1,d2){
+  if(!d1||!d2) return 999;
+  const t1=new Date(d1).getTime(), t2=new Date(d2).getTime();
+  return Math.abs(Math.round((t1-t2)/86400000));
+}
+// 偵測：發票品項 vs 補貨白名單 vs 已手動記錄
+function detectRestockMatches(parsed){
+  const items=parsed.items||[];
+  const matches=[]; // 命中補貨白名單
+  const newItems=[]; // 純新品項
+  items.forEach((it,i)=>{
+    const name=typeof it==='string'?it:(it&&it.name||'');
+    if(!name) return;
+    const sub=(it&&it.sub)?Number(it.sub):null;
+    const qty=(it&&it.qty)?Number(it.qty):1;
+    const found=_fuzzyFindProduct(name);
+    if(found){
+      // 在 records 中找 7 天內、同 productId 或名字相似 的「非本張發票」記錄
+      const manualRec=records.find(r=>{
+        if(r.invoice===parsed.invoice) return false; // 自己（再次掃同張）排除
+        const dDiff=_daysDiff(r.date, parsed.date);
+        if(dDiff>7) return false;
+        if(r.productId===found.product.id) return true;
+        if(r.name && _similarity(r.name,name)>=0.6) return true;
+        return false;
+      });
+      matches.push({idx:i,item:it,name,sub,qty,product:found.product,score:found.score,alreadyRecorded:!!manualRec,manualRec});
+    } else {
+      newItems.push({idx:i,item:it,name,sub,qty});
+    }
+  });
+  return {matches,newItems};
+}
+// 渲染三選一面板（A 智慧合併 / B 全部新增 / C 跳過）
+function renderRestockMatchPanel(parsed, det, opts){
+  const {matches,newItems}=det;
+  const dupCount=matches.filter(m=>m.alreadyRecorded).length;
+  const dupSubs=matches.filter(m=>m.alreadyRecorded&&m.sub).reduce((s,m)=>s+m.sub,0);
+  const restockNewCount=matches.filter(m=>!m.alreadyRecorded).length;
+  if(!matches.length) return ''; // 沒命中補貨 → 不顯示面板
+  const idPrefix=opts&&opts.idPrefix||'rsm';
+  const matchRows=matches.map(m=>{
+    const sub=m.sub?` <span style="color:var(--accent);font-family:'DM Mono',monospace">$${m.sub.toLocaleString()}</span>`:'';
+    const dupBadge=m.alreadyRecorded
+      ?`<span style="background:rgba(232,72,138,0.15);color:#e8488a;font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">已於 ${m.manualRec.date} 記過</span>`
+      :'<span style="background:rgba(24,184,124,0.15);color:var(--accent3);font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px">📦 新補貨</span>';
+    return `<div style="font-size:11px;line-height:1.7;padding:2px 0">📦 ${m.product.emoji||''} ${m.product.name}${sub}${dupBadge}</div>`;
+  }).join('');
+  const newRows=newItems.length?newItems.slice(0,6).map(n=>{
+    const sub=n.sub?` <span style="color:var(--accent);font-family:'DM Mono',monospace">$${n.sub.toLocaleString()}</span>`:'';
+    return `<div style="font-size:11px;line-height:1.6;color:var(--text2);padding:1px 0">• ${n.name}${sub}</div>`;
+  }).join('')+(newItems.length>6?`<div style="font-size:10px;color:var(--text3)">⋯ 還有 ${newItems.length-6} 項</div>`:''):'';
+  const canSubtract=dupSubs>0;
+  const totalAfter=parsed.total-dupSubs;
+  return `
+    <div style="background:linear-gradient(135deg,rgba(255,234,167,0.45),rgba(255,224,138,0.18));border:1.5px solid rgba(212,160,72,0.35);border-radius:var(--r-sm);padding:12px 13px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:800;color:#8A5A2B;margin-bottom:8px">
+        🎯 偵測到 ${matches.length} 項補貨白名單命中${dupCount?`（其中 ${dupCount} 項可能已手動記過）`:''}
+      </div>
+      <div style="background:var(--surface);border-radius:8px;padding:8px 10px;margin-bottom:8px">
+        ${matchRows}
+      </div>
+      ${newItems.length?`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">✨ 其他新品項：${newItems.length} 項</div><div style="background:var(--bg2);border-radius:6px;padding:6px 10px;margin-bottom:8px">${newRows}</div>`:''}
+
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">📊 處理方式</div>
+      <label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--accent);border-radius:8px;margin-bottom:6px;cursor:pointer">
+        <input type="radio" name="${idPrefix}-mode" value="A" checked style="margin-top:2px;accent-color:var(--accent)"/>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700;color:var(--accent)">A. 智慧合併（推薦）</div>
+          <div style="font-size:10px;color:var(--text2);line-height:1.55;margin-top:2px">
+            ${canSubtract
+              ?`扣除已記過的補貨小計 <strong>$${dupSubs.toLocaleString()}</strong>，新增金額 <strong>$${totalAfter.toLocaleString()}</strong>（保留全部 ${parsed.items.length} 項細項供搜尋）`
+              :`本發票無單品價格，無法精算扣除金額；改用「全部新增 $${parsed.total.toLocaleString()}」並標記為「已比對補貨」`}
+          </div>
+        </div>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer">
+        <input type="radio" name="${idPrefix}-mode" value="B" style="margin-top:2px;accent-color:var(--accent)"/>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700">B. 全部新增（金額 $${parsed.total.toLocaleString()}）</div>
+          <div style="font-size:10px;color:var(--text2);line-height:1.55;margin-top:2px">${dupCount?`⚠️ 將與已有 ${dupCount} 筆手動記錄重複計算 ${dupSubs?'$'+dupSubs.toLocaleString():''}`:'未發現重複，可安心使用'}</div>
+        </div>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer">
+        <input type="radio" name="${idPrefix}-mode" value="C" style="margin-top:2px;accent-color:var(--accent)"/>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700">C. 整張跳過（不新增記錄）</div>
+          <div style="font-size:10px;color:var(--text2);line-height:1.55;margin-top:2px">發票字軌仍寫入防重，下次掃同張不會再跳出</div>
+        </div>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(24,184,124,0.08);border-radius:6px;cursor:pointer">
+        <input type="checkbox" id="${idPrefix}-restock" ${restockNewCount?'checked':''} style="accent-color:var(--accent3)"/>
+        <span style="font-size:11px;color:var(--text)">📦 同時將補貨品 <strong>${matches.map(m=>m.product.name.slice(0,4)).join('、')}</strong> 回補到庫存（更新「最近購買日」）</span>
+      </label>
+    </div>
+  `;
+}
+
 async function openInvoiceScanner(){
   closeFab();
   const errEl=document.getElementById('invScanError');
@@ -1587,6 +1709,10 @@ function onInvoiceQRDecoded(rawLeft, rawRight){
     }
   }
   _invPending=parsed;
+  // v48: 偵測補貨白名單命中 + 已手動記過
+  const det=detectRestockMatches(parsed);
+  _invPending._detect=det;
+  const restockPanel=renderRestockMatchPanel(parsed,det,{idPrefix:'inv-rsm'});
   // 填結果
   const itemsHtml=parsed.items.length?parsed.items.slice(0,10).map(it=>{
     if(typeof it==='string') return `• ${it}`;
@@ -1610,6 +1736,7 @@ function onInvoiceQRDecoded(rawLeft, rawRight){
       <div style="font-size:10px;color:var(--text2);margin-bottom:6px">📋 品項（${parsed.items.length}）${rawRight?' <span style="color:var(--accent3);font-weight:700">✓ 含明細</span>':''}</div>
       <div style="font-size:12px;line-height:1.7">${itemsHtml}${parsed.items.length>10?'<br>...':''}</div>
     </div>`:''}
+    ${restockPanel}
     <div class="form-group"><label class="form-label">品名（可修改）</label>
       <input class="form-input" id="ir-name" value="${firstName}"/>
     </div>
@@ -1679,20 +1806,54 @@ function confirmInvoiceRecord(){
   const pay=document.getElementById('ir-pay').value;
   const p=_invPending;
   const isRestock=_invType==='restock';
+  // v48: 讀取 A/B/C 模式 + 是否回補庫存
+  const det=p._detect;
+  const modeRadio=document.querySelector('input[name="inv-rsm-mode"]:checked');
+  const mode=(det && det.matches.length && modeRadio)?modeRadio.value:'B'; // 沒命中 → 直接 B
+  const restockChk=document.getElementById('inv-rsm-restock');
+  const doRestock=restockChk?restockChk.checked:false;
+  // 模式 C：整張跳過（仍寫 invoiceSeen 防重）
+  if(mode==='C'){
+    if(!invoiceSeen) invoiceSeen={};
+    invoiceSeen[p.invoice]={date:p.date,total:p.total,seller:p.sellerId||'',savedAt:new Date().toISOString(),skipped:true};
+    if(doRestock && det) _applyRestockBoughtDate(det,p.date);
+    save();
+    closeModal('invoiceResultOverlay');
+    showToast(`⏭ 已跳過此發票（仍記錄字軌防重）`,'ok');
+    if(typeof renderAll==='function') renderAll();
+    _invPending=null;
+    return;
+  }
+  // 計算金額：A 模式且有單價 → 扣除已記過補貨小計
+  let recPrice=p.total;
+  let mergeNote='';
+  if(mode==='A' && det){
+    const dupSubs=det.matches.filter(m=>m.alreadyRecorded&&m.sub).reduce((s,m)=>s+m.sub,0);
+    if(dupSubs>0){
+      recPrice=p.total-dupSubs;
+      const dupNames=det.matches.filter(m=>m.alreadyRecorded&&m.sub).map(m=>m.product.name.slice(0,8)).join('、');
+      mergeNote=` · 智慧合併扣除已記過：${dupNames} -$${dupSubs.toLocaleString()}`;
+    } else if(det.matches.some(m=>m.alreadyRecorded)){
+      mergeNote=` · 比對到 ${det.matches.filter(m=>m.alreadyRecorded).length} 項已記過（無單價無法扣除）`;
+    }
+  }
   const rec={
     id:Date.now(),
     name,
     emoji:isRestock?(catById(cat)?.emoji||'📦'):(catEmoji(cat)||'🧾'),
     brand:'掃描發票',
-    price:p.total,
+    price:recPrice,
     cat,
     date:p.date,
     type:isRestock?'var':'life',
     pay,
     invoice:p.invoice,
-    note:`發票 ${p.invoice}${p.sellerId?' · '+p.sellerId:''}`,
+    note:`發票 ${p.invoice}${p.sellerId?' · '+p.sellerId:''}${mergeNote}`,
     // v46: 存入細項清單，供詳情展開 + 全域搜尋
-    items:(p.items||[]).map(it=>typeof it==='string'?{name:it}:{name:it.name,qty:it.qty||null,sub:it.sub||null})
+    items:(p.items||[]).map(it=>typeof it==='string'?{name:it}:{name:it.name,qty:it.qty||null,sub:it.sub||null}),
+    // v48: 標記合併模式
+    _mergeMode:mode,
+    _origTotal:p.total
   };
   if(pay==='card' && creditCards.length){
     rec.cardId=creditCards[0].id;
@@ -1702,11 +1863,27 @@ function confirmInvoiceRecord(){
   // 記錄字軌防重
   if(!invoiceSeen) invoiceSeen={};
   invoiceSeen[p.invoice]={date:p.date,total:p.total,seller:p.sellerId||'',savedAt:new Date().toISOString()};
+  // v48: 回補補貨庫存（更新 boughtDate）
+  if(doRestock && det && det.matches.length){
+    _applyRestockBoughtDate(det,p.date);
+  }
   save();
   closeModal('invoiceResultOverlay');
-  showToast(`✓ 已加入 ${name} $${p.total.toLocaleString()}`,'ok');
+  let toastMsg=`✓ 已加入 ${name} $${recPrice.toLocaleString()}`;
+  if(mode==='A' && recPrice<p.total) toastMsg+=`（已扣除重複 $${(p.total-recPrice).toLocaleString()}）`;
+  if(doRestock && det) toastMsg+=` · 📦 補回 ${det.matches.length} 項`;
+  showToast(toastMsg,'ok');
   if(typeof renderAll==='function') renderAll();
   _invPending=null;
+}
+
+// v48: 回補補貨品 boughtDate
+function _applyRestockBoughtDate(det,date){
+  if(!det||!det.matches) return;
+  det.matches.forEach(m=>{
+    const p=products.find(x=>x.id===m.product.id);
+    if(p) p.boughtDate=date||todayStr();
+  });
 }
 
 // ── 📥 CSV 匯入（統一發票兌獎 App 匯出的消費明細）──
@@ -1806,6 +1983,22 @@ async function importInvoiceCSV(ev){
     else news.push(r);
   });
   _csvPending={news,dupes,totalRows,parseFailFiles};
+  // v48: 對每筆 news 跑補貨白名單偵測，彙整全域摘要
+  let totalMatches=0, totalDupItems=0, totalDupSubs=0, rowsWithMatches=0;
+  news.forEach(r=>{
+    r._detect=detectRestockMatches(r);
+    if(r._detect.matches.length){
+      rowsWithMatches++;
+      totalMatches+=r._detect.matches.length;
+      r._detect.matches.forEach(m=>{
+        if(m.alreadyRecorded){
+          totalDupItems++;
+          if(m.sub) totalDupSubs+=m.sub;
+        }
+      });
+    }
+  });
+  _csvPending._summary={totalMatches,totalDupItems,totalDupSubs,rowsWithMatches};
   // 渲染摘要
   const body=document.getElementById('csvImportBody');
   body.innerHTML=`
@@ -1831,6 +2024,38 @@ async function importInvoiceCSV(ev){
       ${news.length>12?`<div style="text-align:center;font-size:10px;color:var(--text3);padding:6px">... 還有 ${news.length-12} 筆</div>`:''}
     </div>`:'<div style="text-align:center;padding:14px;color:var(--text3);font-size:12px">沒有新發票可匯入</div>'}
     ${parseFailFiles?`<div style="font-size:10px;color:var(--danger);text-align:center;margin-bottom:8px">⚠️ ${parseFailFiles} 個檔案無法解析</div>`:''}
+    ${rowsWithMatches?`
+      <div style="background:linear-gradient(135deg,rgba(255,234,167,0.45),rgba(255,224,138,0.18));border:1.5px solid rgba(212,160,72,0.35);border-radius:var(--r-sm);padding:11px 12px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:800;color:#8A5A2B;margin-bottom:8px">
+          🎯 ${rowsWithMatches} 張發票命中補貨白名單，共 ${totalMatches} 項${totalDupItems?`（其中 ${totalDupItems} 項可能已記過${totalDupSubs?` $${totalDupSubs.toLocaleString()}`:''}）`:''}
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">📊 全域處理方式（套用全部）</div>
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--bg2);border:1.5px solid var(--accent);border-radius:8px;margin-bottom:5px;cursor:pointer">
+          <input type="radio" name="csv-rsm-mode" value="A" checked style="margin-top:2px;accent-color:var(--accent)"/>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700;color:var(--accent)">A. 智慧合併（推薦）</div>
+            <div style="font-size:10px;color:var(--text2);line-height:1.5;margin-top:2px">每張發票自動扣除已手動記過的補貨小計${totalDupSubs?`（預計減 $${totalDupSubs.toLocaleString()}）`:'（無單價時改用全額）'}</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;margin-bottom:5px;cursor:pointer">
+          <input type="radio" name="csv-rsm-mode" value="B" style="margin-top:2px;accent-color:var(--accent)"/>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700">B. 全部新增（金額不調整）</div>
+            <div style="font-size:10px;color:var(--text2);line-height:1.5;margin-top:2px">${totalDupItems?`⚠️ 可能與已有手動記錄重複計算`:'未發現重複，可安心使用'}</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer">
+          <input type="radio" name="csv-rsm-mode" value="C" style="margin-top:2px;accent-color:var(--accent)"/>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700">C. 命中補貨的整張跳過</div>
+            <div style="font-size:10px;color:var(--text2);line-height:1.5;margin-top:2px">只匯入「沒命中補貨」的發票（命中者寫入字軌防重，但不新增記錄）</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(24,184,124,0.08);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="csv-rsm-restock" checked style="accent-color:var(--accent3)"/>
+          <span style="font-size:11px;color:var(--text)">📦 同時將命中的補貨品回補庫存（更新最近購買日）</span>
+        </label>
+      </div>`:''}
   `;
   // 下拉
   const catSel=document.getElementById('csv-cat');
@@ -1847,17 +2072,46 @@ function confirmCSVImport(){
   const pay=document.getElementById('csv-pay').value;
   const firstCard=creditCards.length?creditCards[0]:null;
   const now=Date.now();
+  // v48: 讀全域模式 + 是否回補庫存
+  const modeRadio=document.querySelector('input[name="csv-rsm-mode"]:checked');
+  const mode=modeRadio?modeRadio.value:'B';
+  const restockChk=document.getElementById('csv-rsm-restock');
+  const doRestock=restockChk?restockChk.checked:false;
+  let imported=0, skipped=0, totalDeducted=0, totalRestocked=0;
   _csvPending.news.forEach((r,i)=>{
+    const det=r._detect;
+    const hasMatch=det && det.matches.length>0;
+    // 模式 C：命中補貨 → 跳過記錄但寫字軌
+    if(mode==='C' && hasMatch){
+      if(!invoiceSeen) invoiceSeen={};
+      invoiceSeen[r.invoice]={date:r.date,total:r.total,seller:r.sellerId||'',savedAt:new Date().toISOString(),skipped:true};
+      if(doRestock) { _applyRestockBoughtDate(det,r.date); totalRestocked+=det.matches.length; }
+      skipped++;
+      return;
+    }
+    // 計算金額（A 模式扣除已記過的小計）
+    let recPrice=r.total, mergeNote='';
+    if(mode==='A' && hasMatch){
+      const dupSubs=det.matches.filter(m=>m.alreadyRecorded&&m.sub).reduce((s,m)=>s+m.sub,0);
+      if(dupSubs>0){
+        recPrice=r.total-dupSubs;
+        totalDeducted+=dupSubs;
+        const dupNames=det.matches.filter(m=>m.alreadyRecorded&&m.sub).map(m=>m.product.name.slice(0,8)).join('、');
+        mergeNote=` · 智慧合併扣除：${dupNames} -$${dupSubs.toLocaleString()}`;
+      }
+    }
     const rec={
       id:now+i,
       name:r.seller||`發票 ${r.invoice.slice(-4)}`,
       emoji:'🧾',
-      price:r.total,
+      price:recPrice,
       cat, date:r.date,
       type:'var', pay,
       invoice:r.invoice,
-      note:`CSV 匯入 · ${r.invoice}${r.sellerId?' · '+r.sellerId:''}`,
-      items:r.items||[]
+      note:`CSV 匯入 · ${r.invoice}${r.sellerId?' · '+r.sellerId:''}${mergeNote}`,
+      items:r.items||[],
+      _mergeMode:mode,
+      _origTotal:r.total
     };
     if(pay==='card' && firstCard){
       rec.cardId=firstCard.id;
@@ -1866,13 +2120,20 @@ function confirmCSVImport(){
     records.push(rec);
     if(!invoiceSeen) invoiceSeen={};
     invoiceSeen[r.invoice]={date:r.date,total:r.total,seller:r.sellerId||'',savedAt:new Date().toISOString()};
+    if(doRestock && hasMatch){ _applyRestockBoughtDate(det,r.date); totalRestocked+=det.matches.length; }
+    imported++;
   });
   save();
   closeModal('csvImportOverlay');
-  showToast(`✓ 匯入 ${_csvPending.news.length} 筆發票（跳過 ${_csvPending.dupes.length} 筆重複）`,'ok');
+  let msg=`✓ 匯入 ${imported} 筆發票`;
+  if(skipped>0) msg+=`（跳過命中補貨 ${skipped} 筆）`;
+  msg+=`（重複 ${_csvPending.dupes.length}）`;
+  if(totalDeducted>0) msg+=` · 扣 $${totalDeducted.toLocaleString()}`;
+  if(totalRestocked>0) msg+=` · 📦 回補 ${totalRestocked} 項`;
+  showToast(msg,'ok');
   if(typeof renderAll==='function') renderAll();
   if(typeof renderInvSeenHint==='function') renderInvSeenHint();
-  const importedCount=_csvPending.news.length;
+  const importedCount=imported;
   _csvPending=null;
   // 匯入完若有中獎號碼資料 → 提示對獎
   if(importedCount>0){
