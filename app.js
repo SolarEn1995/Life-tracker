@@ -1722,7 +1722,7 @@ function onInvoiceQRDecoded(rawLeft, rawRight){
   const parsed=parseTaiwanInvoiceQR(rawLeft);
   if(!parsed){
     const errEl=document.getElementById('invScanError');
-    errEl.innerHTML=`⚠️ 不是台灣電子發票格式<br><div style="font-size:10px;color:#999;word-break:break-all;margin-top:4px">原始內容：${raw.substring(0,60)}...</div>`;
+    errEl.innerHTML=`⚠️ 不是台灣電子發票格式<br><div style="font-size:10px;color:#999;word-break:break-all;margin-top:4px">原始內容：${(rawLeft||'').substring(0,60)}...</div>`;
     errEl.style.display='block';
     // 繼續掃
     if(_invScanState.running) _invScanState.raf=requestAnimationFrame(scanLoop);
