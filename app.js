@@ -8518,3 +8518,114 @@ window.toggleFabMore=toggleFabMore;
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
 })();
+
+// ── v43 Web Share Target — 從其他 app 分享文字快速進帳 ──
+(function(){
+  // 關鍵字 → 類別 對照（按優先序）
+  const CAT_KEYWORDS=[
+    {cat:'food', kws:['星巴克','路易莎','cama','麥當勞','肯德基','摩斯','早餐','午餐','晚餐','宵夜','便當','咖啡','飲料','奶茶','茶','麵','飯','鍋','燒','超商','全家','7-11','7-eleven','萊爾富','OK 超商','foodpanda','uber eats','ubereats','foodpanda','美食','小吃','餐廳','吃']},
+    {cat:'transport', kws:['計程車','uber','悠遊卡','悠遊付','加油','汽油','停車','高鐵','台鐵','客運','火車','捷運','機車','etc','拖吊','Lyft','airport']},
+    {cat:'entertainment', kws:['netflix','spotify','disney','youtube','遊戲','電影','影城','威秀','ktv','好樂迪','錢櫃','steam','playstation','xbox','遊樂']},
+    {cat:'clothing', kws:['uniqlo','zara','h&m','gu','net','服飾','衣服','鞋','洗衣']},
+    {cat:'medical', kws:['藥局','醫院','診所','健保','藥','屈臣氏','康是美','寶雅']},
+    {cat:'social', kws:['聚餐','酒吧','餐酒','dinner','party','宴']},
+    {cat:'travel', kws:['飯店','旅館','機票','航空','agoda','booking','airbnb','klook','kkday','旅遊']},
+  ];
+  function guessCategory(text){
+    if(!text) return 'other';
+    const lower=text.toLowerCase();
+    for(const {cat,kws} of CAT_KEYWORDS){
+      for(const k of kws){ if(lower.includes(k.toLowerCase())) return cat; }
+    }
+    return 'other';
+  }
+  function extractAmount(text){
+    if(!text) return null;
+    // 優先抓 NT$ / NTD / TWD / \$ / 元 旁邊的數字
+    const patterns=[
+      /NT\$\s*([\d,]+(?:\.\d+)?)/i,
+      /NTD\s*([\d,]+(?:\.\d+)?)/i,
+      /TWD\s*([\d,]+(?:\.\d+)?)/i,
+      /\$\s*([\d,]+(?:\.\d+)?)/,
+      /([\d,]+(?:\.\d+)?)\s*元/,
+      /消費\D*([\d,]+(?:\.\d+)?)/,
+      /金額\D*([\d,]+(?:\.\d+)?)/,
+    ];
+    for(const re of patterns){
+      const m=text.match(re);
+      if(m){
+        const v=parseFloat(m[1].replace(/,/g,''));
+        if(!isNaN(v)&&v>0&&v<10000000) return v;
+      }
+    }
+    // 兜底：抓字串中第一個合理金額（10~999999）
+    const all=text.match(/[\d,]+(?:\.\d+)?/g)||[];
+    for(const s of all){
+      const v=parseFloat(s.replace(/,/g,''));
+      if(!isNaN(v)&&v>=10&&v<=999999) return v;
+    }
+    return null;
+  }
+  function extractMerchant(text){
+    if(!text) return '';
+    // 嘗試抓 "於 XXX 消費" / "在 XXX" / "店家：XXX"
+    const m1=text.match(/於\s*([^\s,，。！]{2,20})\s*消費/);
+    if(m1) return m1[1].trim();
+    const m2=text.match(/在\s*([^\s,，。！]{2,20})/);
+    if(m2) return m2[1].trim();
+    const m3=text.match(/店家[:：]\s*([^\s,，。！]{2,20})/);
+    if(m3) return m3[1].trim();
+    // 取第一行非數字長度 2-20 的詞
+    const firstLine=text.split(/[\n\r]/).map(s=>s.trim()).filter(Boolean)[0]||'';
+    const words=firstLine.split(/[\s,，、:：]/).filter(s=>s && !/^[\d.,￥元]+$/i.test(s));
+    return (words[0]||'').slice(0,20);
+  }
+  function handleShareTarget(){
+    const params=new URLSearchParams(window.location.search);
+    const title=params.get('share_title')||'';
+    const text=params.get('share_text')||'';
+    const url=params.get('share_url')||'';
+    if(!title && !text && !url) return false;
+    const combined=[title,text,url].filter(Boolean).join('\n');
+    // 清掉 URL 避免重整時又跳
+    try{ history.replaceState({}, document.title, window.location.pathname); }catch(_){}
+    const amount=extractAmount(combined);
+    const merchant=extractMerchant(combined)||title.slice(0,20);
+    const cat=guessCategory(combined);
+    // 等 app 初始化完成
+    setTimeout(()=>{
+      try{
+        if(typeof openQuickExpense!=='function'){
+          if(window.showToast) showToast('收到分享，但 app 還沒準備好','warn');
+          return;
+        }
+        // 預先設定來源欄位讓 openQuickExpense 撈得到
+        const hqN=document.getElementById('hqName'); if(hqN) hqN.value=merchant||'';
+        const hqA=document.getElementById('hqAmount'); if(hqA) hqA.value=amount?String(amount):'';
+        // 設定首頁類別 active 讓 qe 撈到正確 cat
+        document.querySelectorAll('#hqCats .hq-cat').forEach(el=>{
+          el.classList.toggle('active', el.dataset.val===cat);
+        });
+        openQuickExpense();
+        // 雙保險：直接設值
+        const qeN=document.getElementById('qe-name'); if(qeN && merchant) qeN.value=merchant;
+        const qeA=document.getElementById('qe-amount'); if(qeA && amount) qeA.value=amount;
+        // 切類別
+        if(typeof qeCat!=='undefined'){ window.qeCat=cat; }
+        document.querySelectorAll('#qeCatSelect .cat-opt').forEach(el=>{
+          el.classList.toggle('selected', el.dataset.val===cat);
+        });
+        // 備註欄帶上原始文字方便對帳
+        const memo=document.getElementById('qe-memo');
+        if(memo) memo.value='來自分享：'+(text||title||url).slice(0,120);
+        if(window.showToast){
+          if(amount) showToast('已解析金額 NT$'+amount.toLocaleString(),'ok');
+          else showToast('未抓到金額，請手動輸入','warn');
+        }
+      }catch(e){ console.error('share-target error',e); }
+    }, 400);
+    return true;
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', handleShareTarget);
+  else handleShareTarget();
+})();

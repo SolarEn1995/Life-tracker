@@ -9,6 +9,15 @@
   "background_color": "#FF8A65",
   "theme_color": "#FF8A65",
   "lang": "zh-TW",
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "params": {
+      "title": "share_title",
+      "text": "share_text",
+      "url": "share_url"
+    }
+  },
   "icons": [
     {
       "src": "icon-192.svg?v=42",
