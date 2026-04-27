@@ -174,6 +174,8 @@ function save(){
   if(typeof debts!=='undefined') localStorage.setItem('btDebts',JSON.stringify(debts));
   if(typeof invoiceSeen!=='undefined') localStorage.setItem('btInvoiceSeen',JSON.stringify(invoiceSeen));
   if(typeof lotteryNumbers!=='undefined') localStorage.setItem('btLotteryNumbers',JSON.stringify(lotteryNumbers));
+  // v50: 寫入後使頻率快取失效（products/records 可能改變）
+  if(typeof _bumpFreqCache==='function') _bumpFreqCache();
 }
 
 // ── Bug Fix 2: 時區安全的日期解析 + 使用 getNow() ──
@@ -321,9 +323,25 @@ function renderStats(now){
     el.textContent=`/ $${budget.toLocaleString()}`;
     el.className='hsc-budget '+(pct>=1?'over':pct>=0.7?'warn':'ok');
   };
+  // v50: 同步迷你進度條
+  const setBudgetBar=(barId,spent,budget)=>{
+    const el=document.getElementById(barId); if(!el) return;
+    if(!budget||budget<=0){ el.style.display='none'; return; }
+    el.style.display='block';
+    const pct=Math.min(100,(spent/budget)*100);
+    const fill=el.querySelector('span');
+    if(fill){
+      fill.style.width=pct+'%';
+      const lvl=spent/budget>=1?'over':(spent/budget>=0.7?'warn':'ok');
+      fill.className=lvl;
+    }
+  };
   setBudgetLabel('totalSpendBudget',varTotal,monthlyBudget);
   setBudgetLabel('homeLifeBudget',lifeTotal,lifeBudget);
   setBudgetLabel('totalFixedBudget',fixedTotal,(typeof fixedBudget!=='undefined'?fixedBudget:0));
+  setBudgetBar('totalSpendBar',varTotal,monthlyBudget);
+  setBudgetBar('homeLifeBar',lifeTotal,lifeBudget);
+  setBudgetBar('totalFixedBar',fixedTotal,(typeof fixedBudget!=='undefined'?fixedBudget:0));
   const alertBarEl=document.getElementById('alertBar');
   if(alertBarEl) alertBarEl.style.display=urgent>0?'block':'none';
   if(urgent>0){ const acb=document.getElementById('alertCountBadge'); if(acb) acb.textContent=urgent; }
@@ -893,17 +911,24 @@ function renderProducts(){
 function renderHomeRestockSummary(){
   const el=document.getElementById('homeRestockSummary'); if(!el) return;
   // 含 5–10 天比價建議：擴大到 ≤14 天，按 d 升冪取前 5
-  const list=products.map(p=>({p,d:getDaysLeft(p)})).filter(x=>x.d<=14).sort((a,b)=>a.d-b.d).slice(0,5);
+  const list=products.map(p=>({p,d:getDaysLeft(p),freq:_getRestockFrequency(p)})).filter(x=>x.d<=14).sort((a,b)=>a.d-b.d).slice(0,5);
   if(!list.length){ el.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;text-align:center;color:var(--text3);box-shadow:var(--shadow);font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:18px">🎉</span><span>目前沒有需補貨的商品</span></div>`; return; }
-  const rows=list.map(({p,d})=>{
+  const rows=list.map(({p,d,freq})=>{
     const color=d<=3?'var(--danger)':(d<=7?'var(--warn)':'var(--accent3)');
     const msg=d<=0?'已用完！':`(剩 ${d} 天)`;
     const compareTip=(d>=5&&d<=10)?`<span class="rb-tip">🛒 建議比價</span>`:'';
+    // v50: 補貨頻率（依購買歷史推算）
+    let freqTip='';
+    if(freq && freq.avgDays){
+      const overdue=freq.daysSinceLast>freq.avgDays;
+      freqTip=`<span class="rb-freq-tip${overdue?' urgent':''}">📊 平均 ${freq.avgDays} 天/次 · 距上次 ${freq.daysSinceLast} 天${overdue?' ⚠️':''}</span>`;
+    }
     return `<div class="rb-row" onclick="openCompareModal(${p.id})" style="border-left:4px solid ${color};margin-bottom:6px;box-shadow:var(--shadow)">
       <div class="rb-emoji" style="font-size:22px;width:30px">${p.emoji}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${p.name}</div>
         <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.brand}${compareTip}</div>
+        ${freqTip}
       </div>
       <div style="text-align:right;margin-right:4px">
         <div style="font-size:13px;font-weight:700;color:${color}">${msg}</div>
@@ -1225,6 +1250,37 @@ function deleteRecord(id){
     showToast('✓ 已復原','ok');
   });
 }
+// v50: 再記一次（複製到今天）
+function cloneRecord(id){
+  const orig=records.find(r=>String(r.id)===String(id));
+  if(!orig) return;
+  const today=todayStr();
+  const clone={
+    ...orig,
+    id:Date.now(),
+    date:today,
+    note:'',           // 不複製備註（避免「發票 XX 已經記過」的舊文）
+    invoice:'',        // 不複製發票字軌
+    items:[],          // 不複製細項
+    productIds:[],
+    _mergeMode:undefined,
+    _origTotal:undefined,
+    _travelBudget:false
+  };
+  // 信用卡的話重算 billingMonth
+  if(orig.pay==='card' && orig.cardId){
+    const card=creditCards.find(c=>c.id===orig.cardId);
+    if(card && typeof calcBillingMonth==='function') clone.billingMonth=calcBillingMonth(today,card);
+  }
+  records.push(clone);
+  save();renderRecords();renderChart();renderStats();
+  showUndoToast(`🔁 已再記一次「${orig.name}」 $${orig.price.toLocaleString()}`,()=>{
+    const i=records.findIndex(r=>r.id===clone.id);
+    if(i>=0) records.splice(i,1);
+    save();renderRecords();renderChart();renderStats();
+    showToast('✓ 已復原','ok');
+  });
+}
 function clearData(type){
   if(type==='records'){
     showConfirm('確定清除所有花費記錄？<br><span style="font-size:11px;color:var(--text2)">此操作無法復原</span>',()=>{
@@ -1431,6 +1487,48 @@ function _daysDiff(d1,d2){
   if(!d1||!d2) return 999;
   const t1=new Date(d1).getTime(), t2=new Date(d2).getTime();
   return Math.abs(Math.round((t1-t2)/86400000));
+}
+// v50: 補貨頻率推算（用 records 中的 productIds 與名字 fuzzy match）
+const _freqCache=new Map();
+let _freqCacheVer=0;
+function _bumpFreqCache(){ _freqCache.clear(); _freqCacheVer++; }
+function _getRestockFrequency(p){
+  if(!p) return null;
+  const cacheKey=p.id+'_'+_freqCacheVer;
+  if(_freqCache.has(cacheKey)) return _freqCache.get(cacheKey);
+  // 收集相關記錄：productIds 包含 p.id，或 name 相似度 >= 0.6
+  const dates=new Set();
+  for(const r of records){
+    if(!r.date) continue;
+    let hit=false;
+    if(Array.isArray(r.productIds) && r.productIds.includes(p.id)) hit=true;
+    else if(r.productId===p.id) hit=true;
+    else if(r.name && _similarity(r.name,p.name)>=0.6) hit=true;
+    if(hit) dates.add(r.date);
+  }
+  // 加入 boughtDate 作為錨點
+  if(p.boughtDate) dates.add(p.boughtDate);
+  const sorted=[...dates].sort();
+  if(sorted.length<2){
+    _freqCache.set(cacheKey,null);
+    return null;
+  }
+  // 計算相鄰兩次的平均日數（過濾雜訊：< 1 天的視為同一次購買）
+  const gaps=[];
+  for(let i=1;i<sorted.length;i++){
+    const g=_daysDiff(sorted[i],sorted[i-1]);
+    if(g>=1) gaps.push(g);
+  }
+  if(!gaps.length){
+    _freqCache.set(cacheKey,null);
+    return null;
+  }
+  const avgDays=Math.round(gaps.reduce((s,g)=>s+g,0)/gaps.length);
+  const lastDate=sorted[sorted.length-1];
+  const daysSinceLast=_daysDiff(lastDate,todayStr());
+  const result={avgDays,daysSinceLast,lastDate,sampleCount:sorted.length};
+  _freqCache.set(cacheKey,result);
+  return result;
 }
 // 偵測：發票品項 vs 補貨白名單 vs 已手動記錄
 function detectRestockMatches(parsed){
@@ -5462,7 +5560,7 @@ function renderRecords(){
         ?`<div onclick="event.stopPropagation();toggleRecordSelect('${r.id}')" style="flex:0 0 22px;width:22px;height:22px;border-radius:6px;border:2px solid ${checked?'var(--accent)':'var(--border2)'};background:${checked?'var(--accent)':'transparent'};color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:800;margin-right:8px">${checked?'✓':''}</div>`
         :'';
       const rowClick=(recordSelectMode&&selectable)?` onclick="toggleRecordSelect('${r.id}')" style="cursor:pointer"`:'';
-      const actionBtns=recordSelectMode?'':`${r.type==='life'?`<button onclick="editRecord('${r.id}')" style="flex:0;background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1" title="編輯">✏️</button>`:''}${(r.type!=='fixed'&&r.type!=='installment')?`<button onclick="deleteRecord('${r.id}')" style="flex:0;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1" title="刪除">✕</button>`:''}`;
+      const actionBtns=recordSelectMode?'':`${r.type==='life'?`<button onclick="editRecord('${r.id}')" style="flex:0;background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1" title="編輯">✏️</button>`:''}${(r.type==='var'||r.type==='life'||r.type==='easycard'||r.type==='voucher')?`<button onclick="event.stopPropagation();cloneRecord('${r.id}')" style="flex:0;background:none;border:none;color:var(--accent3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1" title="再記一次（複製到今天）">🔁</button>`:''}${(r.type!=='fixed'&&r.type!=='installment')?`<button onclick="deleteRecord('${r.id}')" style="flex:0;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1" title="刪除">✕</button>`:''}`;
 
       return `<div class="record-item" id="rec-${r.id}"${rowClick}>
         ${checkboxHtml}<div class="ri-emoji">${r.emoji}</div>
