@@ -1400,11 +1400,16 @@ function openAIChooser(){
 window._invScanState={stream:null,running:false,detector:null,pending:null,raf:0,leftRaw:null,rightRaw:null,startAt:0};
 
 // ── v48: 補貨白名單比對（Dice 雙字頻 + 軟性日期+金額查重）──
+// v49: bigram 快取 + 軟性重複偵測
+const _bigramCache=new Map();
 function _bigrams(s){
   s=String(s||'').toLowerCase().replace(/\s+/g,'');
+  if(_bigramCache.has(s)) return _bigramCache.get(s);
   const out=new Set();
   for(let i=0;i<s.length-1;i++) out.add(s.substr(i,2));
-  if(s.length===1) out.add(s); // 單字也納
+  if(s.length===1) out.add(s);
+  if(_bigramCache.size>2000) _bigramCache.clear(); // 防爆記憶體
+  _bigramCache.set(s,out);
   return out;
 }
 function _similarity(a,b){
@@ -1453,16 +1458,46 @@ function detectRestockMatches(parsed){
       newItems.push({idx:i,item:it,name,sub,qty});
     }
   });
-  return {matches,newItems};
+  // v49: 軟性整張重複（金額 ±5% + 日期 ±2 天，且非自己發票字軌）
+  const total=parsed.total||0;
+  const tolerance=Math.max(5, total*0.05);
+  const softDup=total>0?records.find(r=>{
+    if(parsed.invoice && r.invoice===parsed.invoice) return false;
+    if(_daysDiff(r.date, parsed.date)>2) return false;
+    return Math.abs((r.price||0)-total)<=tolerance;
+  }):null;
+  return {matches,newItems,softDup};
 }
 // 渲染三選一面板（A 智慧合併 / B 全部新增 / C 跳過）
 function renderRestockMatchPanel(parsed, det, opts){
-  const {matches,newItems}=det;
+  const {matches,newItems,softDup}=det;
   const dupCount=matches.filter(m=>m.alreadyRecorded).length;
   const dupSubs=matches.filter(m=>m.alreadyRecorded&&m.sub).reduce((s,m)=>s+m.sub,0);
   const restockNewCount=matches.filter(m=>!m.alreadyRecorded).length;
-  if(!matches.length) return ''; // 沒命中補貨 → 不顯示面板
+  // v49: 即使沒命中補貨，若軟性重複 → 仍要警示
+  if(!matches.length && !softDup) return '';
   const idPrefix=opts&&opts.idPrefix||'rsm';
+  const softDupBanner=softDup?`
+    <div style="background:rgba(232,72,138,0.1);border:1.5px solid rgba(232,72,138,0.4);border-radius:8px;padding:8px 11px;margin-bottom:10px;font-size:11px;line-height:1.55">
+      <div style="font-weight:800;color:#c33877;margin-bottom:3px">⚠️ 偵測到疑似重複記錄</div>
+      <div style="color:var(--text2)">${softDup.date} · ${softDup.name||'未命名'} · <span style="font-family:'DM Mono',monospace;color:var(--accent)">$${(softDup.price||0).toLocaleString()}</span>（金額相近 ±5%、日期 ±2 天）</div>
+    </div>`:'';
+  if(!matches.length){
+    // 只有軟性重複，沒命中補貨：顯示簡化警示 + B/C 二選一
+    return `
+      <div style="background:linear-gradient(135deg,rgba(255,234,167,0.45),rgba(255,224,138,0.18));border:1.5px solid rgba(212,160,72,0.35);border-radius:var(--r-sm);padding:12px 13px;margin-bottom:12px">
+        ${softDupBanner}
+        <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">📊 處理方式</div>
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--accent);border-radius:8px;margin-bottom:6px;cursor:pointer">
+          <input type="radio" name="${idPrefix}-mode" value="B" checked style="margin-top:2px;accent-color:var(--accent)"/>
+          <div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--accent)">B. 仍然新增（金額 $${parsed.total.toLocaleString()}）</div><div style="font-size:10px;color:var(--text2);margin-top:2px">確認不是重複，繼續記錄</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;cursor:pointer">
+          <input type="radio" name="${idPrefix}-mode" value="C" style="margin-top:2px;accent-color:var(--accent)"/>
+          <div style="flex:1"><div style="font-size:11px;font-weight:700">C. 跳過（不新增）</div><div style="font-size:10px;color:var(--text2);margin-top:2px">確認已記過，發票字軌寫入防重</div></div>
+        </label>
+      </div>`;
+  }
   const matchRows=matches.map(m=>{
     const sub=m.sub?` <span style="color:var(--accent);font-family:'DM Mono',monospace">$${m.sub.toLocaleString()}</span>`:'';
     const dupBadge=m.alreadyRecorded
@@ -1478,6 +1513,7 @@ function renderRestockMatchPanel(parsed, det, opts){
   const totalAfter=parsed.total-dupSubs;
   return `
     <div style="background:linear-gradient(135deg,rgba(255,234,167,0.45),rgba(255,224,138,0.18));border:1.5px solid rgba(212,160,72,0.35);border-radius:var(--r-sm);padding:12px 13px;margin-bottom:12px">
+      ${softDupBanner}
       <div style="font-size:12px;font-weight:800;color:#8A5A2B;margin-bottom:8px">
         🎯 偵測到 ${matches.length} 項補貨白名單命中${dupCount?`（其中 ${dupCount} 項可能已手動記過）`:''}
       </div>
@@ -1853,7 +1889,9 @@ function confirmInvoiceRecord(){
     items:(p.items||[]).map(it=>typeof it==='string'?{name:it}:{name:it.name,qty:it.qty||null,sub:it.sub||null}),
     // v48: 標記合併模式
     _mergeMode:mode,
-    _origTotal:p.total
+    _origTotal:p.total,
+    // v49: 標記命中的補貨品 ID（供日後統計補貨頻率）
+    productIds:(det&&det.matches.length)?det.matches.map(m=>m.product.id):[]
   };
   if(pay==='card' && creditCards.length){
     rec.cardId=creditCards[0].id;
@@ -2016,12 +2054,28 @@ async function importInvoiceCSV(ev){
         <div style="font-size:16px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace">$${news.reduce((s,r)=>s+r.total,0).toLocaleString()}</div>
       </div>
     </div>
-    ${news.length?`<div style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;margin-bottom:10px">
-      ${news.slice(0,12).map(r=>`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 6px;border-bottom:1px solid var(--border)">
-        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.date} · ${r.seller||r.invoice}${r.items&&r.items.length?` <span style="color:var(--accent3);font-weight:700">📋${r.items.length}</span>`:''}</span>
-        <span style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:600">$${r.total.toLocaleString()}</span>
-      </div>`).join('')}
-      ${news.length>12?`<div style="text-align:center;font-size:10px;color:var(--text3);padding:6px">... 還有 ${news.length-12} 筆</div>`:''}
+    ${news.length?`<div style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;margin-bottom:10px">
+      ${news.slice(0,30).map((r,idx)=>{
+        const det=r._detect;
+        const hasMatch=det && det.matches.length>0;
+        const hasSoftDup=det && det.softDup;
+        const flag=hasMatch?'🎯':(hasSoftDup?'⚠️':'');
+        const flagColor=hasMatch?'var(--accent)':(hasSoftDup?'#c33877':'var(--text2)');
+        const perDropdown=(hasMatch||hasSoftDup)?`
+          <select class="csv-row-mode" data-idx="${idx}" style="font-size:10px;padding:2px 4px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text);margin-left:4px">
+            <option value="">使用全域</option>
+            ${hasMatch?'<option value="A">A 智慧合併</option>':''}
+            <option value="B">B 全部新增</option>
+            <option value="C">C 跳過</option>
+          </select>`:'';
+        const detail=hasMatch?` <span style="color:var(--accent);font-size:10px">📦${det.matches.length}</span>${det.matches.filter(m=>m.alreadyRecorded).length?` <span style="color:#c33877;font-size:10px">已記${det.matches.filter(m=>m.alreadyRecorded).length}</span>`:''}`:(hasSoftDup?' <span style="color:#c33877;font-size:10px">疑重</span>':'');
+        return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:5px 6px;border-bottom:1px solid var(--border);gap:6px">
+          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${flagColor}">${flag} ${r.date} · ${r.seller||r.invoice}${r.items&&r.items.length?` <span style="color:var(--accent3);font-weight:700">📋${r.items.length}</span>`:''}${detail}</span>
+          ${perDropdown}
+          <span style="font-family:'DM Mono',monospace;color:var(--accent);font-weight:600">$${r.total.toLocaleString()}</span>
+        </div>`;
+      }).join('')}
+      ${news.length>30?`<div style="text-align:center;font-size:10px;color:var(--text3);padding:6px">... 還有 ${news.length-30} 筆（套用全域模式）</div>`:''}
     </div>`:'<div style="text-align:center;padding:14px;color:var(--text3);font-size:12px">沒有新發票可匯入</div>'}
     ${parseFailFiles?`<div style="font-size:10px;color:var(--danger);text-align:center;margin-bottom:8px">⚠️ ${parseFailFiles} 個檔案無法解析</div>`:''}
     ${rowsWithMatches?`
@@ -2077,12 +2131,19 @@ function confirmCSVImport(){
   const mode=modeRadio?modeRadio.value:'B';
   const restockChk=document.getElementById('csv-rsm-restock');
   const doRestock=restockChk?restockChk.checked:false;
+  // v49: 讀 per-row override
+  const perRowOverride={};
+  document.querySelectorAll('.csv-row-mode').forEach(sel=>{
+    const v=sel.value;
+    if(v) perRowOverride[sel.dataset.idx]=v;
+  });
   let imported=0, skipped=0, totalDeducted=0, totalRestocked=0;
   _csvPending.news.forEach((r,i)=>{
     const det=r._detect;
     const hasMatch=det && det.matches.length>0;
+    const rowMode=perRowOverride[i]||mode; // per-row 優先，否則用全域
     // 模式 C：命中補貨 → 跳過記錄但寫字軌
-    if(mode==='C' && hasMatch){
+    if(rowMode==='C' && hasMatch){
       if(!invoiceSeen) invoiceSeen={};
       invoiceSeen[r.invoice]={date:r.date,total:r.total,seller:r.sellerId||'',savedAt:new Date().toISOString(),skipped:true};
       if(doRestock) { _applyRestockBoughtDate(det,r.date); totalRestocked+=det.matches.length; }
@@ -2091,7 +2152,7 @@ function confirmCSVImport(){
     }
     // 計算金額（A 模式扣除已記過的小計）
     let recPrice=r.total, mergeNote='';
-    if(mode==='A' && hasMatch){
+    if(rowMode==='A' && hasMatch){
       const dupSubs=det.matches.filter(m=>m.alreadyRecorded&&m.sub).reduce((s,m)=>s+m.sub,0);
       if(dupSubs>0){
         recPrice=r.total-dupSubs;
@@ -2110,8 +2171,9 @@ function confirmCSVImport(){
       invoice:r.invoice,
       note:`CSV 匯入 · ${r.invoice}${r.sellerId?' · '+r.sellerId:''}${mergeNote}`,
       items:r.items||[],
-      _mergeMode:mode,
-      _origTotal:r.total
+      _mergeMode:rowMode,
+      _origTotal:r.total,
+      productIds:hasMatch?det.matches.map(m=>m.product.id):[]
     };
     if(pay==='card' && firstCard){
       rec.cardId=firstCard.id;
