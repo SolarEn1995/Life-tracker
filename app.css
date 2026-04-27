@@ -2217,3 +2217,99 @@ html[data-theme="dark"] .range-month-input{
     animation:none !important;
   }
 }
+
+/* ── v45 消費明細工具列 v2（搜尋+單日+排序合一） ── */
+.rec-toolbar-v2{ gap:8px; flex-wrap:wrap; }
+.rec-search-wrap{
+  flex:1; min-width:160px;
+  display:flex; align-items:center; gap:6px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:22px;
+  padding:6px 12px;
+  height:36px;
+  box-sizing:border-box;
+  transition:border-color .18s, box-shadow .18s;
+}
+.rec-search-wrap:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(255,123,84,.15);
+}
+.rec-search-icon{ font-size:14px; opacity:.7; flex-shrink:0; }
+.rec-search-input{
+  flex:1; min-width:0;
+  border:none; outline:none; background:transparent;
+  font-size:13px; color:var(--text);
+  font-family:inherit;
+}
+.rec-search-input::placeholder{ color:var(--text3); font-size:12px; }
+.rec-search-clear{
+  flex-shrink:0; border:none; background:rgba(255,123,84,.12);
+  color:var(--accent); width:22px; height:22px; border-radius:50%;
+  font-size:11px; cursor:pointer; line-height:1; padding:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:transform .15s;
+}
+.rec-search-clear:active{ transform:scale(.85); }
+.rec-day-chip, .rec-sort-chip{
+  position:relative; flex-shrink:0;
+  height:36px; padding:0 14px;
+  font-size:12px; font-weight:700;
+  display:inline-flex; align-items:center; gap:4px;
+  white-space:nowrap;
+}
+.rec-day-chip.has-value{
+  background:linear-gradient(135deg,#FFE6A8,#FFD89B);
+  color:#8A5A2B;
+  border-color:rgba(212,160,72,.55);
+}
+.rec-day-hidden-input{
+  position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+  border:none; padding:0; margin:0; font-size:0;
+}
+@media (max-width:380px){
+  .rec-search-input::placeholder{ font-size:11px; }
+  .rec-day-chip, .rec-sort-chip{ padding:0 10px; }
+}
+
+/* ── v45 心情卡頂部金額（合併可用餘額） ── */
+.cmc-amount-row{
+  position:absolute; top:14px; right:16px;
+  display:flex; align-items:center; gap:6px;
+  z-index:3;
+}
+.cmc-amount{
+  font-family:'DM Mono','Inter',monospace;
+  font-size:20px; font-weight:900;
+  letter-spacing:-.4px;
+  line-height:1;
+  color:var(--accent3);
+}
+.cmc-amount.warn{ color:var(--warn); }
+.cmc-amount.danger{ color:var(--danger); }
+.cmc-amount-label{
+  font-size:9px; font-weight:700;
+  color:var(--text3);
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  text-align:right;
+  line-height:1.1;
+}
+.cmc-amount-stack{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+.cmc-privacy-mini{
+  border:none; background:rgba(0,0,0,.05); cursor:pointer;
+  width:24px; height:24px; border-radius:50%;
+  font-size:11px; line-height:1; padding:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--text2); transition:background .15s;
+}
+.cmc-privacy-mini:hover{ background:rgba(0,0,0,.10); }
+html[data-theme="dark"] .cmc-privacy-mini{ background:rgba(255,255,255,.08); }
+html[data-theme="dark"] .cmc-privacy-mini:hover{ background:rgba(255,255,255,.14); }
+.cat-mood-card.has-amount .cmc-top{ padding-right:90px; }
+@media (max-width:340px){
+  .cmc-amount{ font-size:17px; }
+  .cat-mood-card.has-amount .cmc-top{ padding-right:78px; }
+}
+/* 餘額卡隱藏時，cashflow bar 上的 margin 補回去避免黏到 cat card */
+.free-card.fc-merged{ display:none !important; }

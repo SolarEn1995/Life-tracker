@@ -673,7 +673,12 @@ function renderCatMood(ctx){
   window._lastCmcCtx=ctx;
   const income=ctx.monthlyIncome||0;
   const spend=(ctx.varTotal||0)+(ctx.lifeTotal||0)+(ctx.fixedTotal||0);
-  if(income<=0){ card.style.display='none'; return; }
+  if(income<=0){
+    card.style.display='none';
+    // v45: 沒收入時恢復 free-card 顯示（占位邀請新增薪資）
+    const fc=document.getElementById('freeCard'); if(fc) fc.classList.remove('fc-merged');
+    return;
+  }
   card.style.display='block';
   const balance=income-spend;
   const rate=balance/income;
@@ -768,6 +773,38 @@ function renderCatMood(ctx){
   document.getElementById('cmcBarFill').style.width=pct+'%';
   const rateEl=document.getElementById('cmcRate');
   rateEl.textContent=(rate*100).toFixed(0)+'%';
+
+  // ── v45 將「本月可用餘額」整合進心情卡右上 ──
+  try{
+    const goal=(typeof getSavingGoalAmount==='function')?getSavingGoalAmount():0;
+    const free=balance-goal;
+    let amtRow=card.querySelector('.cmc-amount-row');
+    if(!amtRow){
+      amtRow=document.createElement('div');
+      amtRow.className='cmc-amount-row';
+      amtRow.innerHTML=`
+        <div class="cmc-amount-stack">
+          <span class="cmc-amount-label">本月可用</span>
+          <span class="cmc-amount privacy-mask" id="cmcAmount">$0</span>
+        </div>
+        <button class="cmc-privacy-mini" onclick="event.stopPropagation();togglePrivacy()" title="切換隱私">👁</button>
+      `;
+      card.appendChild(amtRow);
+    }
+    const amtEl=card.querySelector('#cmcAmount');
+    if(amtEl){
+      amtEl.textContent=`${free<0?'-$':'$'}${Math.abs(free).toLocaleString()}`;
+      amtEl.classList.remove('warn','danger');
+      const denom=Math.max(1,income-goal);
+      const fp=free/denom;
+      if(free<0) amtEl.classList.add('danger');
+      else if(fp<0.2) amtEl.classList.add('warn');
+    }
+    card.classList.add('has-amount');
+    // 隱藏舊的 free-card（資訊已合併進貓貓卡）
+    const fc=document.getElementById('freeCard');
+    if(fc) fc.classList.add('fc-merged');
+  }catch(e){ console.error('merge fc error',e); }
   rateEl.style.color=rate<0?'var(--danger)':rate<0.2?'var(--warn)':'var(--accent3)';
 }
 
@@ -4956,6 +4993,22 @@ function renderRecords(){
     allRecs=allRecs.filter(r=>r.date===recordDayFilter);
   }
 
+  // v45 搜尋（商家名 / 備註 / 標籤 / 類別 label）
+  if(recordSearchQuery){
+    const q=recordSearchQuery;
+    const catLabel=(id)=>{
+      const c=(typeof expCats!=='undefined'?expCats:[]).find(x=>x.id===id);
+      return c?(c.label||'').toLowerCase():'';
+    };
+    allRecs=allRecs.filter(r=>{
+      if((r.name||'').toLowerCase().includes(q)) return true;
+      if((r.memo||'').toLowerCase().includes(q)) return true;
+      if((r.tags||[]).some(t=>String(t).toLowerCase().includes(q))) return true;
+      if(catLabel(r.cat).includes(q)) return true;
+      return false;
+    });
+  }
+
   const typeTag={var:'',life:`<span class="record-tag" style="background:#fde9f2;color:#e8488a">生活</span>`,voucher:`<span class="record-tag" style="background:var(--accent-light);color:var(--accent)">即享券</span>`,easycard:`<span class="record-tag" style="background:#dbeafe;color:#0891b2">🚇 悠遊卡</span>`,fixed:`<span class="record-tag fix">固定</span>`,installment:`<span class="record-tag" style="background:#ede9fe;color:#7c3aed">分期</span>`};
   const recListEl=document.getElementById('recordList'); if(!recListEl) return;
 
@@ -4971,8 +5024,10 @@ function renderRecords(){
   }
 
   recListEl.innerHTML=!allRecs.length
-    ?(recordDayFilter
-        ?emptyState({cat:'sleeping',title:'這天沒有消費記錄',sub:'換個日期，或點「✕ 清除」回到原本的區間'})
+    ?(recordSearchQuery
+        ?emptyState({cat:'sleeping',title:`找不到「${recordSearchQuery}」`,sub:'試試其他關鍵字，或點搜尋框旁的 ✕ 清除'})
+        :recordDayFilter
+        ?emptyState({cat:'sleeping',title:'這天沒有消費記錄',sub:'換個日期，或再點一次「📅」chip 清除'})
         :emptyState({cat:'sleeping',title:'本月還沒有敗家紀錄',sub:'主子睡得很香，要不要記一筆喚醒牠？'})
       )
     :allRecs.map(r=>{
@@ -5076,9 +5131,9 @@ function applyCustomRange(){
 /* ── 金額 / 日期排序切換 ── */
 function cycleRecordSort(){
   const MODES=[
-    {key:'date',    label:'📅 日期'},
-    {key:'amount_desc', label:'💰 金額↓'},
-    {key:'amount_asc',  label:'💰 金額↑'},
+    {key:'date',    label:'⇅ 日期↓'},
+    {key:'amount_desc', label:'⇅ 金額↓'},
+    {key:'amount_asc',  label:'⇅ 金額↑'},
   ];
   const cur=MODES.findIndex(m=>m.key===recordSortBy);
   const next=MODES[(cur+1)%MODES.length];
@@ -5091,8 +5146,7 @@ function cycleRecordSort(){
 /* ── 單日篩選 ── */
 function setRecordDayFilter(date){
   recordDayFilter=date||null;
-  const clearBtn=document.getElementById('recordDayClearBtn');
-  if(clearBtn) clearBtn.style.display=recordDayFilter?'inline-block':'none';
+  updateRecordDayChip();
   recordsVisible=RECORDS_PAGE_SIZE;
   renderRecords();
 }
@@ -5100,8 +5154,54 @@ function clearRecordDayFilter(){
   recordDayFilter=null;
   const input=document.getElementById('recordDayFilterInput');
   if(input) input.value='';
-  const clearBtn=document.getElementById('recordDayClearBtn');
-  if(clearBtn) clearBtn.style.display='none';
+  updateRecordDayChip();
+  recordsVisible=RECORDS_PAGE_SIZE;
+  renderRecords();
+}
+function updateRecordDayChip(){
+  const chip=document.getElementById('recordDayChip');
+  const lbl=document.getElementById('recordDayChipLabel');
+  if(!chip||!lbl) return;
+  if(recordDayFilter){
+    const d=new Date(recordDayFilter);
+    const txt=`📅 ${d.getMonth()+1}/${d.getDate()} ✕`;
+    lbl.textContent=txt;
+    chip.classList.add('has-value');
+    // 點擊改為清除
+    chip.onclick=function(e){
+      // 只有點擊 chip 本身（含 label）才清除；點到 input 由 onchange 處理
+      if(e.target.tagName!=='INPUT'){ e.preventDefault(); clearRecordDayFilter(); }
+    };
+  } else {
+    lbl.textContent='📅 日期';
+    chip.classList.remove('has-value');
+    chip.onclick=null; // 預設由 input click 處理
+  }
+}
+function toggleRecordDayPicker(){
+  // 觸發隱藏 date input 的原生 picker（讓使用者直接選日期）
+  const input=document.getElementById('recordDayFilterInput');
+  if(!input) return;
+  if(recordDayFilter){ clearRecordDayFilter(); return; }
+  if(input.showPicker) try{ input.showPicker(); }catch(_){ input.click(); }
+  else input.click();
+}
+
+/* ── v45 搜尋（記錄名稱 / 備註 / 標籤 / 類別 label） ── */
+let recordSearchQuery='';
+function setRecordSearch(q){
+  recordSearchQuery=(q||'').trim().toLowerCase();
+  const clr=document.getElementById('recordSearchClear');
+  if(clr) clr.style.display=recordSearchQuery?'inline-flex':'none';
+  recordsVisible=RECORDS_PAGE_SIZE;
+  renderRecords();
+}
+function clearRecordSearch(){
+  recordSearchQuery='';
+  const inp=document.getElementById('recordSearchInput');
+  if(inp) inp.value='';
+  const clr=document.getElementById('recordSearchClear');
+  if(clr) clr.style.display='none';
   recordsVisible=RECORDS_PAGE_SIZE;
   renderRecords();
 }
